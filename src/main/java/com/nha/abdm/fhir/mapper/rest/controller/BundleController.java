@@ -178,4 +178,25 @@ public class BundleController {
         .contentType(MediaType.APPLICATION_JSON)
         .body(ctx.newJsonParser().encodeResourceToString(bundleResponse.getBundle()));
   }
+    /**
+     * @param invoiceBundleRequest which has all the invoice details
+     *                             like charge items, total amount, tax, etc.
+     * @return FHIR bundle if no error found
+     * @throws ParseException while parsing the string into date
+     */
+    @PostMapping("/invoice")
+    public ResponseEntity<Object> createInvoiceBundle(
+            @Valid @RequestBody InvoiceBundleRequest invoiceBundleRequest) {
+
+        BundleResponse bundleResponse =
+                wellnessRecordConverter.getWellnessBundle(wellnessRecordRequest);
+
+        if (Objects.nonNull(bundleResponse.getError()))
+            return ResponseEntity.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(FacadeError.builder().error(bundleResponse.getError()).build());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(ctx.newJsonParser().encodeResourceToString(bundleResponse.getBundle()));
+    }
 }
