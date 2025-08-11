@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  fhir-mapper:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fhir-mapper
+    ports:
+      - '8085:8085'
+    networks:
+      - docker_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  docker_network:
+    driver: bridge

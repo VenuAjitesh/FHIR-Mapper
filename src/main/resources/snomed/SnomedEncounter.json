@@ -1,0 +1,222 @@
+[
+  {
+    "code": "AMB",
+    "display": "Ambulatory"
+  },
+  {
+    "code": "171238007",
+    "display": "Arthritis screening"
+  },
+  {
+    "code": "171242005",
+    "display": "Chromosome abnormality screening"
+  },
+  {
+    "code": "171183004",
+    "display": "Diabetes mellitus screening"
+  },
+  {
+    "code": "391277002",
+    "display": "Digestive system disease screening"
+  },
+  {
+    "code": "171219003",
+    "display": "Ear disorder screening"
+  },
+  {
+    "code": "473200002",
+    "display": "Genetic screening for disorder"
+  },
+  {
+    "code": "171233003",
+    "display": "Genitourinary disease screening"
+  },
+  {
+    "code": "243790003",
+    "display": "Infection screening"
+  },
+  {
+    "code": "60151004",
+    "display": "Neonatal screening"
+  },
+  {
+    "code": "171214008",
+    "display": "Neurological screening"
+  },
+  {
+    "code": "171228002",
+    "display": "Respiratory disease screening"
+  },
+  {
+    "code": "300007000",
+    "display": "Screening for cardiovascular system disease"
+  },
+  {
+    "code": "866150003",
+    "display": "Screening for developmental disorder"
+  },
+  {
+    "code": "300005008",
+    "display": "Screening for mental disorders"
+  },
+  {
+    "code": "15886004",
+    "display": "Screening for cancer"
+  },
+  {
+    "code": "370854007",
+    "display": "Screening for substance abuse"
+  },
+  {
+    "code": "171237002",
+    "display": "Skin disease screening"
+  },
+  {
+    "code": "408760009",
+    "display": "Vision screening"
+  },
+  {
+    "code": "274412005",
+    "display": "Eye disorder screening"
+  },
+  {
+    "code": "171126009",
+    "display": "Tuberculosis screening"
+  },
+  {
+    "code": "171121004",
+    "display": "HIV screening"
+  },
+  {
+    "code": "243787009",
+    "display": "Antenatal screening"
+  },
+  {
+    "code": "103735009",
+    "display": "Palliative care"
+  },
+  {
+    "code": "112802009",
+    "display": "Cardiovascular surgical procedure"
+  },
+  {
+    "code": "71025006",
+    "display": "Dilation procedure"
+  },
+  {
+    "code": "122459003",
+    "display": "Dissection procedure"
+  },
+  {
+    "code": "34896006",
+    "display": "Incision"
+  },
+  {
+    "code": "287391004",
+    "display": "Nose, mouth or pharynx operations"
+  },
+  {
+    "code": "386638009",
+    "display": "Obstetric operation"
+  },
+  {
+    "code": "112697007",
+    "display": "Operation on musculoskeletal system"
+  },
+  {
+    "code": "16545005",
+    "display": "Operation on nervous system"
+  },
+  {
+    "code": "387661001",
+    "display": "Operation on respiratory tract"
+  },
+  {
+    "code": "74943008",
+    "display": "Operation on trunk"
+  },
+  {
+    "code": "107907001",
+    "display": "Operative procedure on digestive system"
+  },
+  {
+    "code": "89901005",
+    "display": "Operative procedure on head"
+  },
+  {
+    "code": "107994000",
+    "display": "Operative procedure on hematopoietic system"
+  },
+  {
+    "code": "107876005",
+    "display": "Operative procedure on integumentary system"
+  },
+  {
+    "code": "392236004",
+    "display": "Operative procedure on spinal structure"
+  },
+  {
+    "code": "410771003",
+    "display": "Surgical procedure for clinical finding and/or disorder"
+  },
+  {
+    "code": "313071005",
+    "display": "Substance abuse counselling"
+  },
+  {
+    "code": "79841006",
+    "display": "Genetic counseling"
+  },
+  {
+    "code": "171022008",
+    "display": "Psychological counseling"
+  },
+  {
+    "code": "24165007",
+    "display": "Alcoholism counselling"
+  },
+  {
+    "code": "228557008",
+    "display": "Cognitive and behavioral therapy"
+  },
+  {
+    "code": "75516001",
+    "display": "Psychotherapy"
+  },
+  {
+    "code": "266739000",
+    "display": "Physiotherapy/remedial therapy"
+  },
+  {
+    "code": "5154007",
+    "display": "Speech therapy"
+  },
+  {
+    "code": "773412008",
+    "display": "Traditional medicine"
+  },
+  {
+    "code": "385804009",
+    "display": "Diabetic care"
+  },
+  {
+    "code": "367336001",
+    "display": "Chemotherapy"
+  },
+  {
+    "code": "18629005",
+    "display": "Administration of medication"
+  },
+  {
+    "code": "86273004",
+    "display": "Biopsy"
+  },
+  {
+    "code": "23835007",
+    "display": "Electroconvulsive therapy"
+  },
+  {
+    "code": "397619005",
+    "display": "Family planning education"
+  }
+]

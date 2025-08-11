@@ -1,0 +1,2638 @@
+[
+  {
+    "code": "781087000",
+    "display": "Medical care"
+  },
+  {
+    "code": "133898004",
+    "display": "Preoperative care"
+  },
+  {
+    "code": "11429006",
+    "display": "Consultation"
+  },
+  {
+    "code": "363680008",
+    "display": "Radiographic imaging procedure"
+  },
+  {
+    "code": "53115007",
+    "display": "Diagnostic dental procedure"
+  },
+  {
+    "code": "32150000",
+    "display": "Periodontic procedure"
+  },
+  {
+    "code": "55670007",
+    "display": "Endodontic procedure"
+  },
+  {
+    "code": "281171009",
+    "display": "Maxillofacial technical (device) procedure"
+  },
+  {
+    "code": "79076007",
+    "display": "Prosthetic readjustment"
+  },
+  {
+    "code": "110461004",
+    "display": "Adjunctive care"
+  },
+  {
+    "code": "225362009",
+    "display": "Dental care"
+  },
+  {
+    "code": "103697008",
+    "display": "Patient referral for dental care"
+  },
+  {
+    "code": "384762007",
+    "display": "Transportation procedure"
+  },
+  {
+    "code": "52637005",
+    "display": "Test tube ovum fertilization"
+  },
+  {
+    "code": "113091000",
+    "display": "Magnetic resonance imaging"
+  },
+  {
+    "code": "53958007",
+    "display": "Harvesting of donor material"
+  },
+  {
+    "code": "271298009",
+    "display": "Organ retrieval operation"
+  },
+  {
+    "code": "265764009",
+    "display": "Renal dialysis"
+  },
+  {
+    "code": "717278002",
+    "display": "Burn care management"
+  },
+  {
+    "code": "50849002",
+    "display": "Emergency room admission"
+  },
+  {
+    "code": "310054005",
+    "display": "Infectious diseases service"
+  },
+  {
+    "code": "240917005",
+    "display": "Interventional radiology"
+  },
+  {
+    "code": "64915003",
+    "display": "Cardiac surgery procedure"
+  },
+  {
+    "code": "305367005",
+    "display": "Admission to gastroenterology department"
+  },
+  {
+    "code": "310056007",
+    "display": "Nephrology service"
+  },
+  {
+    "code": "310057003",
+    "display": "Neurology service"
+  },
+  {
+    "code": "310036006",
+    "display": "Cardiology service"
+  },
+  {
+    "code": "305366001",
+    "display": "Admission to endocrinology department"
+  },
+  {
+    "code": "700415000",
+    "display": "Pediatric surgery care management"
+  },
+  {
+    "code": "305434007",
+    "display": "Admission to urology department"
+  },
+  {
+    "code": "830077005",
+    "display": "Admission to neonatal intensive care unit"
+  },
+  {
+    "code": "310039004",
+    "display": "Pulmonary medicine service"
+  },
+  {
+    "code": "108290001",
+    "display": "Radiation oncology AND/OR radiotherapy"
+  },
+  {
+    "code": "399097000",
+    "display": "Administration of anesthesia"
+  },
+  {
+    "code": "224886008",
+    "display": "Treatment room (environment)"
+  },
+  {
+    "code": "9632001",
+    "display": "Nursing procedure (procedure)"
+  },
+  {
+    "code": "13288007",
+    "display": "Monitor, device (physical object)"
+  },
+  {
+    "code": "309904001",
+    "display": "Intensive care unit (environment)"
+  },
+  {
+    "code": "182998008",
+    "display": "Intensive nursing care (regime/therapy)"
+  },
+  {
+    "code": "272181003",
+    "display": "Clinical equipment and/or device (physical object)"
+  },
+  {
+    "code": "225738002",
+    "display": "Operating room (environment)"
+  },
+  {
+    "code": "63653004",
+    "display": "Biomedical device (physical object)"
+  },
+  {
+    "code": "3895009",
+    "display": "Application of dressing (procedure)"
+  },
+  {
+    "code": "289122001",
+    "display": "Cosmetic material (substance)"
+  },
+  {
+    "code": "16349000",
+    "display": "Orthopedic device (physical object)"
+  },
+  {
+    "code": "6919005",
+    "display": "Protective clothing material, device (physical object)"
+  },
+  {
+    "code": "430033006",
+    "display": "Infusion pump (physical object)"
+  },
+  {
+    "code": "11429006",
+    "display": "Consultation (procedure)"
+  },
+  {
+    "code": "387713003",
+    "display": "Surgical procedure (procedure)"
+  },
+  {
+    "code": "398228004",
+    "display": "Anesthesia consultation (procedure)"
+  },
+  {
+    "code": "878786001",
+    "display": "Operating room technician (occupation)"
+  },
+  {
+    "code": "91251008",
+    "display": "Physical therapy procedure (regime/therapy)"
+  },
+  {
+    "code": "71388002",
+    "display": "Procedure (procedure)"
+  },
+  {
+    "code": "367336001",
+    "display": "Chemotherapy (procedure)"
+  },
+  {
+    "code": "278414003",
+    "display": "Pain management (procedure)"
+  },
+  {
+    "code": "127801007",
+    "display": "Body fluid analysis (procedure)"
+  },
+  {
+    "code": "276341003",
+    "display": "Cardiovascular investigation (procedure)"
+  },
+  {
+    "code": "252275004",
+    "display": "Hematology test (procedure)"
+  },
+  {
+    "code": "19851009",
+    "display": "Microbiology procedure (procedure)"
+  },
+  {
+    "code": "118678004",
+    "display": "Procedure on nervous system (procedure)"
+  },
+  {
+    "code": "371572003",
+    "display": "Nuclear medicine procedure (procedure)"
+  },
+  {
+    "code": "15220000",
+    "display": "Laboratory test (procedure)"
+  },
+  {
+    "code": "363679005",
+    "display": "Imaging (procedure)"
+  },
+  {
+    "code": "396550006",
+    "display": "Blood test (procedure)"
+  },
+  {
+    "code": "43782000",
+    "display": "Organ or system related test (procedure)"
+  },
+  {
+    "code": "252416005",
+    "display": "Histopathology test (procedure)"
+  },
+  {
+    "code": "415564008",
+    "display": "Specimen sent to reference laboratory for testing (situation)"
+  },
+  {
+    "code": "715544005",
+    "display": "Transportation by ambulance with assistance of one person (procedure)"
+  },
+  {
+    "code": "305056002",
+    "display": "Admission procedure (procedure)"
+  },
+  {
+    "code": "184047000",
+    "display": "Patient registration (procedure)"
+  },
+  {
+    "code": "107727007",
+    "display": "Chart related administrative procedure (procedure)"
+  },
+  {
+    "code": "14734007",
+    "display": "Administrative procedure (procedure)"
+  },
+  {
+    "code": "312635000",
+    "display": "Provision of telephone (procedure)"
+  },
+  {
+    "code": "303607000",
+    "display": "Biomedical equipment (physical object)"
+  },
+  {
+    "code": "225737007",
+    "display": "Mortuary (environment)"
+  },
+  {
+    "code": "33022008",
+    "display": "Hospital-based outpatient department (environment)"
+  },
+  {
+    "code": "171324002",
+    "display": "New patient screening (procedure)"
+  },
+  {
+    "code": "112802009",
+    "display": "Cardiovascular operative procedure (procedure)"
+  },
+  {
+    "code": "118672003",
+    "display": "Procedure on cardiovascular system (procedure)"
+  },
+  {
+    "code": "118797008",
+    "display": "Procedure on heart (procedure)"
+  },
+  {
+    "code": "81733005",
+    "display": "Dental surgical procedure (procedure)"
+  },
+  {
+    "code": "118683007",
+    "display": "Procedure on ear and related structures (procedure)"
+  },
+  {
+    "code": "118673008",
+    "display": "Procedure on digestive system (procedure)"
+  },
+  {
+    "code": "118675001",
+    "display": "Procedure on female genital system (procedure)"
+  },
+  {
+    "code": "118677009",
+    "display": "Procedure on urinary system (procedure)"
+  },
+  {
+    "code": "89901005",
+    "display": "Operative procedure on head (procedure)"
+  },
+  {
+    "code": "118897002",
+    "display": "Procedure on eye proper (procedure)"
+  },
+  {
+    "code": "118666003",
+    "display": "Procedure on musculoskeletal system (procedure)"
+  },
+  {
+    "code": "225746001",
+    "display": "Ward (environment)"
+  },
+  {
+    "code": "705333009",
+    "display": "Toileting assistive device (physical object)"
+  },
+  {
+    "code": "105789008",
+    "display": "Cannula/tube/catheter, device (physical object)"
+  },
+  {
+    "code": "108290001",
+    "display": "Radiation oncology AND/OR radiotherapy (procedure)"
+  },
+  {
+    "code": "23745001",
+    "display": "Documentation procedure (procedure)"
+  },
+  {
+    "code": "468046005",
+    "display": "Cardiac catheterization laboratory computer (physical object)"
+  },
+  {
+    "code": "118781003",
+    "display": "Procedure on nose (procedure)"
+  },
+  {
+    "code": "118670006",
+    "display": "Procedure on upper respiratory tract (procedure)"
+  },
+  {
+    "code": "763158003",
+    "display": "Medicinal product (product)"
+  },
+  {
+    "code": "310000008",
+    "display": "Accident and Emergency service (qualifier value)"
+  },
+  {
+    "code": "737481003",
+    "display": "Inpatient care management (procedure)"
+  },
+  {
+    "code": "11429006",
+    "display": "Consultation (procedure)"
+  },
+  {
+    "code": "737850002",
+    "display": "Day care case management (procedure)"
+  },
+  {
+    "code": "410345004",
+    "display": "Medical/dental care case management (procedure)"
+  },
+  {
+    "code": "387713003",
+    "display": "Surgical procedure (procedure)"
+  },
+  {
+    "code": "73957001",
+    "display": "Air transport ambulance, device (physical object)"
+  },
+  {
+    "code": "465341007",
+    "display": "Automobile ambulance (physical object)"
+  },
+  {
+    "code": "568291000005106",
+    "display": "Hospital unit (environment)"
+  },
+  {
+    "code": "272181003",
+    "display": "Clinical equipment and/or device (physical object)"
+  },
+  {
+    "code": "77343006",
+    "display": "Angiography (procedure)"
+  },
+  {
+    "code": "439533007",
+    "display": "Endoscopic balloon dilatation of ostium of paranasal sinus (procedure)"
+  },
+  {
+    "code": "711364006",
+    "display": "Surgery using robotic assistance (procedure)"
+  },
+  {
+    "code": "266719004",
+    "display": "Oral chemotherapy (procedure)"
+  },
+  {
+    "code": "713348007",
+    "display": "Thermoplasty of bronchus (procedure)"
+  },
+  {
+    "code": "1269349006",
+    "display": "Transplantation of stem cell (procedure)"
+  },
+  {
+    "code": "76334006",
+    "display": "Immunotherapy (procedure)"
+  },
+  {
+    "code": "763158003",
+    "display": "Medicinal product (product)"
+  },
+  {
+    "code": "75516001",
+    "display": "Psychotherapy (regime/therapy)"
+  },
+  {
+    "code": "91251008",
+    "display": "Physical therapy procedure (regime/therapy)"
+  },
+  {
+    "code": "15220000",
+    "display": "Laboratory test (procedure)"
+  },
+  {
+    "code": "51032003",
+    "display": "Hospital admission, donor for transplant organ (procedure)"
+  },
+  {
+    "code": "9632001",
+    "display": "Nursing procedure (procedure)"
+  },
+  {
+    "code": "5880005",
+    "display": "Physical examination procedure (procedure)"
+  },
+  {
+    "code": "29303009",
+    "display": "Electrocardiographic procedure (procedure)"
+  },
+  {
+    "code": "16310003",
+    "display": "Ultrasonography (procedure)"
+  },
+  {
+    "code": "49083007",
+    "display": "Administration of vaccine product containing virus antigen (procedure)"
+  },
+  {
+    "code": "108241001",
+    "display": "Dialysis procedure (procedure)"
+  },
+  {
+    "code": "367336001",
+    "display": "Chemotherapy (procedure)"
+  },
+  {
+    "code": "713603004",
+    "display": "Advance care planning (procedure)"
+  },
+  {
+    "code": "710967003",
+    "display": "Management of health status after discharge from hospital (procedure)"
+  },
+  {
+    "code": "49122002",
+    "display": "Ambulance, device (physical object)"
+  },
+  {
+    "code": "275926002",
+    "display": "Screening - health check (procedure)"
+  },
+  {
+    "code": "33879002",
+    "display": "Administration of vaccine to produce active immunity (procedure)"
+  },
+  {
+    "code": "60689008",
+    "display": "Home care of patient (regime/therapy)"
+  },
+  {
+    "code": "410225009",
+    "display": "Mental health care management (procedure)"
+  },
+  {
+    "code": "410083007",
+    "display": "Rehabilitation therapy management (procedure)"
+  },
+  {
+    "code": "737492002",
+    "display": "Outpatient care management (procedure)"
+  },
+  {
+    "code": "385907003",
+    "display": "Eye care management (procedure)"
+  },
+  {
+    "code": "409972000",
+    "display": "Pre-hospital care (situation)"
+  },
+  {
+    "code": "1259939000",
+    "display": "Ayurveda medicine (qualifier value)"
+  },
+  {
+    "code": "1259938008",
+    "display": "Homeopathic medicine (qualifier value)"
+  },
+  {
+    "code": "1259940003",
+    "display": "Yoga medicine (qualifier value)"
+  },
+  {
+    "code": "1259218001",
+    "display": "Unani medicine (qualifier value)"
+  },
+  {
+    "code": "1259219009",
+    "display": "Siddha medicine (qualifier value)"
+  },
+  {
+    "code": "416113008",
+    "display": "Febrile disorder"
+  },
+  {
+    "code": "91302008",
+    "display": "Sepsis"
+  },
+  {
+    "code": "76571007",
+    "display": "Septic shock"
+  },
+  {
+    "code": "61462000",
+    "display": "Malaria"
+  },
+  {
+    "code": "38362002",
+    "display": "Dengue"
+  },
+  {
+    "code": "20927009",
+    "display": "Dengue hemorrhagic fever"
+  },
+  {
+    "code": "409671005",
+    "display": "Dengue shock syndrome"
+  },
+  {
+    "code": "111864006",
+    "display": "Chikungunya fever"
+  },
+  {
+    "code": "4834000",
+    "display": "Typhoid fever"
+  },
+  {
+    "code": "81000119104",
+    "display": "Symptomatic human immunodeficiency virus infection"
+  },
+  {
+    "code": "77377001",
+    "display": "Leptospirosis"
+  },
+  {
+    "code": "236071009",
+    "display": "Chronic diarrhea"
+  },
+  {
+    "code": "409966000",
+    "display": "Acute diarrhea"
+  },
+  {
+    "code": "46799006",
+    "display": "Dysenteric diarrhea"
+  },
+  {
+    "code": "57412004",
+    "display": "Acute viral hepatitis"
+  },
+  {
+    "code": "76783007",
+    "display": "Chronic hepatitis"
+  },
+  {
+    "code": "27916005",
+    "display": "Abscess of liver"
+  },
+  {
+    "code": "186803007",
+    "display": "Visceral leishmaniasis"
+  },
+  {
+    "code": "233604007",
+    "display": "Pneumonia"
+  },
+  {
+    "code": "312682007",
+    "display": "Empyema"
+  },
+  {
+    "code": "67256000",
+    "display": "Tuberculosis of pericardium"
+  },
+  {
+    "code": "186182003",
+    "display": "Tuberculosis of pleura"
+  },
+  {
+    "code": "68566005",
+    "display": "Urinary tract infectious disease"
+  },
+  {
+    "code": "34476008",
+    "display": "Viral encephalitis"
+  },
+  {
+    "code": "48245008",
+    "display": "Bacterial arthritis"
+  },
+  {
+    "code": "19824006",
+    "display": "Infection of skin and/or subcutaneous tissue"
+  },
+  {
+    "code": "7520000",
+    "display": "Pyrexia of unknown origin"
+  },
+  {
+    "code": "12295008",
+    "display": "Bronchiectasis"
+  },
+  {
+    "code": "10509002",
+    "display": "Acute bronchitis"
+  },
+  {
+    "code": "195951007",
+    "display": "Acute exacerbation of chronic obstructive airways disease"
+  },
+  {
+    "code": "233703007",
+    "display": "Interstitial lung disease"
+  },
+  {
+    "code": "301183007",
+    "display": "Bacterial endocarditis"
+  },
+  {
+    "code": "86348002",
+    "display": "Mycotic endocarditis"
+  },
+  {
+    "code": "31996006",
+    "display": "Vasculitis"
+  },
+  {
+    "code": "197456007",
+    "display": "Acute pancreatitis"
+  },
+  {
+    "code": "235494005",
+    "display": "Chronic pancreatitis"
+  },
+  {
+    "code": "389026000",
+    "display": "Ascites"
+  },
+  {
+    "code": "47000000",
+    "display": "Acute transverse myelitis"
+  },
+  {
+    "code": "49436004",
+    "display": "Atrial fibrillation"
+  },
+  {
+    "code": "35304003",
+    "display": "Cardiac tamponade"
+  },
+  {
+    "code": "42343007",
+    "display": "Congestive heart failure"
+  },
+  {
+    "code": "708038006",
+    "display": "Acute exacerbation of asthma"
+  },
+  {
+    "code": "733858005",
+    "display": "Acute severe refractory exacerbation of asthma"
+  },
+  {
+    "code": "233765002",
+    "display": "Respiratory failure without hypercapnia"
+  },
+  {
+    "code": "709109004",
+    "display": "Hypercapnic respiratory failure"
+  },
+  {
+    "code": "409622000",
+    "display": "Respiratory failure"
+  },
+  {
+    "code": "363732003",
+    "display": "Addison's disease"
+  },
+  {
+    "code": "7093002",
+    "display": "Renal colic"
+  },
+  {
+    "code": "42399005",
+    "display": "Renal failure syndrome"
+  },
+  {
+    "code": "128613002",
+    "display": "Seizure disorder"
+  },
+  {
+    "code": "230456007",
+    "display": "Status epilepticus"
+  },
+  {
+    "code": "230690007",
+    "display": "Cerebrovascular accident"
+  },
+  {
+    "code": "192759008",
+    "display": "Cerebral venous sinus thrombosis"
+  },
+  {
+    "code": "422504002",
+    "display": "Ischemic stroke"
+  },
+  {
+    "code": "274100004",
+    "display": "Cerebral hemorrhage"
+  },
+  {
+    "code": "24700007",
+    "display": "Multiple sclerosis"
+  },
+  {
+    "code": "74772000",
+    "display": "Meningomyelitis"
+  },
+  {
+    "code": "25044007",
+    "display": "Neuromyelitis optica"
+  },
+  {
+    "code": "16631009",
+    "display": "Transverse myelopathy syndrome"
+  },
+  {
+    "code": "230745008",
+    "display": "Hydrocephalus"
+  },
+  {
+    "code": "21263006",
+    "display": "Myxedema coma"
+  },
+  {
+    "code": "29028009",
+    "display": "Thyrotoxic crisis"
+  },
+  {
+    "code": "90560007",
+    "display": "Inflammatory disorder due to increased blood urate level"
+  },
+  {
+    "code": "36118008",
+    "display": "Pneumothorax"
+  },
+  {
+    "code": "257277002",
+    "display": "Combined disorder of muscle AND peripheral nerve"
+  },
+  {
+    "code": "302866003",
+    "display": "Hypoglycemia"
+  },
+  {
+    "code": "280137006",
+    "display": "Diabetic foot"
+  },
+  {
+    "code": "420422005",
+    "display": "Ketoacidosis due to diabetes mellitus"
+  },
+  {
+    "code": "66931009",
+    "display": "Hypercalcemia"
+  },
+  {
+    "code": "5291005",
+    "display": "Hypocalcemia"
+  },
+  {
+    "code": "89627008",
+    "display": "Hyponatremia"
+  },
+  {
+    "code": "771115008",
+    "display": "Hypernatremia"
+  },
+  {
+    "code": "421966007",
+    "display": "Non-ketotic non-hyperosmolar coma due to diabetes mellitus"
+  },
+  {
+    "code": "78975002",
+    "display": "Malignant essential hypertension"
+  },
+  {
+    "code": "132721000119104",
+    "display": "Hypertensive emergency"
+  },
+  {
+    "code": "127040003",
+    "display": "Sickle cell-hemoglobin SS disease"
+  },
+  {
+    "code": "39579001",
+    "display": "Anaphylaxis"
+  },
+  {
+    "code": "52072009",
+    "display": "Heat stroke"
+  },
+  {
+    "code": "55464009",
+    "display": "Systemic lupus erythematosus"
+  },
+  {
+    "code": "40956001",
+    "display": "Guillain-Barré syndrome"
+  },
+  {
+    "code": "61288004",
+    "display": "Poisoning caused by venomous snake"
+  },
+  {
+    "code": "8260003",
+    "display": "Organophosphate poisoning"
+  },
+  {
+    "code": "75478009",
+    "display": "Poisoning"
+  },
+  {
+    "code": "302497006",
+    "display": "Hemodialysis"
+  },
+  {
+    "code": "71192002",
+    "display": "Peritoneal dialysis"
+  },
+  {
+    "code": "20720000",
+    "display": "Plasmapheresis"
+  },
+  {
+    "code": "33389009",
+    "display": "Transfusion of whole blood"
+  },
+  {
+    "code": "54790000",
+    "display": "Transfusion of blood component"
+  },
+  {
+    "code": "363679005",
+    "display": "Imaging"
+  },
+  {
+    "code": "252416005",
+    "display": "Histopathology test"
+  },
+  {
+    "code": "86273004",
+    "display": "Biopsy"
+  },
+  {
+    "code": "45900003",
+    "display": "Esophagectomy"
+  },
+  {
+    "code": "307332009",
+    "display": "Esophagectomy and colonic interposition"
+  },
+  {
+    "code": "708987006",
+    "display": "Laparoscopic total gastrectomy"
+  },
+  {
+    "code": "26452005",
+    "display": "Total gastrectomy"
+  },
+  {
+    "code": "54956002",
+    "display": "Gastrostomy"
+  },
+  {
+    "code": "72971003",
+    "display": "Gastrojejunostomy with vagotomy"
+  },
+  {
+    "code": "46381000",
+    "display": "Truncal vagotomy with pyloroplasty"
+  },
+  {
+    "code": "287811008",
+    "display": "Perforated peptic ulcer closure"
+  },
+  {
+    "code": "235674005",
+    "display": "Perforation of stomach"
+  },
+  {
+    "code": "270909006",
+    "display": "Duodenal perforation"
+  },
+  {
+    "code": "363742001",
+    "display": "Pyloroplasty"
+  },
+  {
+    "code": "173788005",
+    "display": "Pyloromyotomy"
+  },
+  {
+    "code": "49245001",
+    "display": "Bypass gastrojejunostomy"
+  },
+  {
+    "code": "238280007",
+    "display": "Drainage of peritoneal pseudocyst"
+  },
+  {
+    "code": "238275003",
+    "display": "Drainage of peritoneal cyst"
+  },
+  {
+    "code": "75389003",
+    "display": "Pancreaticocystogastrostomy"
+  },
+  {
+    "code": "234321000",
+    "display": "Splenic cystogastrostomy"
+  },
+  {
+    "code": "234322007",
+    "display": "Splenic cystojejunostomy"
+  },
+  {
+    "code": "238278001",
+    "display": "Peritoneal cystojejunostomy"
+  },
+  {
+    "code": "238279009",
+    "display": "Peritoneal cystogastrostomy"
+  },
+  {
+    "code": "174740002",
+    "display": "Open cystogastrotomy of pancreas"
+  },
+  {
+    "code": "62937006",
+    "display": "Feeding enterostomy of jejunum"
+  },
+  {
+    "code": "301784005",
+    "display": "Ileostomy operation"
+  },
+  {
+    "code": "67389003",
+    "display": "Diverticulectomy of duodenum"
+  },
+  {
+    "code": "61218006",
+    "display": "Excision of Meckel's diverticulum"
+  },
+  {
+    "code": "80146002",
+    "display": "Excision of appendix"
+  },
+  {
+    "code": "6025007",
+    "display": "Laparoscopic appendectomy"
+  },
+  {
+    "code": "47693006",
+    "display": "Rupture of appendix"
+  },
+  {
+    "code": "174052001",
+    "display": "Drainage of appendix abscess"
+  },
+  {
+    "code": "26390003",
+    "display": "Total colectomy"
+  },
+  {
+    "code": "787874000",
+    "display": "Laparoscopic total colectomy"
+  },
+  {
+    "code": "359571009",
+    "display": "Right colectomy"
+  },
+  {
+    "code": "50774009",
+    "display": "Laparoscopic-assisted right colectomy"
+  },
+  {
+    "code": "82619000",
+    "display": "Left colectomy"
+  },
+  {
+    "code": "41330009",
+    "display": "Laparoscopic-assisted left colectomy"
+  },
+  {
+    "code": "398740003",
+    "display": "Colostomy"
+  },
+  {
+    "code": "1805005",
+    "display": "Surgical closure of stoma"
+  },
+  {
+    "code": "84604002",
+    "display": "Sigmoid colectomy"
+  },
+  {
+    "code": "174286001",
+    "display": "Perineal operations for rectal prolapse"
+  },
+  {
+    "code": "73921006",
+    "display": "Repair of rectal prolapse by abdominal approach"
+  },
+  {
+    "code": "440032004",
+    "display": "Laparoscopic fixation of prolapse of rectum"
+  },
+  {
+    "code": "274031008",
+    "display": "Rectal polypectomy"
+  },
+  {
+    "code": "4558008",
+    "display": "Anterior resection of rectum"
+  },
+  {
+    "code": "90527009",
+    "display": "Laparoscopic-assisted anterior resection of rectum"
+  },
+  {
+    "code": "315328007",
+    "display": "Anterior resection of rectum with anastomosis"
+  },
+  {
+    "code": "392027008",
+    "display": "Anal fissurectomy"
+  },
+  {
+    "code": "24496007",
+    "display": "Hemorrhoidectomy"
+  },
+  {
+    "code": "412737002",
+    "display": "Stapling of hemorrhoid"
+  },
+  {
+    "code": "174396007",
+    "display": "Pilonidal sinus operation"
+  },
+  {
+    "code": "107808005",
+    "display": "Accessory sinus excision"
+  },
+  {
+    "code": "302392001",
+    "display": "Curettage of sinus"
+  },
+  {
+    "code": "74770008",
+    "display": "Exploratory laparotomy"
+  },
+  {
+    "code": "177916006",
+    "display": "Resuture of burst abdomen"
+  },
+  {
+    "code": "107963000",
+    "display": "Liver excision"
+  },
+  {
+    "code": "708590009",
+    "display": "Laparoscopic wedge resection of liver"
+  },
+  {
+    "code": "708589000",
+    "display": "Laparoscopic resection of segment of liver"
+  },
+  {
+    "code": "38102005",
+    "display": "Cholecystectomy"
+  },
+  {
+    "code": "45993005",
+    "display": "Cholecystectomy with exploration of common duct"
+  },
+  {
+    "code": "45595009",
+    "display": "Laparoscopic cholecystectomy"
+  },
+  {
+    "code": "67557008",
+    "display": "Laparoscopic cholecystectomy with exploration of common duct"
+  },
+  {
+    "code": "66361005",
+    "display": "Excision of choledochal cyst"
+  },
+  {
+    "code": "234319005",
+    "display": "Splenectomy"
+  },
+  {
+    "code": "174776001",
+    "display": "Total splenectomy"
+  },
+  {
+    "code": "314118002",
+    "display": "Laparoscopic total splenectomy"
+  },
+  {
+    "code": "446408009",
+    "display": "Laparoscopic excision of part of spleen"
+  },
+  {
+    "code": "173747005",
+    "display": "Roux-en-Y gastrojejunostomy"
+  },
+  {
+    "code": "91516004",
+    "display": "Distal subtotal pancreatectomy with pancreaticojejunostomy"
+  },
+  {
+    "code": "116241004",
+    "display": "Pancreaticoduodenectomy"
+  },
+  {
+    "code": "20767001",
+    "display": "Shunt of portal vein to vena cava"
+  },
+  {
+    "code": "175793006",
+    "display": "Mesocaval shunt"
+  },
+  {
+    "code": "238299003",
+    "display": "Excision of mesenteric cyst"
+  },
+  {
+    "code": "92433007",
+    "display": "Benign neoplasm of retroperitoneum"
+  },
+  {
+    "code": "608797008",
+    "display": "Open repair of inguinal hernia"
+  },
+  {
+    "code": "15018006",
+    "display": "Laparoscopic repair of inguinal hernia"
+  },
+  {
+    "code": "608796004",
+    "display": "Open repair of femoral hernia"
+  },
+  {
+    "code": "608789001",
+    "display": "Laparoscopic repair of femoral hernia"
+  },
+  {
+    "code": "608790005",
+    "display": "Laparoscopic repair of obturator hernia"
+  },
+  {
+    "code": "238184006",
+    "display": "Repair of epigastric hernia"
+  },
+  {
+    "code": "44946007",
+    "display": "Repair of umbilical hernia"
+  },
+  {
+    "code": "9877001",
+    "display": "Repair of paraumbilical hernia"
+  },
+  {
+    "code": "15694008",
+    "display": "Repair of spigelian hernia"
+  },
+  {
+    "code": "238187004",
+    "display": "Repair of incisional hernia"
+  },
+  {
+    "code": "9292007",
+    "display": "Esophageal hiatus hernia repair"
+  },
+  {
+    "code": "413181005",
+    "display": "Laparoscopic repair of hiatus hernia"
+  },
+  {
+    "code": "359890009",
+    "display": "Fundoplication"
+  },
+  {
+    "code": "359893006",
+    "display": "Total fundoplication"
+  },
+  {
+    "code": "78656005",
+    "display": "Laparoscopic fundoplication"
+  },
+  {
+    "code": "21810005",
+    "display": "Excision of lesion of scrotum"
+  },
+  {
+    "code": "236326007",
+    "display": "Excision of multiple scrotal sebaceous cysts"
+  },
+  {
+    "code": "236347006",
+    "display": "Hydrocele operation"
+  },
+  {
+    "code": "176481007",
+    "display": "Excision of cyst of epididymis"
+  },
+  {
+    "code": "176490000",
+    "display": "Reversal of vasectomy"
+  },
+  {
+    "code": "236334001",
+    "display": "Total orchidectomy"
+  },
+  {
+    "code": "178286005",
+    "display": "Block dissection of inguinal lymph nodes"
+  },
+  {
+    "code": "112851007",
+    "display": "Full thickness excision of lip, reconstruction with local flap"
+  },
+  {
+    "code": "20418004",
+    "display": "Wedge resection"
+  },
+  {
+    "code": "173225009",
+    "display": "Wedge excision of lip"
+  },
+  {
+    "code": "39562007",
+    "display": "Vermilionectomy"
+  },
+  {
+    "code": "173218002",
+    "display": "Excision of vermilion border and advancement of lip mucosa"
+  },
+  {
+    "code": "359703006",
+    "display": "Total glossectomy"
+  },
+  {
+    "code": "177124000",
+    "display": "Biopsy of tongue"
+  },
+  {
+    "code": "173357008",
+    "display": "Removal of lesion of tongue"
+  },
+  {
+    "code": "234246002",
+    "display": "Selective neck dissection of cervical lymph nodes"
+  },
+  {
+    "code": "59687004",
+    "display": "Excision of laryngeal polyp"
+  },
+  {
+    "code": "308030005",
+    "display": "Microlaryngoscopic vocal cord polypectomy"
+  },
+  {
+    "code": "173490007",
+    "display": "Excision of lesion of submandibular gland"
+  },
+  {
+    "code": "45685007",
+    "display": "Radical neck dissection"
+  },
+  {
+    "code": "178347009",
+    "display": "Excision of branchial cyst"
+  },
+  {
+    "code": "233401008",
+    "display": "Excision of carotid body tumor"
+  },
+  {
+    "code": "302338000",
+    "display": "Lobectomy of thyroid gland"
+  },
+  {
+    "code": "24443003",
+    "display": "Total thyroidectomy"
+  },
+  {
+    "code": "237486002",
+    "display": "Total thyroidectomy with cervical lymph node dissection"
+  },
+  {
+    "code": "287258006",
+    "display": "Parathyroid adenoma excision"
+  },
+  {
+    "code": "399750009",
+    "display": "Excision of thymus"
+  },
+  {
+    "code": "57071006",
+    "display": "Sympathectomy"
+  },
+  {
+    "code": "392021009",
+    "display": "Lumpectomy of breast"
+  },
+  {
+    "code": "172043006",
+    "display": "Simple mastectomy"
+  },
+  {
+    "code": "406505007",
+    "display": "Modified radical mastectomy"
+  },
+  {
+    "code": "384723003",
+    "display": "Radical mastectomy"
+  },
+  {
+    "code": "172106007",
+    "display": "Excision of fistula of mammary duct"
+  },
+  {
+    "code": "238356005",
+    "display": "Intercostal drain removal"
+  },
+  {
+    "code": "177789001",
+    "display": "Excision of rib and open drainage of pleural cavity"
+  },
+  {
+    "code": "238332006",
+    "display": "Total thoracoplasty"
+  },
+  {
+    "code": "26411001",
+    "display": "Decortication of lung and parietal pleurectomy"
+  },
+  {
+    "code": "75935006",
+    "display": "Thoracoscopic lobectomy of lung"
+  },
+  {
+    "code": "173171007",
+    "display": "Lobectomy of lung"
+  },
+  {
+    "code": "444188003",
+    "display": "Thoracoscopic wedge resection of lung"
+  },
+  {
+    "code": "284181007",
+    "display": "Incision and drainage of abscess"
+  },
+  {
+    "code": "274068006",
+    "display": "Excision of lipoma"
+  },
+  {
+    "code": "428297005",
+    "display": "Excision of cyst"
+  },
+  {
+    "code": "440258006",
+    "display": "Excision of skin"
+  },
+  {
+    "code": "312775003",
+    "display": "Debridement of ulcer"
+  },
+  {
+    "code": "771225007",
+    "display": "Reconstruction using free flap"
+  },
+  {
+    "code": "119561005",
+    "display": "Grafting procedure"
+  },
+  {
+    "code": "265675003",
+    "display": "Split thickness graft of skin to skin"
+  },
+  {
+    "code": "304039000",
+    "display": "Skin flap operation"
+  },
+  {
+    "code": "264983002",
+    "display": "Transfer of tendon"
+  },
+  {
+    "code": "107996003",
+    "display": "Lymphatic system excision"
+  },
+  {
+    "code": "27929005",
+    "display": "Arteriovenous fistulization"
+  },
+  {
+    "code": "717285003",
+    "display": "Vascular system care"
+  },
+  {
+    "code": "21911005",
+    "display": "Biopsy of lymph node"
+  },
+  {
+    "code": "447338009",
+    "display": "Aspiration of endometrium"
+  },
+  {
+    "code": "171149006",
+    "display": "Screening for malignant neoplasm of cervix"
+  },
+  {
+    "code": "50796003",
+    "display": "Cervical biopsy"
+  },
+  {
+    "code": "274942001",
+    "display": "Biopsy of vulva"
+  },
+  {
+    "code": "87515005",
+    "display": "Ileostomy management and care"
+  },
+  {
+    "code": "25953003",
+    "display": "Colostomy management and care"
+  },
+  {
+    "code": "10849003",
+    "display": "Removal of foreign body"
+  },
+  {
+    "code": "225746001",
+    "display": "Ward (environment)"
+  },
+  {
+    "code": "224663004",
+    "display": "Single room (environment)"
+  },
+  {
+    "code": "67604003",
+    "display": "Household appliance (physical object)"
+  },
+  {
+    "code": "5679009",
+    "display": "Bed sheet, device (physical object)"
+  },
+  {
+    "code": "47448006",
+    "display": "Hot water (substance)"
+  },
+  {
+    "code": "182591009",
+    "display": "Water bed (physical object)"
+  },
+  {
+    "code": "229772003",
+    "display": "Bed (physical object)"
+  },
+  {
+    "code": "1348009",
+    "display": "Day care center (environment)"
+  },
+  {
+    "code": "25721000087108",
+    "display": "Emergency shelter (environment)"
+  },
+  {
+    "code": "9632001",
+    "display": "Nursing procedure (procedure)"
+  },
+  {
+    "code": "3895009",
+    "display": "Application of dressing (procedure)"
+  },
+  {
+    "code": "401304009",
+    "display": "Service of nebulizer (procedure)"
+  },
+  {
+    "code": "59108006",
+    "display": "Injection (procedure)"
+  },
+  {
+    "code": "430033006",
+    "display": "Infusion pump (physical object)"
+  },
+  {
+    "code": "159753002",
+    "display": "General caretaker (occupation)"
+  },
+  {
+    "code": "116859006",
+    "display": "Transfusion of blood product (procedure)"
+  },
+  {
+    "code": "11429006",
+    "display": "Consultation (procedure)"
+  },
+  {
+    "code": "252465000",
+    "display": "Pulse oximetry (procedure)"
+  },
+  {
+    "code": "309906004",
+    "display": "Burns unit (environment)"
+  },
+  {
+    "code": "397771005",
+    "display": "High dependency unit (environment)"
+  },
+  {
+    "code": "309907008",
+    "display": "Cardiac intensive care unit (environment)"
+  },
+  {
+    "code": "409688003",
+    "display": "Hospital isolation room (environment)"
+  },
+  {
+    "code": "309909006",
+    "display": "Neurological intensive care unit (environment)"
+  },
+  {
+    "code": "398161000",
+    "display": "Postoperative anesthesia care unit (environment)"
+  },
+  {
+    "code": "387713003",
+    "display": "Surgical procedure (procedure)"
+  },
+  {
+    "code": "309904001",
+    "display": "Intensive care unit (environment)"
+  },
+  {
+    "code": "182998008",
+    "display": "Intensive nursing care (regime/therapy)"
+  },
+  {
+    "code": "61968008",
+    "display": "Syringe, device (physical object)"
+  },
+  {
+    "code": "13288007",
+    "display": "Monitor, device (physical object)"
+  },
+  {
+    "code": "23852006",
+    "display": "Cardiac monitoring (regime/therapy)"
+  },
+  {
+    "code": "399217008",
+    "display": "Cardioassist by aortic balloon pump (procedure)"
+  },
+  {
+    "code": "31394004",
+    "display": "Light therapy (procedure)"
+  },
+  {
+    "code": "24099007",
+    "display": "Oxygen (substance)"
+  },
+  {
+    "code": "706172005",
+    "display": "Ventilator (physical object)"
+  },
+  {
+    "code": "424172009",
+    "display": "Dual pressure spontaneous ventilation support weaning protocol (regime/therapy)"
+  },
+  {
+    "code": "225738002",
+    "display": "Operating room (environment)"
+  },
+  {
+    "code": "257715004",
+    "display": "Theater (environment)"
+  },
+  {
+    "code": "1255635002",
+    "display": "Birth room (environment)"
+  },
+  {
+    "code": "122456005",
+    "display": "Laser device (physical object)"
+  },
+  {
+    "code": "701418007",
+    "display": "C-arm drape (physical object)"
+  },
+  {
+    "code": "423827005",
+    "display": "Endoscopy (procedure)"
+  },
+  {
+    "code": "51316009",
+    "display": "Laparoscopic procedure (procedure)"
+  },
+  {
+    "code": "272181003",
+    "display": "Clinical equipment and/or device (physical object)"
+  },
+  {
+    "code": "462524004",
+    "display": "Neurosurgical ultrasonic navigation system (physical object)"
+  },
+  {
+    "code": "80557002",
+    "display": "Drilling of bone (procedure)"
+  },
+  {
+    "code": "118299005",
+    "display": "Semiconductor laser device (physical object)"
+  },
+  {
+    "code": "310801006",
+    "display": "Ureteroscope (physical object)"
+  },
+  {
+    "code": "312077001",
+    "display": "Flexible ureteroscope (physical object)"
+  },
+  {
+    "code": "6012004",
+    "display": "Hearing aid, device (physical object)"
+  },
+  {
+    "code": "63653004",
+    "display": "Biomedical device (physical object)"
+  },
+  {
+    "code": "5776009",
+    "display": "Medicinal product acting as anesthetic agent (product)"
+  },
+  {
+    "code": "86174004",
+    "display": "Laparoscope, device (physical object)"
+  },
+  {
+    "code": "14106009",
+    "display": "Cardiac pacemaker, device (physical object)"
+  },
+  {
+    "code": "704722004",
+    "display": "Dual chamber rate responsive implantable cardiac pacemaker (physical object)"
+  },
+  {
+    "code": "705637003",
+    "display": "Drug-eluting coronary artery stent (physical object)"
+  },
+  {
+    "code": "464052002",
+    "display": "Bare metal coronary artery stent (physical object)"
+  },
+  {
+    "code": "356497001",
+    "display": "Bone cements (product)"
+  },
+  {
+    "code": "303533002",
+    "display": "Hip joint implant (physical object)"
+  },
+  {
+    "code": "63995005",
+    "display": "Bandage, device (physical object)"
+  },
+  {
+    "code": "256246007",
+    "display": "Cotton - textile (physical object)"
+  },
+  {
+    "code": "350785008",
+    "display": "Gauzes (physical object)"
+  },
+  {
+    "code": "52291003",
+    "display": "Glove, device (physical object)"
+  },
+  {
+    "code": "261382003",
+    "display": "Mask (physical object)"
+  },
+  {
+    "code": "994005",
+    "display": "Brush, device (physical object)"
+  },
+  {
+    "code": "48741003",
+    "display": "Toothpaste (substance)"
+  },
+  {
+    "code": "25780000",
+    "display": "Soap (substance)"
+  },
+  {
+    "code": "739000003",
+    "display": "Lotion (basic dose form)"
+  },
+  {
+    "code": "255698008",
+    "display": "Shampoo (substance)"
+  },
+  {
+    "code": "52065008",
+    "display": "Diaper, device (physical object)"
+  },
+  {
+    "code": "40519001",
+    "display": "Binder, device (physical object)"
+  },
+  {
+    "code": "74094004",
+    "display": "Belt, device (physical object)"
+  },
+  {
+    "code": "228184002",
+    "display": "Stocking (physical object)"
+  },
+  {
+    "code": "16650009",
+    "display": "Splint, device (physical object)"
+  },
+  {
+    "code": "9096001",
+    "display": "Support, device (physical object)"
+  },
+  {
+    "code": "51883004",
+    "display": "Sling, device (physical object)"
+  },
+  {
+    "code": "272363005",
+    "display": "Fixed orthodontic appliance (physical object)"
+  },
+  {
+    "code": "12150006",
+    "display": "Cannula, device (physical object)"
+  },
+  {
+    "code": "255560000",
+    "display": "Intravenous (qualifier value)"
+  },
+  {
+    "code": "19923001",
+    "display": "Catheter, device (physical object)"
+  },
+  {
+    "code": "83059008",
+    "display": "Tube, device (physical object)"
+  },
+  {
+    "code": "57134006",
+    "display": "Instrument, device (physical object)"
+  },
+  {
+    "code": "408097009",
+    "display": "Strip (physical object)"
+  },
+  {
+    "code": "369443003",
+    "display": "Bedpan (physical object)"
+  },
+  {
+    "code": "91251008",
+    "display": "Physiotherapy (regime/therapy)"
+  },
+  {
+    "code": "81375008",
+    "display": "Physical assessment (procedure)"
+  },
+  {
+    "code": "386053000",
+    "display": "Evaluation procedure (procedure)"
+  },
+  {
+    "code": "45900003",
+    "display": "Esophagectomy (procedure)"
+  },
+  {
+    "code": "235162005",
+    "display": "Trans-hiatal esophagectomy (procedure)"
+  },
+  {
+    "code": "90410003",
+    "display": "Wedge resection of stomach (procedure)"
+  },
+  {
+    "code": "50774009",
+    "display": "Laparoscopic-assisted right colectomy (procedure)"
+  },
+  {
+    "code": "174071004",
+    "display": "Extended right hemicolectomy (procedure)"
+  },
+  {
+    "code": "41330009",
+    "display": "Laparoscopic-assisted left colectomy (procedure)"
+  },
+  {
+    "code": "82619000",
+    "display": "Left colectomy (procedure)"
+  },
+  {
+    "code": "235325001",
+    "display": "Extended left hemicolectomy (procedure)"
+  },
+  {
+    "code": "26925005",
+    "display": "Transverse colectomy (procedure)"
+  },
+  {
+    "code": "84604002",
+    "display": "Sigmoid colectomy (procedure)"
+  },
+  {
+    "code": "1390003",
+    "display": "Laparoscopic-assisted sigmoid colectomy (procedure)"
+  },
+  {
+    "code": "708913004",
+    "display": "Laparoscopic abdominoperineal resection using robotic assistance (procedure)"
+  },
+  {
+    "code": "180056004",
+    "display": "Posterior exenteration of pelvis (procedure)"
+  },
+  {
+    "code": "180055000",
+    "display": "Anterior exenteration of pelvis (procedure)"
+  },
+  {
+    "code": "69036001",
+    "display": "Total pancreaticoduodenectomy (procedure)"
+  },
+  {
+    "code": "61326000",
+    "display": "Hepatectomy, total right lobectomy (procedure)"
+  },
+  {
+    "code": "63816008",
+    "display": "Hepatectomy, total left lobectomy (procedure)"
+  },
+  {
+    "code": "281255004",
+    "display": "Small bowel obstruction (disorder)"
+  },
+  {
+    "code": "281254000",
+    "display": "Large bowel obstruction (disorder)"
+  },
+  {
+    "code": "39270003",
+    "display": "Lysis of adhesions (procedure)"
+  },
+  {
+    "code": "63185002",
+    "display": "Laparoscopy with biopsy (procedure)"
+  },
+  {
+    "code": "81516001",
+    "display": "Partial nephrectomy (procedure)"
+  },
+  {
+    "code": "236335000",
+    "display": "Subcapsular orchidectomy (procedure)"
+  },
+  {
+    "code": "116171002",
+    "display": "Radical inguinal orchiectomy (procedure)"
+  },
+  {
+    "code": "176599002",
+    "display": "Partial vulvectomy (procedure)"
+  },
+  {
+    "code": "234250009",
+    "display": "Block dissection of pelvic lymph nodes (procedure)"
+  },
+  {
+    "code": "116142003",
+    "display": "Radical hysterectomy (procedure)"
+  },
+  {
+    "code": "116141005",
+    "display": "Abdominal hysterectomy (procedure)"
+  },
+  {
+    "code": "83152002",
+    "display": "Oophorectomy (procedure)"
+  },
+  {
+    "code": "61174009",
+    "display": "Transposition of ovary (procedure)"
+  },
+  {
+    "code": "236940003",
+    "display": "Second look laparoscopy (procedure)"
+  },
+  {
+    "code": "122460008",
+    "display": "Reexploration procedure (procedure)"
+  },
+  {
+    "code": "237370008",
+    "display": "Segmentectomy of breast (procedure)"
+  },
+  {
+    "code": "120146008",
+    "display": "Chest wall excision (procedure)"
+  },
+  {
+    "code": "1115001",
+    "display": "Decortication (procedure)"
+  },
+  {
+    "code": "234272006",
+    "display": "Biopsy of mediastinal lymph node (procedure)"
+  },
+  {
+    "code": "261531000",
+    "display": "Excision of rib (procedure)"
+  },
+  {
+    "code": "65651000",
+    "display": "Ligation of thoracic duct (procedure)"
+  },
+  {
+    "code": "40583006",
+    "display": "Resection of trachea (procedure)"
+  },
+  {
+    "code": "177754003",
+    "display": "Excision of lesion of chest wall (procedure)"
+  },
+  {
+    "code": "234270003",
+    "display": "Biopsy of cervical lymph node (procedure)"
+  },
+  {
+    "code": "75935006",
+    "display": "Thoracoscopic lobectomy of lung (procedure)"
+  },
+  {
+    "code": "235155001",
+    "display": "Endoscopic Congo Red Test (procedure)"
+  },
+  {
+    "code": "65808002",
+    "display": "Excision of presacral tumor (procedure)"
+  },
+  {
+    "code": "231552001",
+    "display": "Anterior orbitotomy (procedure)"
+  },
+  {
+    "code": "29513000",
+    "display": "Irrigation with syringe (procedure)"
+  },
+  {
+    "code": "76508002",
+    "display": "Rhytidoplasty of eyelid (procedure)"
+  },
+  {
+    "code": "75489002",
+    "display": "Blepharoplasty of bilateral upper and lower eyelids (procedure)"
+  },
+  {
+    "code": "371394007",
+    "display": "Removal of scleral buckle (procedure)"
+  },
+  {
+    "code": "59077004",
+    "display": "Canthotomy (procedure)"
+  },
+  {
+    "code": "397537003",
+    "display": "Laser cycloablation (procedure)"
+  },
+  {
+    "code": "258485006",
+    "display": "Corneal scraping specimen (specimen)"
+  },
+  {
+    "code": "231728005",
+    "display": "Repair of prolapsed iris (procedure)"
+  },
+  {
+    "code": "231607009",
+    "display": "Correction of entropion of lower eyelid (procedure)"
+  },
+  {
+    "code": "231612005",
+    "display": "Correction of entropion of upper eyelid (procedure)"
+  },
+  {
+    "code": "69769008",
+    "display": "Repair of blepharoptosis (procedure)"
+  },
+  {
+    "code": "50489001",
+    "display": "Repair of telecanthus (procedure)"
+  },
+  {
+    "code": "87539000",
+    "display": "Cryotherapy of eyelid (procedure)"
+  },
+  {
+    "code": "172214005",
+    "display": "Cryotherapy to lesion of eyelid (procedure)"
+  },
+  {
+    "code": "71091006",
+    "display": "Cryotherapy of ciliary body (procedure)"
+  },
+  {
+    "code": "231631004",
+    "display": "Dacryocystorhinostomy and insertion of tube (procedure)"
+  },
+  {
+    "code": "75745001",
+    "display": "Dacryocystotomy (procedure)"
+  },
+  {
+    "code": "55272009",
+    "display": "Dacryocystectomy (procedure)"
+  },
+  {
+    "code": "172261006",
+    "display": "Drainage of lesion of eyelid (procedure)"
+  },
+  {
+    "code": "172172005",
+    "display": "Drainage of orbit (procedure)"
+  },
+  {
+    "code": "48957009",
+    "display": "Epilation by electrolysis (procedure)"
+  },
+  {
+    "code": "39250009",
+    "display": "Enucleation (procedure)"
+  },
+  {
+    "code": "14509009",
+    "display": "Evisceration (procedure)"
+  },
+  {
+    "code": "75588007",
+    "display": "Excision of lesion of cornea (procedure)"
+  },
+  {
+    "code": "36436000",
+    "display": "Excision of lesion of eyebrow (procedure)"
+  },
+  {
+    "code": "172212009",
+    "display": "Excision of lesion of eyelid (procedure)"
+  },
+  {
+    "code": "47487006",
+    "display": "Excision of lesion of iris (procedure)"
+  },
+  {
+    "code": "60712003",
+    "display": "Excision of lesion of sclera (procedure)"
+  },
+  {
+    "code": "172196000",
+    "display": "Excision of lesion of canthus (procedure)"
+  },
+  {
+    "code": "397112000",
+    "display": "Simple excision of pterygium (procedure)"
+  },
+  {
+    "code": "2242005",
+    "display": "Reconstruction of eyelid (procedure)"
+  },
+  {
+    "code": "1004085005",
+    "display": "Injection of filling material into eyelid (procedure)"
+  },
+  {
+    "code": "240988007",
+    "display": "Division of flap (procedure)"
+  },
+  {
+    "code": "400929002",
+    "display": "Forced duction test (procedure)"
+  },
+  {
+    "code": "783539008",
+    "display": "Full thickness graft of skin to skin (procedure)"
+  },
+  {
+    "code": "265292003",
+    "display": "Goniotomy (procedure)"
+  },
+  {
+    "code": "4143006",
+    "display": "Injection of anterior chamber of eye (procedure)"
+  },
+  {
+    "code": "310557005",
+    "display": "Partial thickness corneal graft (substance)"
+  },
+  {
+    "code": "83694000",
+    "display": "Lamellar keratoplasty (procedure)"
+  },
+  {
+    "code": "46082001",
+    "display": "Lateral orbitotomy (procedure)"
+  },
+  {
+    "code": "419767009",
+    "display": "Bimanual microincisional phacoemulsification of cataract with intraocular lens implantation (procedure)"
+  },
+  {
+    "code": "92829008",
+    "display": "Glaucoma due to combination of mechanisms (disorder)"
+  },
+  {
+    "code": "172389006",
+    "display": "Mucosal graft to conjunctiva (procedure)"
+  },
+  {
+    "code": "86088003",
+    "display": "Centesis (procedure)"
+  },
+  {
+    "code": "42101009",
+    "display": "Penetrating keratoplasty (procedure)"
+  },
+  {
+    "code": "231724007",
+    "display": "Peripheral iridectomy (procedure)"
+  },
+  {
+    "code": "84149000",
+    "display": "Aspiration of cataract by phacoemulsification (procedure)"
+  },
+  {
+    "code": "172426003",
+    "display": "Removal of foreign body from cornea (procedure)"
+  },
+  {
+    "code": "172498005",
+    "display": "Removal of foreign body from iris (procedure)"
+  },
+  {
+    "code": "172173000",
+    "display": "Removal of foreign body from orbit (procedure)"
+  },
+  {
+    "code": "36884001",
+    "display": "Repair of recurrent dislocation of patella (procedure)"
+  },
+  {
+    "code": "58992007",
+    "display": "Complete patellectomy (procedure)"
+  },
+  {
+    "code": "52050007",
+    "display": "Pelvic osteotomy (procedure)"
+  },
+  {
+    "code": "178677007",
+    "display": "Posterior decompression of fracture of spine (procedure)"
+  },
+  {
+    "code": "52734007",
+    "display": "Total replacement of hip (procedure)"
+  },
+  {
+    "code": "785850002",
+    "display": "Reverse prosthetic total arthroplasty of shoulder (procedure)"
+  },
+  {
+    "code": "56060000",
+    "display": "Repair of musculotendinous cuff of shoulder (procedure)"
+  },
+  {
+    "code": "18557009",
+    "display": "Closure by suture (procedure)"
+  },
+  {
+    "code": "80469007",
+    "display": "Arthroplasty of shoulder for recurrent dislocation (procedure)"
+  },
+  {
+    "code": "239468007",
+    "display": "Arthroplasty of shoulder (procedure)"
+  },
+  {
+    "code": "69446009",
+    "display": "Skeletal traction (procedure)"
+  },
+  {
+    "code": "304040003",
+    "display": "Grafting to skin (procedure)"
+  },
+  {
+    "code": "6779009",
+    "display": "Open treatment of slipped femoral epiphysis (procedure)"
+  },
+  {
+    "code": "55705006",
+    "display": "Spinal arthrodesis (procedure)"
+  },
+  {
+    "code": "35443000",
+    "display": "Diagnostic radiography supine and erect of thoracic and lumbar spine for scoliosis (procedure)"
+  },
+  {
+    "code": "122478003",
+    "display": "Synovial biopsy (procedure)"
+  },
+  {
+    "code": "45247004",
+    "display": "Lengthening of tendon (procedure)"
+  },
+  {
+    "code": "281758003",
+    "display": "Repair of tendon (procedure)"
+  },
+  {
+    "code": "178156005",
+    "display": "Repair of tendo achilles (procedure)"
+  },
+  {
+    "code": "264983002",
+    "display": "Transfer of tendon (procedure)"
+  },
+  {
+    "code": "179836002",
+    "display": "Release of torticollis (procedure)"
+  },
+  {
+    "code": "609588000",
+    "display": "Total knee replacement (procedure)"
+  },
+  {
+    "code": "27813003",
+    "display": "Intra-articular injection (procedure)"
+  },
+  {
+    "code": "13714004",
+    "display": "Arthroscopy (procedure)"
+  },
+  {
+    "code": "239430005",
+    "display": "Ligament reconstruction (procedure)"
+  },
+  {
+    "code": "179353004",
+    "display": "Revision uncemented total knee replacement (procedure)"
+  },
+  {
+    "code": "86052008",
+    "display": "Closed reduction of fracture (procedure)"
+  },
+  {
+    "code": "302489004",
+    "display": "Removal of complete external fixator (procedure)"
+  },
+  {
+    "code": "180293003",
+    "display": "Change of plaster jacket (procedure)"
+  },
+  {
+    "code": "90131007",
+    "display": "Arthrocentesis (procedure)"
+  },
+  {
+    "code": "239667008",
+    "display": "Application of above elbow plaster cast (procedure)"
+  },
+  {
+    "code": "239676001",
+    "display": "Application of below knee plaster cast (procedure)"
+  },
+  {
+    "code": "63097004",
+    "display": "Application of long leg cast (procedure)"
+  },
+  {
+    "code": "180289009",
+    "display": "Application of plaster cast (procedure)"
+  },
+  {
+    "code": "37354008",
+    "display": "Application of shoulder spica (procedure)"
+  },
+  {
+    "code": "127599007",
+    "display": "Application of hip spica cast (procedure)"
+  },
+  {
+    "code": "81666003",
+    "display": "Strapping of ankle (procedure)"
+  },
+  {
+    "code": "85046002",
+    "display": "Strapping of elbow (procedure)"
+  },
+  {
+    "code": "24459003",
+    "display": "Strapping of finger (procedure)"
+  },
+  {
+    "code": "21288003",
+    "display": "Strapping of knee (procedure)"
+  },
+  {
+    "code": "229535006",
+    "display": "Shoulder strapping (procedure)"
+  },
+  {
+    "code": "41029007",
+    "display": "Strapping of toes (procedure)"
+  },
+  {
+    "code": "21411002",
+    "display": "Strapping of wrist (procedure)"
+  },
+  {
+    "code": "30549001",
+    "display": "Removal of suture (procedure)"
+  },
+  {
+    "code": "58825001",
+    "display": "Closed reduction of dislocation (procedure)"
+  },
+  {
+    "code": "70163005",
+    "display": "Excision of ganglion cyst (procedure)"
+  },
+  {
+    "code": "284101009",
+    "display": "Removal of implant (procedure)"
+  },
+  {
+    "code": "76699006",
+    "display": "Ligamentous reconstruction of knee, intra-articular and extra-articular (procedure)"
+  },
+  {
+    "code": "387731002",
+    "display": "Excision of lamina of vertebra (procedure)"
+  },
+  {
+    "code": "78918006",
+    "display": "Open reduction of dislocation (procedure)"
+  },
+  {
+    "code": "178668000",
+    "display": "Percutaneous discectomy (procedure)"
+  },
+  {
+    "code": "311479006",
+    "display": "Spinal instrumentation (procedure)"
+  },
+  {
+    "code": "439303004",
+    "display": "Application of rigid total contact leg cast (procedure)"
+  },
+  {
+    "code": "2337004",
+    "display": "Adductor tenotomy of hip (procedure)"
+  },
+  {
+    "code": "239267000",
+    "display": "Release of trigger finger (procedure)"
+  },
+  {
+    "code": "239644006",
+    "display": "Application of pelvic traction (procedure)"
+  },
+  {
+    "code": "178789004",
+    "display": "Manipulation of spine using traction (procedure)"
+  },
+  {
+    "code": "450671005",
+    "display": "Debridement of soft tissue (procedure)"
+  },
+  {
+    "code": "179709006",
+    "display": "Total synovectomy of joint (procedure)"
+  },
+  {
+    "code": "387821004",
+    "display": "Spinal deformity correction (procedure)"
+  },
+  {
+    "code": "428845007",
+    "display": "Intramedullary fixation with cementing of bone (procedure)"
+  },
+  {
+    "code": "179892002",
+    "display": "Arthroscopic reattachment glenoid labrum (procedure)"
+  },
+  {
+    "code": "699120002",
+    "display": "Arthroscopic repair of rotator cuff (procedure)"
+  },
+  {
+    "code": "301761003",
+    "display": "Arthroscopic synovial biopsy (procedure)"
+  },
+  {
+    "code": "265106004",
+    "display": "Insertion of Austin-Moore prosthesis (procedure)"
+  },
+  {
+    "code": "439756000",
+    "display": "Open reduction of bimalleolar fracture of lateral and medial malleoli with internal fixation (procedure)"
+  },
+  {
+    "code": "61916001",
+    "display": "Injection into bone marrow (procedure)"
+  },
+  {
+    "code": "239690003",
+    "display": "Application of buttress strapping (procedure)"
+  },
+  {
+    "code": "239329001",
+    "display": "Excision of bone (procedure)"
+  },
+  {
+    "code": "699119008",
+    "display": "Repair of medial ligament of talocrural joint (procedure)"
+  },
+  {
+    "code": "708899000",
+    "display": "Closed reduction of fracture of femur and internal fixation using dynamic condylar screw plate (procedure)"
+  },
+  {
+    "code": "239619003",
+    "display": "Dynamization of external fixator (procedure)"
+  },
+  {
+    "code": "239259008",
+    "display": "Lengthening of tendons or muscles of the flexor compartment of the forearm (procedure)"
+  },
+  {
+    "code": "179537001",
+    "display": "Excision arthroplasty (procedure)"
+  },
+  {
+    "code": "385523005",
+    "display": "External fixator using Ilizarov system (physical object)"
+  },
+  {
+    "code": "440418007",
+    "display": "Open reduction of fracture of medial malleolus with internal fixation (procedure)"
+  },
+  {
+    "code": "239432002",
+    "display": "Reconstruction of posterior cruciate ligament of knee joint (procedure)"
+  },
+  {
+    "code": "69171004",
+    "display": "Excision of radial head (procedure)"
+  },
+  {
+    "code": "56153009",
+    "display": "Reconstruction of radial head (procedure)"
+  },
+  {
+    "code": "112694000",
+    "display": "Saucerization (procedure)"
+  },
+  {
+    "code": "313295000",
+    "display": "Fixation of fracture using Herbert screw (procedure)"
+  },
+  {
+    "code": "257949002",
+    "display": "Tension band wiring of fracture (procedure)"
+  },
+  {
+    "code": "178493006",
+    "display": "Alveolar bone graft (procedure)"
+  },
+  {
+    "code": "180673001",
+    "display": "Cross finger flap (substance)"
+  },
+  {
+    "code": "384686000",
+    "display": "Reattachment of lower extremity (procedure)"
+  },
+  {
+    "code": "307554005",
+    "display": "Reconstruction of nose with flap (procedure)"
+  },
+  {
+    "code": "782787005",
+    "display": "Split thickness graft of skin (substance)"
+  },
+  {
+    "code": "284079008",
+    "display": "Revision of scar (procedure)"
+  },
+  {
+    "code": "405444008",
+    "display": "Revision of amputation of foot (procedure)"
+  },
+  {
+    "code": "240995003",
+    "display": "Release of burns contracture (procedure)"
+  },
+  {
+    "code": "231619001",
+    "display": "Surgical dehiscence of the aponeurotic insertion of Muller's muscle (procedure)"
+  },
+  {
+    "code": "52781008",
+    "display": "Congenital hip dysplasia (disorder)"
+  },
+  {
+    "code": "367411006",
+    "display": "Hamstring tendon transfer (procedure)"
+  },
+  {
+    "code": "32492002",
+    "display": "Excision of accessory navicular bone (procedure)"
+  },
+  {
+    "code": "308446007",
+    "display": "Excision of distal end of ulna (procedure)"
+  },
+  {
+    "code": "158965000",
+    "display": "Medical practitioner (occupation)"
+  },
+  {
+    "code": "303133007",
+    "display": "Responsible medical officer (occupation)"
+  }
+]

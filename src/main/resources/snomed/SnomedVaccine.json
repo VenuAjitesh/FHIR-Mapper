@@ -1,0 +1,754 @@
+[
+  {
+    "code": "1119305005",
+    "display": "COVID-19 antigen vaccine"
+  },
+  {
+    "code": "1119349007",
+    "display": "COVID-19 mRNA vaccine"
+  },
+  {
+    "code": "871761004",
+    "display": "Rotavirus vaccine"
+  },
+  {
+    "code": "318351000221106",
+    "display": "Diphtheria toxoid and acellular pertussis and inactivated poliomyelitis type 1,2, and 3 and tetanus toxoid pediatric vaccine"
+  },
+  {
+    "code": "1052330009",
+    "display": "Pneumococcal 10-valent conjugate vaccine"
+  },
+  {
+    "code": "836498007",
+    "display": "Mumps orthorubulavirus antigen-containing vaccine product"
+  },
+  {
+    "code": "871929006",
+    "display": "Diphtheria and hepatitis B and tetanus vaccine"
+  },
+  {
+    "code": "2261000221104",
+    "display": "Influenza A virus subtypes H1N1 and H3N2 and Influenza B virus Victoria and Yamagata lineage antigens only vaccine product"
+  },
+  {
+    "code": "428601009",
+    "display": "Paratyphoid vaccine"
+  },
+  {
+    "code": "836389008",
+    "display": "Vaccinia virus antigen-containing vaccine product"
+  },
+  {
+    "code": "871755002",
+    "display": "Typhoid Vi capsular polysaccharide vaccine"
+  },
+  {
+    "code": "871732000",
+    "display": "Rubella vaccine"
+  },
+  {
+    "code": "836400005",
+    "display": "Adenovirus antigen-containing vaccine product"
+  },
+  {
+    "code": "871893003",
+    "display": "Diphtheria and acellular pertussis and inactivated poliomyelitis and tetanus vaccine"
+  },
+  {
+    "code": "971000221109",
+    "display": "Live attenuated typhoid vaccine in oral dose form"
+  },
+  {
+    "code": "601000221108",
+    "display": "Bordetella pertussis antigen-containing vaccine product"
+  },
+  {
+    "code": "1181000221105",
+    "display": "Influenza vaccine"
+  },
+  {
+    "code": "871878002",
+    "display": "Diphtheria and pertussis and poliomyelitis and tetanus vaccine"
+  },
+  {
+    "code": "2031000221103",
+    "display": "Adult diphtheria and tetanus toxoids vaccine"
+  },
+  {
+    "code": "871723002",
+    "display": "Q fever vaccine"
+  },
+  {
+    "code": "871826000",
+    "display": "Diphtheria and tetanus vaccine"
+  },
+  {
+    "code": "871921009",
+    "display": "Staphylococcus toxoid vaccine"
+  },
+  {
+    "code": "836375003",
+    "display": "Hepatitis A virus antigen-containing vaccine product"
+  },
+  {
+    "code": "836398006",
+    "display": "Streptococcus pneumoniae antigen-containing vaccine product"
+  },
+  {
+    "code": "2181000221101",
+    "display": "Cholera vaccine in oral dose form"
+  },
+  {
+    "code": "1031000221108",
+    "display": "Human poliovirus antigen-containing vaccine product"
+  },
+  {
+    "code": "860818003",
+    "display": "Anthrax vaccine"
+  },
+  {
+    "code": "871887006",
+    "display": "Diphtheria and Haemophilus influenzae type B and pertussis and poliomyelitis and tetanus vaccine"
+  },
+  {
+    "code": "871803007",
+    "display": "Hepatitis A and B vaccine"
+  },
+  {
+    "code": "836495005",
+    "display": "Varicella-zoster virus antigen-containing vaccine product"
+  },
+  {
+    "code": "871717007",
+    "display": "Yellow fever vaccine"
+  },
+  {
+    "code": "1111000221101",
+    "display": "Live attenuated Argentinian haemorrhagic fever vaccine"
+  },
+  {
+    "code": "1111000221101",
+    "display": "Live attenuated Argentinian hemorrhagic fever vaccine"
+  },
+  {
+    "code": "871737006",
+    "display": "Mumps vaccine"
+  },
+  {
+    "code": "871890000",
+    "display": "Diphtheria and Haemophilus influenzae type B and poliomyelitis and tetanus vaccine"
+  },
+  {
+    "code": "871758000",
+    "display": "Pertussis vaccine"
+  },
+  {
+    "code": "871764007",
+    "display": "Haemophilus influenzae type B vaccine"
+  },
+  {
+    "code": "2251000221101",
+    "display": "Live attenuated measles and mumps and rubella and varicella-zoster vaccine"
+  },
+  {
+    "code": "836403007",
+    "display": "Tick-borne encephalitis virus antigen-containing vaccine product"
+  },
+  {
+    "code": "91000221102",
+    "display": "Inactivated hepatitis A vaccine"
+  },
+  {
+    "code": "836384003",
+    "display": "Bacillus anthracis antigen-containing vaccine product"
+  },
+  {
+    "code": "1121000221106",
+    "display": "Live attenuated yellow fever vaccine"
+  },
+  {
+    "code": "1119220001",
+    "display": "Pneumococcal 23-valent conjugate vaccine"
+  },
+  {
+    "code": "2191000221103",
+    "display": "Inactivated rabies vaccine grown in cellular line"
+  },
+  {
+    "code": "1861000221106",
+    "display": "BCG (Bacillus Calmette-Guerin) vaccine"
+  },
+  {
+    "code": "871873006",
+    "display": "Meningitis A, C, W135 and Y vaccine"
+  },
+  {
+    "code": "462321000124107",
+    "display": "Tdap - Low dose diphtheria and low dose acellular pertussis and tetanus vaccine"
+  },
+  {
+    "code": "319941000221104",
+    "display": "BCG (Bacillus Calmette-Guerin) vaccine in parenteral dose form"
+  },
+  {
+    "code": "871750007",
+    "display": "Hepatitis A pediatric vaccine"
+  },
+  {
+    "code": "871750007",
+    "display": "Hepatitis A paediatric vaccine"
+  },
+  {
+    "code": "871726005",
+    "display": "Rabies vaccine"
+  },
+  {
+    "code": "836378001",
+    "display": "Japanese encephalitis virus antigen-containing vaccine product"
+  },
+  {
+    "code": "2021000221101",
+    "display": "Tetanus toxoid vaccine"
+  },
+  {
+    "code": "840564009",
+    "display": "Leptospira antigen-containing vaccine product"
+  },
+  {
+    "code": "840599008",
+    "display": "Borrelia burgdorferi antigen-containing vaccine product"
+  },
+  {
+    "code": "1010308001",
+    "display": "Inactivated whole Hepatitis A HM-175 strain vaccine"
+  },
+  {
+    "code": "2091000221104",
+    "display": "Diphtheria and Haemophilus influenza B and acellular pertussis and poliomyelitis and tetanus pediatric vaccine"
+  },
+  {
+    "code": "836381006",
+    "display": "Corynebacterium diphtheriae antigen-containing vaccine product"
+  },
+  {
+    "code": "871891001",
+    "display": "Diphtheria and hepatitis B and acellular pertussis and inactivated poliomyelitis and tetanus vaccine"
+  },
+  {
+    "code": "836387005",
+    "display": "Rotavirus antigen-containing vaccine product"
+  },
+  {
+    "code": "836368004",
+    "display": "Bacteria antigen-containing vaccine product"
+  },
+  {
+    "code": "774618008",
+    "display": "Diphtheria toxoid and whole cell pertussis and tetanus toxoid adsorbed vaccine"
+  },
+  {
+    "code": "836393002",
+    "display": "Rabies lyssavirus antigen-containing vaccine product"
+  },
+  {
+    "code": "871837004",
+    "display": "Diphtheria and poliomyelitis and tetanus vaccine"
+  },
+  {
+    "code": "871738001",
+    "display": "Live attenuated mumps vaccine"
+  },
+  {
+    "code": "836402002",
+    "display": "Live attenuated Mycobacterium bovis antigen-containing vaccine product"
+  },
+  {
+    "code": "871908002",
+    "display": "Measles and mumps and rubella and varicella virus vaccine"
+  },
+  {
+    "code": "991000221105",
+    "display": "Cholera vaccine"
+  },
+  {
+    "code": "871721000",
+    "display": "Ebolavirus antigen only vaccine product"
+  },
+  {
+    "code": "871876003",
+    "display": "Diphtheria and acellular pertussis and tetanus vaccine"
+  },
+  {
+    "code": "2241000221103",
+    "display": "Live attenuated measles, mumps, and rubella vaccine"
+  },
+  {
+    "code": "871772009",
+    "display": "Influenza H1N1 vaccine"
+  },
+  {
+    "code": "871730008",
+    "display": "Low dose diphtheria vaccine"
+  },
+  {
+    "code": "1119254000",
+    "display": "Pneumococcal 13-valent conjugate vaccine"
+  },
+  {
+    "code": "911000221103",
+    "display": "Human papillomavirus vaccine"
+  },
+  {
+    "code": "318341000221109",
+    "display": "Diphtheria toxoid and Haemophilus influenzae type B and acellular pertussis and tetanus toxoid pediatric vaccine"
+  },
+  {
+    "code": "318341000221109",
+    "display": "Diphtheria toxoid and Haemophilus influenzae type B and acellular pertussis and tetanus toxoid paediatric vaccine"
+  },
+  {
+    "code": "836390004",
+    "display": "Salmonella enterica subspecies enterica serovar Typhi antigen-containing vaccine product"
+  },
+  {
+    "code": "961000221100",
+    "display": "Typhoid vaccine"
+  },
+  {
+    "code": "871817003",
+    "display": "Measles and rubella vaccine"
+  },
+  {
+    "code": "871766009",
+    "display": "Live attenuated measles vaccine"
+  },
+  {
+    "code": "1010689004",
+    "display": "Haemophilus influenzae type B capsular polysaccharide polyribosylribitol phosphate conjugated to Clostridium tetani toxoid vaccine"
+  },
+  {
+    "code": "871729003",
+    "display": "Diphtheria vaccine"
+  },
+  {
+    "code": "1011000221100",
+    "display": "Live attenuated cholera vaccine in oral dose form"
+  },
+  {
+    "code": "871724008",
+    "display": "Japanese encephalitis virus vaccine"
+  },
+  {
+    "code": "871871008",
+    "display": "Meningitis A and C vaccine"
+  },
+  {
+    "code": "775641005",
+    "display": "Diphtheria toxoid and tetanus toxoid adsorbed vaccine"
+  },
+  {
+    "code": "1801000221105",
+    "display": "Pneumococcal polysaccharide vaccine"
+  },
+  {
+    "code": "2171000221104",
+    "display": "Typhoid polysaccharide vaccine in parenteral dose form"
+  },
+  {
+    "code": "777725002",
+    "display": "Tetanus toxoid adsorbed vaccine"
+  },
+  {
+    "code": "2041000221105",
+    "display": "Haemophilus influenzae type B capsular polysaccharide conjugated vaccine"
+  },
+  {
+    "code": "871718002",
+    "display": "Plague vaccine"
+  },
+  {
+    "code": "409568008",
+    "display": "Pentavalent (ABCDE) botulinum toxoid vaccine"
+  },
+  {
+    "code": "121000221105",
+    "display": "Inactivated hepatitis A and hepatitis B surface antigen vaccine"
+  },
+  {
+    "code": "840549009",
+    "display": "Yersinia pestis antigen-containing vaccine product"
+  },
+  {
+    "code": "871911001",
+    "display": "Lyme disease vaccine"
+  },
+  {
+    "code": "871919004",
+    "display": "Varicella-zoster vaccine"
+  },
+  {
+    "code": "871806004",
+    "display": "Haemophilus influenzae type B and Hepatitis B virus antigens only vaccine product"
+  },
+  {
+    "code": "2001000221108",
+    "display": "Human papillomavirus 6, 11, 16 and 18 vaccine"
+  },
+  {
+    "code": "871925000",
+    "display": "Hepatitis B surface antigen vaccine"
+  },
+  {
+    "code": "2071000221100",
+    "display": "Diphtheria toxoid and Haemophilus influenzae type B and whole cell pertussis and tetanus toxoid paediatric vaccine"
+  },
+  {
+    "code": "2071000221100",
+    "display": "Diphtheria toxoid and Haemophilus influenzae type B and whole cell pertussis and tetanus toxoid pediatric vaccine"
+  },
+  {
+    "code": "1052328007",
+    "display": "Pneumococcal 7-valent conjugate vaccine"
+  },
+  {
+    "code": "1010313002",
+    "display": "Live attenuated influenza vaccine"
+  },
+  {
+    "code": "871765008",
+    "display": "Measles vaccine"
+  },
+  {
+    "code": "1119351006",
+    "display": "Haemophilus influenzae type B and meningitis C and Y vaccine"
+  },
+  {
+    "code": "836385002",
+    "display": "Yellow fever virus antigen-containing vaccine product"
+  },
+  {
+    "code": "871759008",
+    "display": "Acellular pertussis vaccine"
+  },
+  {
+    "code": "1001000221103",
+    "display": "Inactivated cholera vaccine in oral dose form"
+  },
+  {
+    "code": "871839001",
+    "display": "Diphtheria and Haemophilus influenzae B and pertussis and tetanus vaccine"
+  },
+  {
+    "code": "871816007",
+    "display": "Poliomyelitis and tetanus vaccine"
+  },
+  {
+    "code": "871742003",
+    "display": "Tetanus vaccine"
+  },
+  {
+    "code": "1981000221108",
+    "display": "Meningococcus serogroup B vaccine"
+  },
+  {
+    "code": "871916006",
+    "display": "Meningococcus A, C, W135 and Y capsular oligosaccharide conjugated vaccine"
+  },
+  {
+    "code": "871883005",
+    "display": "Diphtheria and acellular pertussis and poliomyelitis and tetanus paediatric vaccine"
+  },
+  {
+    "code": "871883005",
+    "display": "Diphtheria and acellular pertussis and poliomyelitis and tetanus pediatric vaccine"
+  },
+  {
+    "code": "836379009",
+    "display": "Human papillomavirus antigen-containing vaccine product"
+  },
+  {
+    "code": "871751006",
+    "display": "Hepatitis A vaccine"
+  },
+  {
+    "code": "840563003",
+    "display": "Dengue virus antigen-containing vaccine product"
+  },
+  {
+    "code": "871727001",
+    "display": "Vaccinia virus antigen only vaccine product"
+  },
+  {
+    "code": "1010310004",
+    "display": "Live attenuated Oka-Merck strain varicella vaccine"
+  },
+  {
+    "code": "871897002",
+    "display": "Rocky Mountain spotted fever vaccine"
+  },
+  {
+    "code": "1081000221109",
+    "display": "Live attenuated rotavirus vaccine"
+  },
+  {
+    "code": "836382004",
+    "display": "Measles morbillivirus antigen-containing product"
+  },
+  {
+    "code": "1010322001",
+    "display": "Live attenuated Oka strain varicella vaccine"
+  },
+  {
+    "code": "871822003",
+    "display": "Hepatitis B vaccine"
+  },
+  {
+    "code": "2221000221107",
+    "display": "Live attenuated Varicella-zoster vaccine"
+  },
+  {
+    "code": "1119279002",
+    "display": "Inactivated whole Influenza H5N1 vaccine"
+  },
+  {
+    "code": "836388000",
+    "display": "Rubella virus antigen-containing vaccine product"
+  },
+  {
+    "code": "871888001",
+    "display": "Diphtheria and Haemophilus influenza B and acellular pertussis and inactivated poliomyelitis and tetanus vaccine"
+  },
+  {
+    "code": "1010318006",
+    "display": "Inactivated whole Hepatitis A GBM strain vaccine"
+  },
+  {
+    "code": "37146000",
+    "display": "Typhus vaccine"
+  },
+  {
+    "code": "1991000221106",
+    "display": "Human papillomavirus 16 and 18 vaccine"
+  },
+  {
+    "code": "1061000221102",
+    "display": "Meningitis polysaccharide vaccine"
+  },
+  {
+    "code": "871894009",
+    "display": "Low dose diphtheria and acellular pertussis and inactivated poliomyelitis and tetanus vaccine"
+  },
+  {
+    "code": "871722007",
+    "display": "Adenovirus antigen only vaccine product"
+  },
+  {
+    "code": "871928003",
+    "display": "Diphtheria and measles and pertussis and poliomyelitis and tetanus vaccine"
+  },
+  {
+    "code": "871831003",
+    "display": "Measles and mumps and rubella vaccine"
+  },
+  {
+    "code": "871804001",
+    "display": "Hepatitis A and typhoid vaccine"
+  },
+  {
+    "code": "2211000221102",
+    "display": "Influenza A virus subtypes H1N1 and H3N2 and influenza B virus Victoria lineage antigens only vaccine product"
+  },
+  {
+    "code": "1003499009",
+    "display": "Influenza H5N1 vaccine"
+  },
+  {
+    "code": "836374004",
+    "display": "Hepatitis B virus antigen-containing vaccine product"
+  },
+  {
+    "code": "871768005",
+    "display": "Influenza vaccine in nasal dose form"
+  },
+  {
+    "code": "871716003",
+    "display": "Tularemia vaccine"
+  },
+  {
+    "code": "871716003",
+    "display": "Tularaemia vaccine"
+  },
+  {
+    "code": "871825001",
+    "display": "Inactivated Japanese encephalitis virus adsorbed vaccine"
+  },
+  {
+    "code": "871866001",
+    "display": "Meningitis C vaccine"
+  },
+  {
+    "code": "836421005",
+    "display": "Ebolavirus antigen-containing vaccine product"
+  },
+  {
+    "code": "871895005",
+    "display": "Diphtheria and Haemophilus influenzae type B and hepatitis B and pertussis and poliomyelitis and tetanus"
+  },
+  {
+    "code": "921000221108",
+    "display": "Meningococcus vaccine"
+  },
+  {
+    "code": "951000221102",
+    "display": "Meningococcus group C capsular polysaccharide conjugate vaccine"
+  },
+  {
+    "code": "863950005",
+    "display": "Bacteria and virus antigens-containing vaccine product"
+  },
+  {
+    "code": "871740006",
+    "display": "Inactivated polio vaccine"
+  },
+  {
+    "code": "2051000221107",
+    "display": "Adult diphtheria toxoid and acellular pertussis and tetanus toxoid vaccine"
+  },
+  {
+    "code": "1131000221109",
+    "display": "Inactivated rabies vaccine"
+  },
+  {
+    "code": "871725009",
+    "display": "Inactivated Japanese encephalitis virus vaccine"
+  },
+  {
+    "code": "836380007",
+    "display": "Haemophilus influenzae type B antigen-containing vaccine product"
+  },
+  {
+    "code": "863911006",
+    "display": "Clostridium tetani antigen-containing vaccine product"
+  },
+  {
+    "code": "836377006",
+    "display": "Influenza virus antigen-containing vaccine product"
+  },
+  {
+    "code": "871918007",
+    "display": "Rickettsia antigen-containing vaccine product"
+  },
+  {
+    "code": "1051000221104",
+    "display": "Live attenuated poliovirus serotypes 1 and 3 vaccine in oral dose form"
+  },
+  {
+    "code": "2061000221109",
+    "display": "Diphtheria toxoid and whole cell pertussis and tetanus toxoid paediatric vaccine"
+  },
+  {
+    "code": "2061000221109",
+    "display": "Diphtheria toxoid and whole cell pertussis and tetanus toxoid pediatric vaccine"
+  },
+  {
+    "code": "871719005",
+    "display": "Tick-borne encephalitis vaccine"
+  },
+  {
+    "code": "860722004",
+    "display": "Junin virus antigen-containing product"
+  },
+  {
+    "code": "871889009",
+    "display": "Diphtheria and hepatitis B and inactivated poliomyelitis and acellular pertussis vaccine"
+  },
+  {
+    "code": "865997008",
+    "display": "Hepatitis A adult vaccine"
+  },
+  {
+    "code": "871767000",
+    "display": "Human papillomavirus 9 vaccine"
+  },
+  {
+    "code": "871739009",
+    "display": "Human poliovirus antigen only vaccine product"
+  },
+  {
+    "code": "981000221107",
+    "display": "Pneumococcal vaccine"
+  },
+  {
+    "code": "836369007",
+    "display": "Virus antigen-containing vaccine product"
+  },
+  {
+    "code": "836401009",
+    "display": "Neisseria meningitidis antigen-containing vaccine product"
+  },
+  {
+    "code": "2081000221102",
+    "display": "Diphtheria toxoid, Haemophilus influenzae B, hepatitis B surface antigen, acellular pertussis and tetanus toxoid paediatric vaccine"
+  },
+  {
+    "code": "2081000221102",
+    "display": "Diphtheria toxoid, Haemophilus influenzae B, hepatitis B surface antigen, acellular pertussis and tetanus toxoid pediatric vaccine"
+  },
+  {
+    "code": "871886002",
+    "display": "Diphtheria and Haemophilus influenzae type B and hepatitis B and pertussis and tetanus vaccine"
+  },
+  {
+    "code": "1971000221105",
+    "display": "Meningococcus A, C, W135 and Y capsular polysaccharide conjugated vaccine"
+  },
+  {
+    "code": "840551008",
+    "display": "Francisella tularensis antigen-containing vaccine product"
+  },
+  {
+    "code": "871875004",
+    "display": "Diphtheria and pertussis and tetanus vaccine"
+  },
+  {
+    "code": "871720004",
+    "display": "Dengue vaccine"
+  },
+  {
+    "code": "871838009",
+    "display": "Low dose diphtheria and inactivated poliomyelitis and tetanus vaccine"
+  },
+  {
+    "code": "836500008",
+    "display": "Haemophilus influenzae type B and meningitis C vaccine"
+  },
+  {
+    "code": "836397001",
+    "display": "Coxiella burnetii antigen-containing vaccine product"
+  },
+  {
+    "code": "2201000221100",
+    "display": "Inactivated rabies virus vaccine grown in brain tissue"
+  },
+  {
+    "code": "2231000221105",
+    "display": "Live attenuated measles and rubella vaccine"
+  },
+  {
+    "code": "2101000221107",
+    "display": "Diphtheria and acellular pertussis and Haemophilus influenzae type B and hepatitis B and poliomyelitis and tetanus pediatric vaccine"
+  },
+  {
+    "code": "2101000221107",
+    "display": "Diphtheria and acellular pertussis and Haemophilus influenzae type B and hepatitis B and poliomyelitis and tetanus paediatric vaccine"
+  },
+  {
+    "code": "871827009",
+    "display": "Low dose diphtheria and tetanus vaccine"
+  },
+  {
+    "code": "836383009",
+    "display": "Vibrio cholerae antigen-containing vaccine product"
+  }
+]

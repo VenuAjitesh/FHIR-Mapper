@@ -1,0 +1,69 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.0'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'org.openapi.generator' version '6.6.0'
+    id 'com.diffplug.spotless' version '6.25.0'
+}
+
+group = 'com.nha.abdm.fhir.wrapper'
+version = '1.0-SNAPSHOT'
+subprojects {
+    spotless {
+        java {
+            googleJavaFormat('1.15.0')
+            indentWithTabs(2)
+            indentWithSpaces(4)
+        }
+    }
+}
+afterEvaluate {
+    def spotless = tasks.findByName('spotlessApply')
+    if (spotless) {
+        tasks.withType(JavaCompile) {
+            finalizedBy(spotless)
+
+        }
+
+        tasks.withType(GroovyCompile) {
+            finalizedBy(spotless)
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-base:5.6.1'
+    implementation 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:5.5.0'
+    testImplementation 'org.mockito:mockito-core:5.13.0'
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.postgresql:postgresql:42.7.2'
+    implementation 'com.h2database:h2'
+    implementation 'org.apache.commons:commons-text:1.10.0'
+}
+spotless {
+    java {
+        // Use the default importOrder configuration
+        importOrder()
+
+        removeUnusedImports()
+
+        // Choose one of these formatters.
+        googleJavaFormat()   // has its own section below
+
+        formatAnnotations()  // fixes formatting of type annotations, see below
+
+        licenseHeader '/* (C) $YEAR */' // or licenseHeaderFile
+    }
+}

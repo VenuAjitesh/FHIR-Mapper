@@ -1,0 +1,302 @@
+[
+  {
+    "code": "219006",
+    "display": "Current drinker"
+  },
+  {
+    "code": "105542008",
+    "display": "Non - drinker"
+  },
+  {
+    "code": "82581004",
+    "display": "Ex-drinker"
+  },
+  {
+    "code": "86933000",
+    "display": "Heavy drinker"
+  },
+  {
+    "code": "228277002",
+    "display": "Light drinker"
+  },
+  {
+    "code": "43783005",
+    "display": "Moderate drinker"
+  },
+  {
+    "code": "28127009",
+    "display": "Social drinker"
+  },
+  {
+    "code": "39156-5",
+    "display": "Body mass index (BMI) [Ratio]"
+  },
+  {
+    "code": "29463-7",
+    "display": "Body weight"
+  },
+  {
+    "code": "8302-2",
+    "display": "Body height"
+  },
+  {
+    "code": "56074-8",
+    "display": "Circumference Neck"
+  },
+  {
+    "code": "8280-0",
+    "display": "Waist Circumference at umbilicus by Tape measure"
+  },
+  {
+    "code": "56072-2",
+    "display": "Circumference Mid upper arm - right"
+  },
+  {
+    "code": "2339-0",
+    "display": "Glucose [Mass/volume] in Blood"
+  },
+  {
+    "code": "41604-0",
+    "display": "Fasting glucose [Mass/volume] in Capillary blood by Glucometer"
+  },
+  {
+    "code": "14743-9",
+    "display": "Glucose [Moles/volume] in Capillary blood by Glucometer"
+  },
+  {
+    "code": "14760-3",
+    "display": "Glucose [Moles/volume] in Capillary blood --2 hours post meal"
+  },
+  {
+    "code": "73708-0",
+    "display": "Body fat [Mass] Calculated"
+  },
+  {
+    "code": "34534-8",
+    "display": "12 lead EKG panel"
+  },
+  {
+    "code": "8999-5",
+    "display": "Fluid intake oral Estimated"
+  },
+  {
+    "code": "9052-2",
+    "display": "Calorie intake total"
+  },
+  {
+    "code": "69429-9",
+    "display": "Metabolic rate --resting"
+  },
+  {
+    "code": "94122-9",
+    "display": "Oxygen consumption (VO2)/Body weight [Volume Rate Content] --peak during exercise"
+  },
+  {
+    "code": "8693-4",
+    "display": "Mental status"
+  },
+  {
+    "code": "228273003",
+    "display": "Finding relating to alcohol drinking behavior"
+  },
+  {
+    "code": "365981007",
+    "display": "Finding of tobacco smoking behavior"
+  },
+  {
+    "code": "228509002",
+    "display": "Finding relating to tobacco chewing"
+  },
+  {
+    "code": "41829006",
+    "display": "Finding relating to tobacco chewing"
+  },
+  {
+    "code": "83765003",
+    "display": "Boredom"
+  },
+  {
+    "code": "45763006",
+    "display": "Demoralization"
+  },
+  {
+    "code": "708891002",
+    "display": "Emotionally stable"
+  },
+  {
+    "code": "28669007",
+    "display": "Anhedonia"
+  },
+  {
+    "code": "48694002",
+    "display": "Anxiety"
+  },
+  {
+    "code": "102893002",
+    "display": "Excitability"
+  },
+  {
+    "code": "225012006",
+    "display": "Feeling ashamed"
+  },
+  {
+    "code": "224973000",
+    "display": "Feeling frustrated"
+  },
+  {
+    "code": "224973000",
+    "display": "Feeling frustrated"
+  },
+  {
+    "code": "267076002",
+    "display": "Feeling lonely"
+  },
+  {
+    "code": "307048004",
+    "display": "Feeling isolated"
+  },
+  {
+    "code": "162190005",
+    "display": "No nervous symptoms"
+  },
+  {
+    "code": "225457007",
+    "display": "Feeling suicidal"
+  },
+  {
+    "code": "224977004",
+    "display": "Feeling upset"
+  },
+  {
+    "code": "271596009",
+    "display": "Mental distress"
+  },
+  {
+    "code": "366979004",
+    "display": "Depressed mood"
+  },
+  {
+    "code": "1402001",
+    "display": "Fear"
+  },
+  {
+    "code": "75408008",
+    "display": "Feeling angry"
+  },
+  {
+    "code": "55929007",
+    "display": "Feeling irritable"
+  },
+  {
+    "code": "112080002",
+    "display": "Cheerful mood"
+  },
+  {
+    "code": "225658008",
+    "display": "Mood stable"
+  },
+  {
+    "code": "102894008",
+    "display": "Feeling calm"
+  },
+  {
+    "code": "425363002",
+    "display": "Smiling"
+  },
+  {
+    "code": "79015004",
+    "display": "Worried"
+  },
+  {
+    "code": "53489000",
+    "display": "Tension"
+  },
+  {
+    "code": "55423-8",
+    "display": "Number of steps in unspecified time Pedometer"
+  },
+  {
+    "code": "93832-4",
+    "display": "Sleep duration"
+  },
+  {
+    "code": "41981-2",
+    "display": "Calories burned"
+  },
+  {
+    "code": "80493-0",
+    "display": "Activity level [Acceleration]"
+  },
+  {
+    "code": "77176002",
+    "display": "Smoker"
+  },
+  {
+    "code": "160618006",
+    "display": "Current non-smoker"
+  },
+  {
+    "code": "8517006",
+    "display": "Ex-smoker"
+  },
+  {
+    "code": "230065006",
+    "display": "Chain smoker"
+  },
+  {
+    "code": "230063004",
+    "display": "Heavy cigarette smoker"
+  },
+  {
+    "code": "230060001",
+    "display": "Light cigarette smoker"
+  },
+  {
+    "code": "230062009",
+    "display": "Moderate cigarette smoker"
+  },
+  {
+    "code": "230059006",
+    "display": "Occasional cigarette smoker"
+  },
+  {
+    "code": "61008-9",
+    "display": "Body surface temperature"
+  },
+  {
+    "code": "9279-1",
+    "display": "Respiratory rate"
+  },
+  {
+    "code": "8867-4",
+    "display": "Heart rate"
+  },
+  {
+    "code": "2708-6",
+    "display": "Oxygen saturation in Arterial blood"
+  },
+  {
+    "code": "85354-9",
+    "display": "Blood pressure panel with all children optional"
+  },
+  {
+    "code": "11976-8",
+    "display": "Ovulation date"
+  },
+  {
+    "code": "92656-8",
+    "display": "Number of menstrual periods per year"
+  },
+  {
+    "code": "42798-9",
+    "display": "Age at menarche"
+  },
+  {
+    "code": "42802-9",
+    "display": "Age at menopause"
+  },
+  {
+    "code": "8665-2",
+    "display": "Last menstrual period start date"
+  }
+]

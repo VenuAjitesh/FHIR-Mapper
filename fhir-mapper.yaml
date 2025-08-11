@@ -1,0 +1,1188 @@
+openapi: 3.0.3
+info:
+  title: FHIR Mapper API's
+  description: Conversion of simple json to ABDM compliant FHIR Format bundles
+  version: 1.0.0
+servers:
+  - url: http://localhost:8085/v1/bundle
+
+paths:
+  /op-consultation:
+    post:
+      tags:
+        - HI Types
+      summary: Create an OP Consultation Record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OPConsultRecord'
+      responses:
+        '201':
+          description: Successfully created
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationErrorResponse'
+                  - $ref: '#/components/schemas/GenericErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorResponse'
+  /prescription:
+    post:
+      tags:
+        - HI Types
+      summary: Create a Prescription Record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrescriptionRecord'
+      responses:
+        '201':
+          description: Successfully created
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationErrorResponse'
+                  - $ref: '#/components/schemas/GenericErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorResponse'
+  /health-document:
+    post:
+      tags:
+        - HI Types
+      summary: Create a Health Document Record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HealthDocumentRecord'
+      responses:
+        '201':
+          description: Successfully created
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationErrorResponse'
+                  - $ref: '#/components/schemas/GenericErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorResponse'
+  /diagnostic-report:
+    post:
+      tags:
+        - HI Types
+      summary: Create a Diagnostic Report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiagnosticReport'
+      responses:
+        '201':
+          description: Successfully created
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationErrorResponse'
+                  - $ref: '#/components/schemas/GenericErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorResponse'
+  /immunization:
+    post:
+      tags:
+        - HI Types
+      summary: Create an Immunization Record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImmunizationRecord'
+      responses:
+        '201':
+          description: Successfully created
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationErrorResponse'
+                  - $ref: '#/components/schemas/GenericErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorResponse'
+  /discharge-summary:
+    post:
+      tags:
+        - HI Types
+      summary: Create a Discharge Summary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DischargeSummary'
+      responses:
+        '201':
+          description: Successfully created
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationErrorResponse'
+                  - $ref: '#/components/schemas/GenericErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorResponse'
+  /wellness-record:
+    post:
+      tags:
+        - HI Types
+      summary: Create a Wellness Record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WellnessRecord'
+      responses:
+        '201':
+          description: Successfully created
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationErrorResponse'
+                  - $ref: '#/components/schemas/GenericErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorResponse'
+
+components:
+  schemas:
+    OPConsultRecord:
+      type: object
+      properties:
+        bundleType:
+          type: string
+          enum:
+            - OPConsultRecord
+        careContextReference:
+          type: string
+          example: visit 21-03-2025
+        visitDate:
+          type: string
+          format: date
+          example: 2000-06-23
+        patient:
+          $ref: '#/components/schemas/Patient'
+        practitioners:
+          type: array
+          items:
+            $ref: '#/components/schemas/Practitioner'
+        organisation:
+          $ref: '#/components/schemas/Organisation'
+        chiefComplaints:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChiefComplaint'
+        physicalExaminations:
+          type: array
+          items:
+            $ref: '#/components/schemas/PhysicalExamination'
+        allergies:
+          type: array
+          items:
+            type: string
+        medicalHistories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChiefComplaint'
+        familyHistories:
+          type: array
+          items:
+            $ref: '#/components/schemas/FamilyHistory'
+        serviceRequests:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceRequest'
+        medications:
+          type: array
+          items:
+            $ref: '#/components/schemas/Medication'
+        followups:
+          type: array
+          items:
+            $ref: '#/components/schemas/FollowUp'
+        procedures:
+          type: array
+          items:
+            $ref: '#/components/schemas/Procedure'
+        referrals:
+          type: array
+          items:
+            $ref: '#/components/schemas/Referral'
+        otherObservations:
+          type: array
+          items:
+            $ref: '#/components/schemas/OtherObservation'
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+      required:
+        - bundleType
+        - patient
+        - practitioners
+        - careContextReference
+        - authoredOn
+    PrescriptionRecord:
+      type: object
+      properties:
+        bundleType:
+          type: string
+          enum:
+            - PrescriptionRecord
+        careContextReference:
+          type: string
+          example: visit-{{$isoTimestamp}}
+        authoredOn:
+          type: string
+          format: date
+          example: 2001-05-22
+        encounter:
+          type: string
+          example: ""
+        patient:
+          $ref: '#/components/schemas/Patient'
+        practitioners:
+          type: array
+          items:
+            $ref: '#/components/schemas/Practitioner'
+        organisation:
+          $ref: '#/components/schemas/Organisation'
+        prescriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Medication'
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+      required:
+        - bundleType
+        - patient
+        - practitioners
+        - careContextReference
+        - authoredOn
+        - prescriptions
+      example:
+        bundleType: PrescriptionRecord
+        careContextReference: visit-{{$isoTimestamp}}
+        authoredOn: 2001-05-22
+        encounter: ""
+        patient:
+          name: Venu Ajitesh
+          patientReference: ajitesh6x
+          gender: male
+          birthDate: 2001-04-27
+        practitioners:
+          - name: Dr.Venu Ajitesh
+            practitionerId: Predator
+        organisation:
+          facilityName: Predator_HIP
+          facilityId: Predator_HIP
+        prescriptions:
+          - medicine: Dolo
+            dosage: 1-0-1
+            timing: 1-1-D
+            route: Oral
+            method: swallow
+            additionalInstructions: Take them after food
+            reason: Fever
+        documents:
+          - type: Prescription
+            contentType: application/pdf
+            data: JVBERi0xLjMKJf////8K
+    HealthDocumentRecord:
+      type: object
+      properties:
+        bundleType:
+          type: string
+          enum:
+            - HealthDocumentRecord
+        careContextReference:
+          type: string
+          example: visist 21-03-2024
+        patient:
+          $ref: '#/components/schemas/Patient'
+        authoredOn:
+          type: string
+          format: date
+          example: 2001-04-27
+        practitioners:
+          type: array
+          items:
+            $ref: '#/components/schemas/Practitioner'
+        organisation:
+          $ref: '#/components/schemas/Organisation'
+        encounter:
+          type: string
+          example: ""
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+      required:
+        - bundleType
+        - patient
+        - practitioners
+        - careContextReference
+        - authoredOn
+        - documents
+      example:
+        bundleType: HealthDocumentRecord
+        careContextReference: visist 21-03-2024
+        patient:
+          name: Venu Ajitesh
+          patientReference: ajitesh6x
+          gender: male
+          birthDate: 2001-04-27
+        date: 2001-04-27
+        practitioners:
+          - name: Dr.Venu Ajitesh
+            practitionerId: Predator
+        organisation:
+          facilityName: Predator_HIP
+          facilityId: Predator_HIP
+        encounter: ""
+        documents:
+          - contentType: application/pdf
+            data: xyzadybcljbabvlalbfdbvubujzbj
+    DiagnosticReport:
+      type: object
+      properties:
+        bundleType:
+          type: string
+          enum:
+            - DiagnosticReport
+        careContextReference:
+          type: string
+          example: visist 21-03-2024
+        authoredOn:
+          type: string
+          format: date
+          example: 2024-05-20
+        patient:
+          $ref: '#/components/schemas/Patient'
+        practitioners:
+          type: array
+          items:
+            $ref: '#/components/schemas/Practitioner'
+        organisation:
+          $ref: '#/components/schemas/Organisation'
+        encounter:
+          type: string
+          example: Ambula
+        diagnostics:
+          type: array
+          items:
+            $ref: '#/components/schemas/Diagnostic'
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+      required:
+        - bundleType
+        - patient
+        - practitioners
+        - careContextReference
+        - authoredOn
+        - diagnostics
+      example:
+        bundleType: DiagnosticReport
+        careContextReference: visist 21-03-2024
+        authoredOn: 2024-05-20
+        patient:
+          name: Venu Ajitesh
+          patientReference: ajitesh6x
+          gender: male
+          birthDate: 2001-04-27
+        practitioners:
+          - name: Dr.Venu Ajitesh
+            practitionerId: Predator
+        organisation:
+          facilityName: Predator_HIP
+          facilityId: Predator_HIP
+        encounter: Ambula
+        diagnostics:
+          - serviceName: BloodTest
+            serviceCategory: Hematography
+            result:
+              - observation: Height
+                result: Normal
+                valueQuantity:
+                  unit: CM
+                  value: 170
+            conclusion: Normal
+            presentedForm:
+              contentType: application/pdf
+              data: skciybewydcugueducuyeduychidhyuchyedyhcb
+        documents:
+          - contentType: pdf
+            data: xyzadybcljbabvlalbfdbvubujzbj
+
+    ImmunizationRecord:
+      type: object
+      properties:
+        bundleType:
+          type: string
+          enum:
+            - ImmunizationRecord
+        careContextReference:
+          type: string
+          example: visit-{{$isoTimestamp}}
+        patient:
+          $ref: '#/components/schemas/Patient'
+        practitioners:
+          type: array
+          items:
+            $ref: '#/components/schemas/Practitioner'
+        organisation:
+          $ref: '#/components/schemas/Organisation'
+        immunizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Immunization'
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+      required:
+        - bundleType
+        - patient
+        - practitioners
+        - careContextReference
+        - authoredOn
+        - immunizations
+      example:
+        bundleType: ImmunizationRecord
+        careContextReference: visit-{{$isoTimestamp}}
+        patient:
+          name: Venu Ajitesh
+          patientReference: ajitesh6x
+          gender: male
+          birthDate: 2001-04-27
+        practitioners:
+          - name: Dr.Venu Ajitesh
+            practitionerId: Predator
+        organisation:
+          facilityName: Predator_HIP
+          facilityId: Predator_HIP
+        immunizations:
+          - date: 2024-06-15
+            vaccineName: Covaxin
+            lotNumber: IN00004
+            manufacturer: NHA
+            doseNumber: 3
+        documents:
+          - type: immunization
+            contentType: application/pdf
+            data: xyzadybcljbabvlalbfdbvubujzbj
+    DischargeSummary:
+      type: object
+      properties:
+        bundleType:
+          type: string
+          enum:
+            - discharge-summary
+        careContextReference:
+          type: string
+          example: visist 21-03-2024
+        patient:
+          $ref: '#/components/schemas/Patient'
+        practitioners:
+          type: array
+          items:
+            $ref: '#/components/schemas/Practitioner'
+        organisation:
+          $ref: '#/components/schemas/Organisation'
+        chiefComplaints:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChiefComplaint'
+        physicalExaminations:
+          type: array
+          items:
+            $ref: '#/components/schemas/PhysicalExamination'
+        allergies:
+          type: array
+          items:
+            type: string
+        medicalHistories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChiefComplaint'
+        familyHistories:
+          type: array
+          items:
+            $ref: '#/components/schemas/FamilyHistory'
+        authoredOn:
+          type: string
+          format: date
+        medications:
+          type: array
+          items:
+            $ref: '#/components/schemas/Medication'
+        diagnostics:
+          type: array
+          items:
+            $ref: '#/components/schemas/Diagnostic'
+        procedures:
+          type: array
+          items:
+            $ref: '#/components/schemas/Procedure'
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+      required:
+        - bundleType
+        - patient
+        - practitioners
+        - careContextReference
+        - authoredOn
+      example:
+        bundleType: discharge-summary
+        careContextReference: visist 21-03-2024
+        patient:
+          name: Venu Ajitesh
+          patientReference: ajitesh6x
+          gender: male
+          birthDate: 2001-04-27
+        practitioners:
+          - name: Dr.Venu Ajitesh
+            practitionerId: Predator
+        organisation:
+          facilityName: Predator_HIP
+          facilityId: Predator_HIP
+        chiefComplaints:
+          - complaint: Sugar
+            recordedDate: 2024-05-20
+            dateRange:
+              from: 2018-04-27
+              to: 2018-05-26
+        medications:
+          - medicine: Dolo
+            dosage: 1-0-1
+            timing: 1-1-D
+            route: Oral
+            method: swallow
+            additionalInstructions: Take them after food
+        physicalExaminations:
+          - observation: Height
+            valueQuantity:
+              unit: CM
+              value: 170
+        allergies:
+          - Walnuts
+        medicalHistories:
+          - complaint: Sugar
+            recordedDate: 2024-05-20
+            dateRange:
+              from: 2018-04-27
+              to: 2018-05-26
+        familyHistories:
+          - relationship: Friend
+            observation: Toxic
+        diagnostics:
+          - serviceName: BloodTest
+            serviceCategory: Hematography
+            result:
+              - observation: Height
+                result: Normal
+                valueQuantity:
+                  unit: CM
+                  value: 170
+            conclusion: Normal
+            presentedForm:
+              contentType: application/pdf
+              data: skciybewydcugueducuyeduychidhyuchyedyhcb
+        procedures:
+          - status: INPROGRESS
+            condition: Severe
+            outcome: Healthy
+            details: Operation
+        documents:
+          - type: OP record
+            contentType: application/pdf
+            data: xyzadybcljbabvlalbfdbvubujzbj
+    WellnessRecord:
+      type: object
+      properties:
+        bundleType:
+          type: string
+          enum:
+            - wellness-record
+        careContextReference:
+          type: string
+          example: visist 21-03-2025
+        patient:
+          $ref: '#/components/schemas/Patient'
+        practitioners:
+          type: array
+          items:
+            $ref: '#/components/schemas/Practitioner'
+        organisation:
+          $ref: '#/components/schemas/Organisation'
+        vitalSigns:
+          type: array
+          items:
+            $ref: '#/components/schemas/Observation'
+        bodyMeasurements:
+          type: array
+          items:
+            $ref: '#/components/schemas/Observation'
+        physicalActivities:
+          type: array
+          items:
+            $ref: '#/components/schemas/Observation'
+        generalAssessments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Observation'
+        womanHealths:
+          type: array
+          items:
+            $ref: '#/components/schemas/Observation'
+        lifeStyles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Observation'
+        otherObservations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Observation'
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+      required:
+        - bundleType
+        - patient
+        - practitioners
+        - careContextReference
+      example:
+        bundleType: wellness-record
+        careContextReference: visist 21-03-2025
+        patient:
+          name: Venu Ajitesh
+          patientReference: ajitesh6x
+          gender: male
+          birthDate: 2001-04-27
+        practitioner:
+          - name: Dr.Venu Ajitesh
+            practitionerId: Predator
+        organisation:
+          facilityName: Predator_HIP
+          facilityId: Predator_HIP
+        vitalSigns:
+          - observation: Height
+            result: Normal
+            valueQuantity:
+              unit: CM
+              value: 170
+        bodyMeasurements:
+          - observation: Height
+            result: Normal
+            valueQuantity:
+              unit: CM
+              value: 170
+        physicalActivities:
+          - observation: Height
+            result: Normal
+            valueQuantity:
+              unit: CM
+              value: 170
+        generalAssessments:
+          - observation: Height
+            result: Normal
+            valueQuantity:
+              unit: CM
+              value: 170
+        womanHealths:
+          - observation: Height
+            result: Normal
+            valueQuantity:
+              unit: CM
+              value: 170
+        lifeStyles:
+          - observation: Height
+            result: Normal
+            valueQuantity:
+              unit: CM
+              value: 170
+        otherObservations:
+          - observation: Height
+            result: Normal
+            valueQuantity:
+              unit: CM
+              value: 170
+        documents:
+          - type: Prescription
+            contentType: application/pdf
+            data: JVBERi0xLjMKJf////8KOCAwIG9iago8PAovVHlwZSAvRXh0R1N0YXRlCi9jYSAxCj4
+
+    Patient:
+      type: object
+      properties:
+        name:
+          type: string
+        patientReference:
+          type: string
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+        birthDate:
+          type: string
+          format: date
+      required:
+        - name
+        - patientReference
+      example:
+        name: Venu Ajitesh
+        patientReference: ajitesh6x
+        gender: male
+        birthDate: 2001-04-27
+
+    Practitioner:
+      type: object
+      properties:
+        name:
+          type: string
+        practitionerId:
+          type: string
+      required:
+        - name
+      example:
+        name: Dr.Venu Ajitesh
+        practitionerId: Predator
+
+    Organisation:
+      type: object
+      properties:
+        facilityName:
+          type: string
+        facilityId:
+          type: string
+      required:
+        - facilityName
+      example:
+        facilityName: Predator_HIP
+        facilityId: Predator_HIP
+    Diagnostic:
+      type: object
+      properties:
+        serviceName:
+          type: string
+        serviceCategory:
+          type: string
+        result:
+          type: array
+          items:
+            $ref: '#/components/schemas/Observation'
+        conclusion:
+          type: string
+        presentedForm:
+          $ref: '#/components/schemas/Document'
+      required:
+        - serviceName
+        - serviceCategory
+        - result
+      example:
+        serviceName: BloodTest
+        serviceCategory: Hematography
+        result:
+          - observation: Height
+            result: Normal
+            valueQuantity:
+              unit: CM
+              value: 170
+        conclusion: Normal
+        presentedForm:
+          contentType: application/pdf
+          data: skciybewydcugueducuyeduychidhyuchyedyhcb
+    Immunization:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        vaccineName:
+          type: string
+        lotNumber:
+          type: string
+        manufacturer:
+          type: string
+        doseNumber:
+          type: string
+      required:
+        - date
+        - vaccineName
+      example:
+        date: 2024-06-15
+        vaccineName: Covaxin
+        lotNumber: IN00004
+        manufacturer: NHA
+        doseNumber: 3
+
+    DiagnosticResult:
+      type: object
+      properties:
+        observation:
+          type: string
+        result:
+          type: string
+        valueQuantity:
+          $ref: '#/components/schemas/ValueQuantity'
+      required:
+        - observation
+      example:
+        observation: Height
+        result: Normal
+        valueQuantity:
+          unit: CM
+          value: 170
+
+    ChiefComplaint:
+      type: object
+      properties:
+        complaint:
+          type: string
+        recordedDate:
+          type: string
+          format: date
+        dateRange:
+          $ref: '#/components/schemas/DateRange'
+      required:
+        - complaint
+        - recordedDate
+      example:
+        complaint: Sugar
+        recordedDate: 2024-05-20
+        dateRange:
+          from: 2018-04-27
+          to: 2018-05-26
+
+    DateRange:
+      type: object
+      properties:
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+      example:
+        from: 2018-04-27
+        to: 2018-05-26
+
+    PhysicalExamination:
+      type: object
+      properties:
+        observation:
+          type: string
+        result:
+          type: string
+        valueQuantity:
+          $ref: '#/components/schemas/ValueQuantity'
+      required:
+        - observation
+      example:
+        observation: Height
+        result: Normal
+        valueQuantity:
+          unit: CM
+          value: 170
+
+    ValueQuantity:
+      type: object
+      properties:
+        unit:
+          type: string
+        value:
+          type: number
+      required:
+        - unit
+        - value
+      example:
+        unit: KG
+        value: 90
+
+    FamilyHistory:
+      type: object
+      properties:
+        relationship:
+          type: string
+        observation:
+          type: string
+      required:
+        - relationship
+        - observation
+      example:
+        relationship: Friend
+        observation: Toxic
+
+    ServiceRequest:
+      type: object
+      properties:
+        status:
+          type: string
+        details:
+          type: string
+        specimen:
+          type: string
+      required:
+        - status
+        - details
+      example:
+        status: ACTIVE
+        details: X-RAY
+        specimen: Jhonsons
+
+    Medication:
+      type: object
+      properties:
+        medicine:
+          type: string
+        dosage:
+          type: string
+        timing:
+          description: frequency-period-periodUnit
+          type: string
+          enum: [S,MIN,H,D,WK,MO]
+        route:
+          type: string
+        method:
+          type: string
+        additionalInstructions:
+          type: string
+        reason:
+          type: string
+      required:
+        - medicine
+        - dosage
+      example:
+        medicine: Dolo
+        dosage: 1-0-1
+        timing: 1-1-D
+        route: Oral
+        method: swallow
+        additionalInstructions: Take them after food
+        reason: Fever
+
+
+    FollowUp:
+      type: object
+      properties:
+        serviceType:
+          type: string
+        appointmentTime:
+          type: string
+          format: date
+        reason:
+          type: string
+      required:
+        - serviceType
+        - appointmentTime
+        - reason
+      example:
+        serviceType: OPConsultation
+        appointmentTime: 2024-05-20
+        reason: General
+
+    Procedure:
+      type: object
+      properties:
+        date:
+          type: string
+        status:
+          type: string
+        procedureReason:
+          type: string
+        outcome:
+          type: string
+        procedureName:
+          type: string
+      required:
+        - date
+        - status
+        - procedureName
+        - procedureReason
+      example:
+        date: 2001-04-25
+        status: INPROGRESS
+        procedureReason: Severe
+        outcome: Healthy
+        procedureName: Operation
+
+    Referral:
+      type: object
+      properties:
+        status:
+          type: string
+        details:
+          type: string
+        specimen:
+          type: string
+      required:
+        - status
+        - details
+      example:
+        status: ACTIVE
+        details: Y-RAY
+        specimen: Rock
+
+    Observation:
+      type: object
+      properties:
+        observation:
+          type: string
+        result:
+          type: string
+        valueQuantity:
+          $ref: '#/components/schemas/ValueQuantity'
+      required:
+        - observation
+      example:
+        observation: Height
+        result: Normal
+        valueQuantity:
+          unit: CM
+          value: 170
+
+    OtherObservation:
+      type: object
+      properties:
+        observation:
+          type: string
+        result:
+          type: string
+        valueQuantity:
+          $ref: '#/components/schemas/ValueQuantity'
+      required:
+        - observation
+      example:
+        observation: weight
+        result: Over weight
+        valueQuantity:
+          unit: KG
+          value: 90
+      # Note: Either result or valueQuantity should be included along with observation.
+
+    Document:
+      type: object
+      properties:
+        type:
+          type: string
+        contentType:
+          type: string
+        data:
+          type: string
+      required:
+        - type
+        - contentType
+        - data
+      example:
+        type: OP record
+        contentType: application/pdf
+        data: xyzadybcljbabvlalbfdbvubujzbj
+
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        validationErrors:
+          type: object
+          properties:
+            code:
+              type: integer
+              example: 1000
+            error:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                  message:
+                    type: string
+      example:
+        validationErrors:
+          code: 1000
+          error:
+            - field: bundleType
+              message: must match "PrescriptionRecord"
+
+    GenericErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+            message:
+              type: string
+      example:
+        error:
+          code: 1000
+          message: "Parsing error must match the date format 2002-05-12"

@@ -1,0 +1,418 @@
+[
+  {
+    "code": "319775004",
+    "display": "Aspirin 75 mg oral tablet"
+  },
+  {
+    "code": "370166004",
+    "display": "Aspirin 325 mg oral tablet"
+  },
+  {
+    "code": "374744009",
+    "display": "Aspirin 800 mg oral tablet"
+  },
+  {
+    "code": "370164001",
+    "display": "Aspirin 81 mg chewable tablet"
+  },
+  {
+    "code": "785018008",
+    "display": "Aspirin 2.5 mg/mL oral solution"
+  },
+  {
+    "code": "412575004",
+    "display": "Aspirin 325 mg and codeine 30 mg oral tablet"
+  },
+  {
+    "code": "347070003",
+    "display": "Aspirin 500 mg and glycine 133 mg orodispersible tablet"
+  },
+  {
+    "code": "413586006",
+    "display": "Acetaminophen 250 mg and aspirin 250 mg and caffeine 65 mg oral tablet"
+  },
+  {
+    "code": "412647005",
+    "display": "Aspirin 389 mg and caffeine 32.4 mg and propoxyphene hydrochloride 32 mg oral capsule"
+  },
+  {
+    "code": "322784004",
+    "display": "Aspirin DL-lysine 900 mg and metoclopramide hydrochloride 10 mg oral powder sachet"
+  },
+  {
+    "code": "322236009",
+    "display": "Acetaminophen 500 mg oral tablet"
+  },
+  {
+    "code": "322246006",
+    "display": "Acetaminophen 100 mg/mL oral solution"
+  },
+  {
+    "code": "426061004",
+    "display": "Mesalamine 1.2 g gastro-resistant oral tablet"
+  },
+  {
+    "code": "324409009",
+    "display": "Sulfalene 2 g oral tablet"
+  },
+  {
+    "code": "376693009",
+    "display": "Cefadroxil 1 g oral tablet"
+  },
+  {
+    "code": "329838002",
+    "display": "Naproxen 250 mg gastro-resistant oral tablet"
+  },
+  {
+    "code": "416272002",
+    "display": "Zinc 50 mg oral capsule"
+  },
+  {
+    "code": "418197002",
+    "display": "Glucosamine 1 g oral tablet"
+  },
+  {
+    "code": "426863002",
+    "display": "Melatonin 2 mg prolonged-release oral tablet"
+  },
+  {
+    "code": "765963000",
+    "display": "Budesonide 3 mg gastro-resistant oral capsule"
+  },
+  {
+    "code": "765590000",
+    "display": "Felodipine 5 mg prolonged-release oral tablet"
+  },
+  {
+    "code": "765699007",
+    "display": "Ibuprofen 800 mg prolonged-release oral tablet"
+  },
+  {
+    "code": "766432002",
+    "display": "Fusidic acid 10 mg/g prolonged-release eye drops"
+  },
+  {
+    "code": "324682007",
+    "display": "Miconazole 25 mg/g oral gel"
+  },
+  {
+    "code": "765651007",
+    "display": "Axitinib 5 mg oral tablet"
+  },
+  {
+    "code": "408068006",
+    "display": "Nabilone 2 mg oral capsule"
+  },
+  {
+    "code": "326272004",
+    "display": "Nystatin 25000 unit/g vaginal cream"
+  },
+  {
+    "code": "408597001",
+    "display": "Ganciclovir 1.5 mg/g eye gel"
+  },
+  {
+    "code": "321573006",
+    "display": "Clozapine 25 mg oral tablet"
+  },
+  {
+    "code": "375833002",
+    "display": "Ofloxacin 3 mg/mL ear solution"
+  },
+  {
+    "code": "785252002",
+    "display": "Glycerin 10 mg/mL eye solution"
+  },
+  {
+    "code": "321203006",
+    "display": "Diazepam 1 mg/mL oral solution"
+  },
+  {
+    "code": "784911007",
+    "display": "Carbachol 15 mg/mL eye solution"
+  },
+  {
+    "code": "407773006",
+    "display": "Sulpiride 40 mg/mL oral solution"
+  },
+  {
+    "code": "407836002",
+    "display": "Efavirenz 30 mg/mL oral solution"
+  },
+  {
+    "code": "323074003",
+    "display": "Diazepam 4 mg/mL rectal solution"
+  },
+  {
+    "code": "410840000",
+    "display": "Ribavirin 40 mg/mL oral solution"
+  },
+  {
+    "code": "348336006",
+    "display": "Phenol 10 mg/mL cutaneous solution"
+  },
+  {
+    "code": "784960002",
+    "display": "Epinephrine 1 mg/mL nasal solution"
+  },
+  {
+    "code": "781971000",
+    "display": "Linezolid 2 mg/mL solution for infusion"
+  },
+  {
+    "code": "781781009",
+    "display": "Baclofen 2 mg/mL solution for injection"
+  },
+  {
+    "code": "781829000",
+    "display": "Diazepam 5 mg/mL solution for injection"
+  },
+  {
+    "code": "785204007",
+    "display": "Glucose 200 mg/mL solution for injection"
+  },
+  {
+    "code": "446347007",
+    "display": "Denosumab 60 mg/mL solution for injection"
+  },
+  {
+    "code": "782062009",
+    "display": "Piroxicam 20 mg/mL solution for injection"
+  },
+  {
+    "code": "784839007",
+    "display": "Tobramycin 60 mg/mL solution for inhalation"
+  },
+  {
+    "code": "784910008",
+    "display": "Enflurane 999 mg/mL solution for inhalation"
+  },
+  {
+    "code": "781996002",
+    "display": "Metronidazole 5 mg/mL solution for infusion"
+  },
+  {
+    "code": "782021003",
+    "display": "Nitroglycerin 5 mg/mL solution for injection"
+  },
+  {
+    "code": "348190007",
+    "display": "Tolnaftate 10 mg/g cutaneous powder"
+  },
+  {
+    "code": "766284006",
+    "display": "Clotrimazole 10 mg/g cutaneous powder"
+  },
+  {
+    "code": "324867004",
+    "display": "Nelfinavir 50 microgram/mg oral powder"
+  },
+  {
+    "code": "766429000",
+    "display": "Povidone iodine 25 mg/g cutaneous powder spray"
+  },
+  {
+    "code": "322979001",
+    "display": "Vigabatrin 500 mg powder for oral solution sachet"
+  },
+  {
+    "code": "375854009",
+    "display": "Hemin 313 mg powder for solution for injection vial"
+  },
+  {
+    "code": "323961007",
+    "display": "Aztreonam 1 g powder for solution for injection vial"
+  },
+  {
+    "code": "319948000",
+    "display": "Cholestyramine 4 g powder for oral suspension sachet"
+  },
+  {
+    "code": "785962002",
+    "display": "Cromolyn sodium 20 mg/actuation powder for inhalation"
+  },
+  {
+    "code": "785973009",
+    "display": "Noxythiolin 2.5 g powder for solution for injection vial"
+  },
+  {
+    "code": "782053007",
+    "display": "Phenol 50 mg/mL oil for injection"
+  },
+  {
+    "code": "781828008",
+    "display": "Diazepam 5 mg/mL emulsion for injection"
+  },
+  {
+    "code": "782035001",
+    "display": "Oxytocin 5 unit/mL solution for injection"
+  },
+  {
+    "code": "785006004",
+    "display": "Propofol 10 mg/mL suspension for injection"
+  },
+  {
+    "code": "769129007",
+    "display": "Triptorelin (as triptorelin acetate) 3.75 mg powder for suspension for injection syringe"
+  },
+  {
+    "code": "766169007",
+    "display": "Somatropin(rbe) 600 microgram powder for solution for injection syringe"
+  },
+  {
+    "code": "871797008",
+    "display": "Ozanimod (as ozanimod hydrochloride) 920 microgram oral capsule"
+  },
+  {
+    "code": "386086001",
+    "display": "Tacrine 40 mg oral capsule"
+  },
+  {
+    "code": "415163005",
+    "display": "Pregabalin 200 mg oral capsule"
+  },
+  {
+    "code": "430273009",
+    "display": "Temazepam 22.5 mg oral capsule"
+  },
+  {
+    "code": "423454000",
+    "display": "Vorinostat 100 mg oral capsule"
+  },
+  {
+    "code": "370149001",
+    "display": "Acetaminophen 160 mg oral tablet"
+  },
+  {
+    "code": "377441009",
+    "display": "Acetaminophen 325 mg and tramadol 37.5 mg oral tablet"
+  },
+  {
+    "code": "377594002",
+    "display": "Acetaminophen 325 mg and butalbital 50 mg oral tablet"
+  },
+  {
+    "code": "322341003",
+    "display": "Acetaminophen 500 mg and codeine phosphate 30 mg oral tablet"
+  },
+  {
+    "code": "783660005",
+    "display": "Paroxetine (as paroxetine hydrochloride) 10 mg oral tablet"
+  },
+  {
+    "code": "421386002",
+    "display": "Acetaminophen 300 mg and oxycodone hydrochloride 5 mg oral tablet"
+  },
+  {
+    "code": "377343008",
+    "display": "Acetaminophen 325 mg and oxycodone hydrochloride 5 mg oral tablet"
+  },
+  {
+    "code": "370148009",
+    "display": "Acetaminophen 80 mg chewable tablet"
+  },
+  {
+    "code": "785926003",
+    "display": "Mucin 35 mg/mL oral spray"
+  },
+  {
+    "code": "703958008",
+    "display": "Avanafil 50 mg oral tablet"
+  },
+  {
+    "code": "324682007",
+    "display": "Miconazole 25 mg/g oral gel"
+  },
+  {
+    "code": "442888004",
+    "display": "Iloperidone 8 mg oral tablet"
+  },
+  {
+    "code": "445522003",
+    "display": "Rifaximin 550 mg oral tablet"
+  },
+  {
+    "code": "332248004",
+    "display": "Anthralin 1 mg/g cutaneous cream"
+  },
+  {
+    "code": "332246000",
+    "display": "Anthralin 5 mg/g cutaneous cream"
+  },
+  {
+    "code": "333020002",
+    "display": "Acyclovir 50 mg/g cutaneous cream"
+  },
+  {
+    "code": "331624002",
+    "display": "Benzocaine 30 mg/g cutaneous cream"
+  },
+  {
+    "code": "332199003",
+    "display": "Calcipotriol 50 microgram/mL cutaneous cream"
+  },
+  {
+    "code": "413872001",
+    "display": "Clocortolone pivalate 1 mg/mL cutaneous cream"
+  },
+  {
+    "code": "330588001",
+    "display": "Tropicamide 5 mg/mL eye drops"
+  },
+  {
+    "code": "409490006",
+    "display": "Hydroxyamphetamine hydrobromide 10 mg/mL and tropicamide 2.5 mg/mL eye solution"
+  },
+  {
+    "code": "783373002",
+    "display": "Tropisetron (as tropisetron hydrochloride) 5 mg oral capsule"
+  },
+  {
+    "code": "324682007",
+    "display": "Miconazole 25 mg/g oral gel"
+  },
+  {
+    "code": "408597001",
+    "display": "Ganciclovir 1.5 mg/g eye gel"
+  },
+  {
+    "code": "332378006",
+    "display": "Adapalene 1 mg/g cutaneous gel"
+  },
+  {
+    "code": "135588001",
+    "display": "Benzocaine 100 mg/g dental gel"
+  },
+  {
+    "code": "330229006",
+    "display": "Felbinac 30 mg/g transdermal gel"
+  },
+  {
+    "code": "414272004",
+    "display": "Fluocinolone acetonide 100 microgram/mL cutaneous oil"
+  },
+  {
+    "code": "331469001",
+    "display": "Cod liver oil 114 mg/g and zinc oxide 380 mg/g cutaneous ointment"
+  },
+  {
+    "code": "781919008",
+    "display": "Haloperidol (as haloperidol decanoate) 50 mg/mL oil for injection"
+  },
+  {
+    "code": "781828008",
+    "display": "Diazepam 5 mg/mL emulsion for injection"
+  },
+  {
+    "code": "781752008",
+    "display": "Adenosine 3 mg/mL solution for injection"
+  },
+  {
+    "code": "784932004",
+    "display": "Diazepam 5 mg/mL suspension for injection"
+  },
+  {
+    "code": "376105006",
+    "display": "Estrone 15 mg/mL suspension for injection"
+  }
+]

@@ -1,0 +1,66 @@
+[
+  {
+    "code": "B53.0",
+    "display": "Plasmodium ovale malaria"
+  },
+  {
+    "code": "E11.9",
+    "display": "Type 2 diabetes mellitus : Without complications"
+  },
+  {
+    "code": "I46.9",
+    "display": "Cardiac arrest, unspecified"
+  },
+  {
+    "code": "S82.1",
+    "display": "Fracture of upper end of tibia"
+  },
+  {
+    "code": "K70.3",
+    "display": "Alcoholic cirrhosis of liver"
+  },
+  {
+    "code": "K35.8",
+    "display": "Acute appendicitis, other and unspecified"
+  },
+  {
+    "code": "A08.4",
+    "display": "Viral intestinal infection, unspecified"
+  },
+  {
+    "code": "770573007",
+    "display": "Airway endoscopy report"
+  },
+  {
+    "code": "782659005",
+    "display": "Cystoscopy report"
+  },
+  {
+    "code": "725870000",
+    "display": "Diagnostic coronary angiography report"
+  },
+  {
+    "code": "721981007",
+    "display": "Diagnostic studies report"
+  },
+  {
+    "code": "722143004",
+    "display": "Infectious disease diagnostic study note"
+  },
+  {
+    "code": "720449003",
+    "display": "Pulmonary function report"
+  },
+  {
+    "code": "371528001",
+    "display": "Pathology report"
+  },
+  {
+    "code": "721631001",
+    "display": "Bone marrow pathology biopsy report"
+  },
+  {
+    "code": "4311000179106",
+    "display": "Chemical pathology report"
+  }
+]
