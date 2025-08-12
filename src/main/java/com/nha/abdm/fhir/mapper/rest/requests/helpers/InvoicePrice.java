@@ -7,12 +7,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class InvoiceDeviceResource {
-  private String udiCarrier;
-  private String manufacturer;
-  private String lotNumber;
-  private String note;
+@NoArgsConstructor
+@Builder
+public class InvoicePrice {
+  private String priceType;
+  private double value;
 }

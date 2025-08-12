@@ -69,4 +69,6 @@ public class BundleCompositionIdentifier {
   public static final String BODY_MEASUREMENT = "Body Measurement";
   public static final String VITAL_SIGNS = "Vital Signs";
   public static final String DOCUMENT_REFERENCE = "Document Reference";
+
+  public static final String INVOICE_RECORD = "Invoice Record";
 }

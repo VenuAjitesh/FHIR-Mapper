@@ -1,49 +1,55 @@
+/* (C) 2025 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources.invoice;
 
-import com.nha.abdm.fhir.mapper.rest.requests.helpers.ChargeItemResource;
-import com.nha.abdm.fhir.mapper.rest.requests.helpers.InvoiceResource;
-import org.hl7.fhir.r4.model.ChargeItem;
-import org.hl7.fhir.r4.model.Invoice;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
+import com.nha.abdm.fhir.mapper.rest.requests.InvoiceBundleRequest;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import org.hl7.fhir.r4.model.*;
+import org.springframework.stereotype.Service;
 
 @Service
 public class MakeInvoiceResource {
-    private final MakeInvoiceMedicationResource makeInvoiceMedicationResource;
-    private final MakeInvoiceDeviceResource makeInvoiceDeviceResource;
-    private final MakeInvoiceSubstanceResource makeInvoiceSubstanceResource;
 
-    public MakeInvoiceResource(MakeInvoiceMedicationResource medicationResource,
-                               MakeInvoiceDeviceResource deviceResource,
-                               MakeInvoiceSubstanceResource substanceResource) {
-        this.makeInvoiceMedicationResource = medicationResource;
-        this.makeInvoiceDeviceResource = deviceResource;
-        this.makeInvoiceSubstanceResource = substanceResource;
-    }
-    public Invoice buildInvoice(InvoiceResource invoiceResource) {
-        Invoice invoice = new Invoice();
+  private final MakeInvoicePriceComponent makeInvoicePriceComponent;
 
-        invoice.setId(invoiceResource.getId());
-        invoice.setStatus(Invoice.InvoiceStatus.ACTIVE);
-        invoice.setDate(invoiceResource.getDate());
+  public MakeInvoiceResource(MakeInvoicePriceComponent makeInvoicePriceComponent) {
+    this.makeInvoicePriceComponent = makeInvoicePriceComponent;
+  }
 
-        // Add account or subject if available
-        if (invoiceResource.getSubject() != null) {
-            invoice.setSubject(new Reference(invoiceResource.getSubject()));
-        }
+  public Invoice buildInvoice(
+      InvoiceBundleRequest invoiceBundleRequest,
+      List<ChargeItem> chargeItems,
+      Patient patient,
+      Organization organisation) {
 
-        // Build charge items list
-        List<Invoice.InvoiceLineItemComponent> lineItems = new ArrayList<>();
-        for (ChargeItemResource chargeItemResource : invoiceResource.getChargeItems()) {
-            ChargeItem chargeItem = buildChargeItem(chargeItemResource);
-            Invoice.InvoiceLineItemComponent lineItem = new Invoice.InvoiceLineItemComponent();
-            lineItem.setChargeItem(new Reference(chargeItem));
-            lineItems.add(lineItem);
-        }
+    Invoice invoice = new Invoice();
+    invoice.setId(invoiceBundleRequest.getInvoice().getId());
+    //    invoice.setStatus(Invoice.InvoiceStatus.fromCode(invoiceBundleRequest.getStatus()));
+    // //TODO
+    //    invoice.setDate(invoiceBundleRequest.getInvoiceDate());
+    invoice.setSubject(new Reference(patient.getIdElement()));
+    invoice.setIssuer(new Reference(organisation.getIdElement()));
 
-        invoice.setLineItem(lineItems);
-        return invoice;
-    }
+    Map<String, ChargeItem> chargeItemMap =
+        chargeItems.stream()
+            .collect(Collectors.toMap(item -> item.getIdElement().getIdPart(), item -> item));
+
+    List<Invoice.InvoiceLineItemComponent> lineItems =
+        invoiceBundleRequest.getChargeItems().stream()
+            .filter(item -> chargeItemMap.containsKey(item.getId()))
+            .map(
+                item -> {
+                  Invoice.InvoiceLineItemComponent lineItem =
+                      new Invoice.InvoiceLineItemComponent();
+                  lineItem.setChargeItem(new Reference(item.getId()));
+                  makeInvoicePriceComponent
+                      .makeInvoicePriceComponents(item, invoiceBundleRequest)
+                      .forEach(lineItem::addPriceComponent);
+                  return lineItem;
+                })
+            .collect(Collectors.toList());
+    invoice.setLineItem(lineItems);
+    return invoice;
+  }
 }
