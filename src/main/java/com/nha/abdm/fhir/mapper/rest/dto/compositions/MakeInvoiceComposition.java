@@ -21,7 +21,10 @@ public class MakeInvoiceComposition {
       List<Practitioner> practitionerList,
       Organization organization,
       Invoice invoice,
-      List<ChargeItem> chargeItemList)
+      List<ChargeItem> chargeItemList,
+      List<Device> deviceList,
+      List<Substance> substanceList,
+      List<Medication> medicationList)
       throws ParseException {
     Composition composition = new Composition();
     Meta meta = new Meta();

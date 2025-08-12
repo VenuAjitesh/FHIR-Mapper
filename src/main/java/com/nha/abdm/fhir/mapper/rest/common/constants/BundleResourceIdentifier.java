@@ -35,4 +35,7 @@ public class BundleResourceIdentifier {
   public static final String CARE_PLAN = "CarePlan";
   public static final String INVOICE = "Invoice";
   public static final String CHARGE_ITEM = "ChargeItem";
+  public static final String SUBSTANCE = "Substance";
+  public static final String DEVICE = "Device";
+  public static final String Medication = "Medication";
 }

@@ -8,20 +8,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MakeChargeItemResource {
-  private final MakeInvoiceSubstanceResource makeInvoiceSubstanceResource;
-  private final MakeInvoiceDeviceResource makeInvoiceDeviceResource;
-  private final MakeInvoiceMedicationResource makeInvoiceMedicationResource;
 
-  public MakeChargeItemResource(
-      MakeInvoiceSubstanceResource makeInvoiceSubstanceResource,
-      MakeInvoiceDeviceResource makeInvoiceDeviceResource,
-      MakeInvoiceMedicationResource makeInvoiceMedicationResource) {
-    this.makeInvoiceSubstanceResource = makeInvoiceSubstanceResource;
-    this.makeInvoiceDeviceResource = makeInvoiceDeviceResource;
-    this.makeInvoiceMedicationResource = makeInvoiceMedicationResource;
-  }
-
-  public ChargeItem getChargeItems(ChargeItemResource chargeItemResources) {
+  public ChargeItem getChargeItems(ChargeItemResource chargeItemResources, String resourceUrl) {
     if (chargeItemResources == null) {
       return null;
     }
@@ -42,23 +30,7 @@ public class MakeChargeItemResource {
     if (chargeItemResources.getQuantity() != null) {
       chargeItem.setQuantity(new Quantity().setValue(chargeItemResources.getQuantity()));
     }
-    Reference productRef = null;
-    if (chargeItemResources.getMedication() != null) {
-      productRef =
-          new Reference(
-              makeInvoiceMedicationResource.getMedication(chargeItemResources.getMedication()));
-    } else if (chargeItemResources.getDevice() != null) {
-      productRef =
-          new Reference(makeInvoiceDeviceResource.getDevice(chargeItemResources.getDevice()));
-    } else if (chargeItemResources.getSubstance() != null) {
-      productRef =
-          new Reference(
-              makeInvoiceSubstanceResource.getSubstance(chargeItemResources.getSubstance()));
-    }
-
-    if (productRef != null) {
-      chargeItem.setProduct(productRef);
-    }
+    chargeItem.setProduct(new Reference(resourceUrl));
     return chargeItem;
   }
 }

@@ -90,6 +90,7 @@
   { "code": "419021003", "display": "Tumour cavity route" },
   { "code": "419165009", "display": "Paravertebral route (qualifier value)" },
   { "code": "419231003", "display": "Intrasinal route (qualifier value)" },
+  { "code": "385055001", "display": "Tablet" },
   {
     "code": "419243002",
     "display": "Transcervical route (qualifier value)"

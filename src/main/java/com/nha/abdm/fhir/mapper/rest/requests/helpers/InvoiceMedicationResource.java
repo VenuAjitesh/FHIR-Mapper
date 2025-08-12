@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InvoiceMedicationResource {
-  private String code;
-  private String form;
+  private String medicineName;
   private String manufacturer;
   private String medicationForm;
   private String lotNumber;

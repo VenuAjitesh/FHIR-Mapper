@@ -7,12 +7,14 @@ import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ErrorCode;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.BundleResponse;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.ErrorResponse;
+import com.nha.abdm.fhir.mapper.rest.common.helpers.OrganisationResource;
 import com.nha.abdm.fhir.mapper.rest.dto.compositions.MakeInvoiceComposition;
 import com.nha.abdm.fhir.mapper.rest.dto.resources.*;
-import com.nha.abdm.fhir.mapper.rest.dto.resources.invoice.MakeChargeItemResource;
-import com.nha.abdm.fhir.mapper.rest.dto.resources.invoice.MakeInvoiceResource;
+import com.nha.abdm.fhir.mapper.rest.dto.resources.invoice.*;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.InvoiceBundleRequest;
+import com.nha.abdm.fhir.mapper.rest.requests.helpers.ChargeItemResource;
+import java.text.ParseException;
 import java.util.*;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
@@ -32,6 +34,9 @@ public class InvoiceRequestConverter {
   private final MakeInvoiceComposition makeInvoiceComposition;
   private final MakeChargeItemResource makeChargeItemResource;
   private final MakeInvoiceResource makeInvoiceResource;
+  private final MakeInvoiceDeviceResource makeInvoiceDeviceResource;
+  private final MakeInvoiceSubstanceResource makeInvoiceSubstanceResource;
+  private final MakeInvoiceMedicationResource makeInvoiceMedicationResource;
 
   @Autowired
   public InvoiceRequestConverter(
@@ -42,7 +47,10 @@ public class InvoiceRequestConverter {
       MakeEncounterResource makeEncounterResource,
       MakeInvoiceComposition makeInvoiceComposition,
       MakeChargeItemResource makeChargeItemResource,
-      MakeInvoiceResource makeInvoiceResource) {
+      MakeInvoiceResource makeInvoiceResource,
+      MakeInvoiceDeviceResource makeInvoiceDeviceResource,
+      MakeInvoiceSubstanceResource makeInvoiceSubstanceResource,
+      MakeInvoiceMedicationResource makeInvoiceMedicationResource) {
     this.makePatientResource = makePatientResource;
     this.makePractitionerResource = makePractitionerResource;
     this.makeOrganisationResource = makeOrganisationResource;
@@ -51,6 +59,9 @@ public class InvoiceRequestConverter {
     this.makeInvoiceComposition = makeInvoiceComposition;
     this.makeChargeItemResource = makeChargeItemResource;
     this.makeInvoiceResource = makeInvoiceResource;
+    this.makeInvoiceDeviceResource = makeInvoiceDeviceResource;
+    this.makeInvoiceSubstanceResource = makeInvoiceSubstanceResource;
+    this.makeInvoiceMedicationResource = makeInvoiceMedicationResource;
   }
 
   public BundleResponse makeInvoiceBundle(InvoiceBundleRequest invoiceBundleRequest) {
@@ -74,11 +85,27 @@ public class InvoiceRequestConverter {
                   : null,
               invoiceBundleRequest.getAuthoredOn());
       List<Organization> manufactureList = new ArrayList<>();
+      List<Device> deviceList = new ArrayList<>();
+      List<Substance> substanceList = new ArrayList<>();
+      List<Medication> medicationList = new ArrayList<>();
       List<ChargeItem> chargeItemList =
           Optional.ofNullable(invoiceBundleRequest.getChargeItems())
               .orElse(Collections.emptyList())
               .stream()
-              .map(makeChargeItemResource::getChargeItems)
+              .map(
+                  item -> {
+                    try {
+                      return generateProductAndChargeItem(
+                          item,
+                          deviceList,
+                          substanceList,
+                          medicationList,
+                          manufactureList,
+                          invoiceBundleRequest);
+                    } catch (ParseException e) {
+                      throw new RuntimeException(e);
+                    }
+                  })
               .toList();
       Invoice invoice =
           makeInvoiceResource.buildInvoice(
@@ -86,7 +113,14 @@ public class InvoiceRequestConverter {
 
       Composition composition =
           makeInvoiceComposition.makeCompositionResource(
-              patient, practitionerList, organization, invoice, chargeItemList);
+              patient,
+              practitionerList,
+              organization,
+              invoice,
+              chargeItemList,
+              deviceList,
+              substanceList,
+              medicationList);
 
       bundle.setId(UUID.randomUUID().toString());
       bundle.setType(Bundle.BundleType.DOCUMENT);
@@ -139,6 +173,24 @@ public class InvoiceRequestConverter {
                 .setFullUrl(BundleResourceIdentifier.CHARGE_ITEM + "/" + item.getId())
                 .setResource(item));
       }
+      for (Device item : deviceList) {
+        entries.add(
+            new Bundle.BundleEntryComponent()
+                .setFullUrl(BundleResourceIdentifier.DEVICE + "/" + item.getId())
+                .setResource(item));
+      }
+      for (Substance item : substanceList) {
+        entries.add(
+            new Bundle.BundleEntryComponent()
+                .setFullUrl(BundleResourceIdentifier.SUBSTANCE + "/" + item.getId())
+                .setResource(item));
+      }
+      for (Medication item : medicationList) {
+        entries.add(
+            new Bundle.BundleEntryComponent()
+                .setFullUrl(BundleResourceIdentifier.Medication + "/" + item.getId())
+                .setResource(item));
+      }
       bundle.setEntry(entries);
       return BundleResponse.builder().bundle(bundle).build();
     } catch (Exception e) {
@@ -154,6 +206,41 @@ public class InvoiceRequestConverter {
       return BundleResponse.builder()
           .error(ErrorResponse.builder().code("1000").message(e.getMessage()).build())
           .build();
+    }
+  }
+
+  private ChargeItem generateProductAndChargeItem(
+      ChargeItemResource item,
+      List<Device> deviceList,
+      List<Substance> substanceList,
+      List<Medication> medicationList,
+      List<Organization> manufactureList,
+      InvoiceBundleRequest invoiceBundleRequest)
+      throws ParseException {
+    if (item.getType().equalsIgnoreCase(BundleResourceIdentifier.DEVICE)) {
+      Device device = makeInvoiceDeviceResource.getDevice(item.getDevice());
+      deviceList.add(device);
+      return makeChargeItemResource.getChargeItems(item, device.getIdElement().getId());
+    } else if (item.getType().equalsIgnoreCase(BundleResourceIdentifier.SUBSTANCE)) {
+      Substance substance = makeInvoiceSubstanceResource.getSubstance(item.getSubstance());
+      substanceList.add(substance);
+      return makeChargeItemResource.getChargeItems(item, substance.getIdElement().getId());
+    } else if (item.getType().equalsIgnoreCase(BundleResourceIdentifier.Medication)) {
+      Organization manufacturer = new Organization();
+      if (Objects.nonNull(item.getMedication().getManufacturer())) {
+        manufacturer =
+            makeOrganisationResource.getOrganization(
+                OrganisationResource.builder()
+                    .facilityName(item.getMedication().getManufacturer())
+                    .build());
+        manufactureList.add(manufacturer);
+      }
+      Medication medication =
+          makeInvoiceMedicationResource.getMedication(item.getMedication(), manufacturer);
+      medicationList.add(medication);
+      return makeChargeItemResource.getChargeItems(item, medication.getIdElement().getId());
+    } else {
+      throw new IllegalArgumentException("Unknown product type: " + item.getType());
     }
   }
 }

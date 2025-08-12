@@ -11,8 +11,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InvoiceDeviceResource {
+  private String deviceName;
   private String udiCarrier;
   private String manufacturer;
   private String lotNumber;
+  private String serialNumber;
   private String note;
 }
