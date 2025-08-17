@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class InvoicePrice {
   private String priceType;
-  private double value;
+  private double amount;
 }

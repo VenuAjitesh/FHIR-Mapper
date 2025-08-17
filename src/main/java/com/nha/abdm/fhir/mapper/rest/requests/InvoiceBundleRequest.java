@@ -32,7 +32,7 @@ public class InvoiceBundleRequest {
   @Pattern(
       regexp = "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z)?$",
       message = "Value must match either yyyy-MM-dd or yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-  @NotNull(message = "authoredOn is mandatory timestamp") private String authoredOn;
+  @NotNull(message = "authoredOn is mandatory timestamp") private String invoiceDate;
 
   private String encounter;
 
@@ -46,6 +46,8 @@ public class InvoiceBundleRequest {
   @NotNull(message = "organisation is mandatory") private OrganisationResource organisation;
 
   @NotNull(message = "invoice is mandatory") private InvoiceResource invoice;
+
+  @NotNull(message = "status is mandatory") private String status;
 
   @Valid
   @NotNull(message = "chargeItems are mandatory and must not be empty") private List<ChargeItemResource> chargeItems;

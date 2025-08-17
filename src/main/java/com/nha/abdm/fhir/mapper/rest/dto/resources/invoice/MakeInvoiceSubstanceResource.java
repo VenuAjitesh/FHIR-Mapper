@@ -19,10 +19,14 @@ public class MakeInvoiceSubstanceResource {
         substanceResource.getId() != null
             ? substanceResource.getId()
             : UUID.randomUUID().toString());
+
     substance.setCode(new CodeableConcept().setText(substanceResource.getCode()));
+
     substance.setDescription(substanceResource.getDescription());
+
     substance.setCategory(
         Collections.singletonList(new CodeableConcept().setText(substanceResource.getCategory())));
+
     substance.setInstance(
         Collections.singletonList(
             new Substance.SubstanceInstanceComponent()

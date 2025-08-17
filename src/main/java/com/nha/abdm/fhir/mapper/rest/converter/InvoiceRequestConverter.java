@@ -83,7 +83,7 @@ public class InvoiceRequestConverter {
               invoiceBundleRequest.getEncounter() != null
                   ? invoiceBundleRequest.getEncounter()
                   : null,
-              invoiceBundleRequest.getAuthoredOn());
+              invoiceBundleRequest.getInvoiceDate());
       List<Organization> manufactureList = new ArrayList<>();
       List<Device> deviceList = new ArrayList<>();
       List<Substance> substanceList = new ArrayList<>();
@@ -188,7 +188,7 @@ public class InvoiceRequestConverter {
       for (Medication item : medicationList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.Medication + "/" + item.getId())
+                .setFullUrl(BundleResourceIdentifier.MEDICATION + "/" + item.getId())
                 .setResource(item));
       }
       bundle.setEntry(entries);
@@ -220,12 +220,12 @@ public class InvoiceRequestConverter {
     if (item.getType().equalsIgnoreCase(BundleResourceIdentifier.DEVICE)) {
       Device device = makeInvoiceDeviceResource.getDevice(item.getDevice());
       deviceList.add(device);
-      return makeChargeItemResource.getChargeItems(item, device.getIdElement().getId());
+      return makeChargeItemResource.getChargeItems(item, device.getId());
     } else if (item.getType().equalsIgnoreCase(BundleResourceIdentifier.SUBSTANCE)) {
       Substance substance = makeInvoiceSubstanceResource.getSubstance(item.getSubstance());
       substanceList.add(substance);
-      return makeChargeItemResource.getChargeItems(item, substance.getIdElement().getId());
-    } else if (item.getType().equalsIgnoreCase(BundleResourceIdentifier.Medication)) {
+      return makeChargeItemResource.getChargeItems(item, substance.getId());
+    } else if (item.getType().equalsIgnoreCase(BundleResourceIdentifier.MEDICATION)) {
       Organization manufacturer = new Organization();
       if (Objects.nonNull(item.getMedication().getManufacturer())) {
         manufacturer =
@@ -238,7 +238,7 @@ public class InvoiceRequestConverter {
       Medication medication =
           makeInvoiceMedicationResource.getMedication(item.getMedication(), manufacturer);
       medicationList.add(medication);
-      return makeChargeItemResource.getChargeItems(item, medication.getIdElement().getId());
+      return makeChargeItemResource.getChargeItems(item, medication.getId());
     } else {
       throw new IllegalArgumentException("Unknown product type: " + item.getType());
     }

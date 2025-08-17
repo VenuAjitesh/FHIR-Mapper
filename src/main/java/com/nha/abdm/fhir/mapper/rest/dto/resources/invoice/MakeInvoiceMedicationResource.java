@@ -1,6 +1,7 @@
 /* (C) 2025 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources.invoice;
 
+import ca.uhn.fhir.context.FhirContext;
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
@@ -9,13 +10,16 @@ import com.nha.abdm.fhir.mapper.rest.requests.helpers.InvoiceMedicationResource;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class MakeInvoiceMedicationResource {
   @Autowired SnomedService snomedService;
+  FhirContext ctx = FhirContext.forR4();
 
   public Medication getMedication(
       InvoiceMedicationResource medicationResource, Organization manufacturer)
@@ -51,8 +55,7 @@ public class MakeInvoiceMedicationResource {
 
     medication.setManufacturer(
         new Reference()
-            .setReference(
-                BundleResourceIdentifier.MANUFACTURER + "/" + manufacturer.getIdElement().getId()));
+            .setReference(BundleResourceIdentifier.MANUFACTURER + "/" + manufacturer.getId()));
 
     medication.setBatch(
         new Medication.MedicationBatchComponent()
