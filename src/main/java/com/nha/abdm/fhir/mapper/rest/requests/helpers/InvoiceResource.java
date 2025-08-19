@@ -2,7 +2,6 @@
 package com.nha.abdm.fhir.mapper.rest.requests.helpers;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +14,8 @@ import lombok.NoArgsConstructor;
 public class InvoiceResource {
   private String id;
   private String status;
-  private OffsetDateTime date;
+  private String type;
+  private String date;
   private BigDecimal totalNet;
   private BigDecimal totalGross;
   private String currency;

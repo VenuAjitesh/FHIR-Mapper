@@ -1,7 +1,6 @@
 /* (C) 2025 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources.invoice;
 
-import ca.uhn.fhir.context.FhirContext;
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
@@ -19,39 +18,27 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class MakeInvoiceMedicationResource {
   @Autowired SnomedService snomedService;
-  FhirContext ctx = FhirContext.forR4();
 
   public Medication getMedication(
       InvoiceMedicationResource medicationResource, Organization manufacturer)
       throws ParseException {
+
     Medication medication = new Medication();
     medication.setId(UUID.randomUUID().toString());
     medication.setMeta(
         new Meta().setVersionId("1").setLastUpdatedElement(Utils.getCurrentTimeStamp()));
 
     medication.setCode(
-        new CodeableConcept()
-            .setCoding(
-                Collections.singletonList(
-                    new Coding(
-                        BundleUrlIdentifier.SNOMED_URL,
-                        snomedService
-                            .getSnomedMedicineCode(medicationResource.getMedicineName())
-                            .getCode(),
-                        medicationResource.getMedicineName())))
-            .setText(medicationResource.getMedicineName()));
+        createCodeableConcept(
+            snomedService.getSnomedMedicineCode(medicationResource.getMedicineName()).getCode(),
+            medicationResource.getMedicineName()));
 
     medication.setForm(
-        new CodeableConcept()
-            .setCoding(
-                Collections.singletonList(
-                    new Coding(
-                        BundleUrlIdentifier.SNOMED_URL,
-                        snomedService
-                            .getSnomedMedicineRouteCode(medicationResource.getMedicationForm())
-                            .getCode(),
-                        medicationResource.getMedicationForm())))
-            .setText(medicationResource.getMedicationForm()));
+        createCodeableConcept(
+            snomedService
+                .getSnomedMedicineRouteCode(medicationResource.getMedicationForm())
+                .getCode(),
+            medicationResource.getMedicationForm()));
 
     medication.setManufacturer(
         new Reference()
@@ -61,6 +48,15 @@ public class MakeInvoiceMedicationResource {
         new Medication.MedicationBatchComponent()
             .setLotNumber(medicationResource.getLotNumber())
             .setExpirationDate(Utils.getFormattedDate(medicationResource.getExpiryDate())));
+
     return medication;
+  }
+
+  /** Utility method to create CodeableConcept with SNOMED coding. */
+  private CodeableConcept createCodeableConcept(String code, String display) {
+    return new CodeableConcept()
+        .setCoding(
+            Collections.singletonList(new Coding(BundleUrlIdentifier.SNOMED_URL, code, display)))
+        .setText(display);
   }
 }

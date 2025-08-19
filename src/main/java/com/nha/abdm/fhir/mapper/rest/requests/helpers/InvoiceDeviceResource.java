@@ -23,7 +23,5 @@ public class InvoiceDeviceResource {
   private String expirationDate; // Expiry date if applicable
   private String status; // active | inactive | entered-in-error | unknown
   private String note; // Free text notes
-  private String catalogNumber; // Catalog number (if supplied by manufacturer)
-  private String distinctId; // Unique identifier in hospital system
   private List<String> safety; // Safety characteristics (e.g., Latex Free, Sterile)
 }

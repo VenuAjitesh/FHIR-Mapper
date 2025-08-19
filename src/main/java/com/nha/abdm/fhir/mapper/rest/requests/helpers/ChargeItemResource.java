@@ -13,8 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChargeItemResource {
   private String id;
-  private String type;
-  private String code;
+  private String productType;
+  private String chargeType;
+  private String status;
   private String description;
   private Integer quantity;
   private List<InvoicePrice> price;

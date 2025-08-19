@@ -3,9 +3,10 @@ package com.nha.abdm.fhir.mapper.rest.dto.resources.invoice;
 
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.InvoiceDeviceResource;
-import java.util.Collections;
+import java.text.ParseException;
 import java.util.List;
 import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.Annotation;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Device;
@@ -15,71 +16,55 @@ import org.springframework.stereotype.Service;
 @Service
 public class MakeInvoiceDeviceResource {
 
-  public Device getDevice(InvoiceDeviceResource deviceResource) {
+  public Device getDevice(InvoiceDeviceResource deviceResource) throws ParseException {
+    if (deviceResource == null) {
+      return null;
+    }
+
     Device device = new Device();
+
     device.setId(
-        deviceResource.getUdiCarrier() != null && !deviceResource.getUdiCarrier().isEmpty()
+        StringUtils.isNotBlank(deviceResource.getUdiCarrier())
             ? deviceResource.getUdiCarrier()
             : UUID.randomUUID().toString());
 
-    if (deviceResource.getDeviceName() != null) {
+    if (StringUtils.isNotBlank(deviceResource.getDeviceName())) {
       device.setDeviceName(
-          Collections.singletonList(
+          List.of(
               new Device.DeviceDeviceNameComponent()
                   .setName(deviceResource.getDeviceName())
                   .setType(Device.DeviceNameType.USERFRIENDLYNAME)));
     }
 
-    if (deviceResource.getUdiCarrier() != null) {
+    if (StringUtils.isNotBlank(deviceResource.getUdiCarrier())) {
       device.setUdiCarrier(
-          Collections.singletonList(
+          List.of(
               new Device.DeviceUdiCarrierComponent()
                   .setDeviceIdentifier(deviceResource.getUdiCarrier())));
     }
 
-    if (deviceResource.getManufacturer() != null) {
+    if (StringUtils.isNotBlank(deviceResource.getManufacturer())) {
       device.setManufacturer(deviceResource.getManufacturer());
     }
 
-    if (deviceResource.getSerialNumber() != null)
+    if (StringUtils.isNotBlank(deviceResource.getSerialNumber())) {
       device.setSerialNumber(deviceResource.getSerialNumber());
-    if (deviceResource.getLotNumber() != null) device.setLotNumber(deviceResource.getLotNumber());
-    if (deviceResource.getModelNumber() != null)
+    }
+    if (StringUtils.isNotBlank(deviceResource.getLotNumber())) {
+      device.setLotNumber(deviceResource.getLotNumber());
+    }
+    if (StringUtils.isNotBlank(deviceResource.getModelNumber())) {
       device.setModelNumber(deviceResource.getModelNumber());
-
-    if (deviceResource.getCatalogNumber() != null) {
-      device.addIdentifier(
-          new Identifier()
-              .setSystem("http://example.org/catalogNumber")
-              .setValue(deviceResource.getCatalogNumber()));
     }
 
-    if (deviceResource.getDistinctId() != null) {
-      device.addIdentifier(
-          new Identifier()
-              .setSystem("http://example.org/hospitalSystem/distinctId")
-              .setValue(deviceResource.getDistinctId()));
-    }
-
-    if (deviceResource.getType() != null) {
+    if (StringUtils.isNotBlank(deviceResource.getType())) {
       device.setType(new CodeableConcept().setText(deviceResource.getType()));
     }
 
-    if (deviceResource.getManufactureDate() != null) {
-      try {
-        device.setManufactureDate(Utils.getFormattedDate(deviceResource.getManufactureDate()));
-      } catch (Exception ignored) {
-      }
-    }
+    device.setManufactureDate(Utils.getFormattedDate(deviceResource.getManufactureDate()));
+    device.setExpirationDate(Utils.getFormattedDate(deviceResource.getExpirationDate()));
 
-    if (deviceResource.getExpirationDate() != null) {
-      try {
-        device.setExpirationDate(Utils.getFormattedDate(deviceResource.getExpirationDate()));
-      } catch (Exception ignored) {
-      }
-    }
-
-    if (deviceResource.getStatus() != null) {
+    if (StringUtils.isNotBlank(deviceResource.getStatus())) {
       try {
         device.setStatus(Device.FHIRDeviceStatus.fromCode(deviceResource.getStatus()));
       } catch (Exception e) {
@@ -89,13 +74,24 @@ public class MakeInvoiceDeviceResource {
 
     if (deviceResource.getSafety() != null && !deviceResource.getSafety().isEmpty()) {
       List<CodeableConcept> safetyConcepts =
-          deviceResource.getSafety().stream().map(s -> new CodeableConcept().setText(s)).toList();
+          deviceResource.getSafety().stream()
+              .filter(StringUtils::isNotBlank)
+              .map(s -> new CodeableConcept().setText(s))
+              .toList();
       device.setSafety(safetyConcepts);
     }
 
-    if (deviceResource.getNote() != null) {
-      device.setNote(Collections.singletonList(new Annotation().setText(deviceResource.getNote())));
+    if (StringUtils.isNotBlank(deviceResource.getNote())) {
+      device.setNote(List.of(new Annotation().setText(deviceResource.getNote())));
     }
+
     return device;
+  }
+
+  /** Helper to safely add identifiers */
+  private void addIdentifierIfPresent(Device device, String system, String value) {
+    if (StringUtils.isNotBlank(value)) {
+      device.addIdentifier(new Identifier().setSystem(system).setValue(value));
+    }
   }
 }

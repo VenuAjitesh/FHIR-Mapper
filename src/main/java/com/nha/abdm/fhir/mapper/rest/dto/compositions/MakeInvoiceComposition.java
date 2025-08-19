@@ -6,9 +6,7 @@ import com.nha.abdm.fhir.mapper.rest.common.constants.BundleCompositionIdentifie
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import org.hl7.fhir.r4.model.*;
 import org.springframework.stereotype.Service;
@@ -24,71 +22,115 @@ public class MakeInvoiceComposition {
       List<ChargeItem> chargeItemList,
       List<Device> deviceList,
       List<Substance> substanceList,
-      List<Medication> medicationList)
+      List<Medication> medicationList,
+      PaymentReconciliation paymentReconciliation)
       throws ParseException {
+
     Composition composition = new Composition();
-    Meta meta = new Meta();
-    meta.setVersionId("1");
-    meta.setLastUpdatedElement(Utils.getCurrentTimeStamp());
-    composition.setMeta(meta);
-    CodeableConcept typeCode = new CodeableConcept();
-    Coding typeCoding = new Coding();
-    typeCoding.setSystem(BundleUrlIdentifier.SNOMED_URL);
-    typeCoding.setCode(BundleCompositionIdentifier.INVOICE_RECORD);
-    typeCoding.setDisplay(BundleCompositionIdentifier.INVOICE_RECORD);
-    typeCode.addCoding(typeCoding);
-    composition.setType(typeCode);
-    composition.setTitle(BundleCompositionIdentifier.INVOICE_RECORD);
-    if (Objects.nonNull(organization))
-      composition.setCustodian(
-          new Reference()
-              .setReference(BundleResourceIdentifier.ORGANISATION + "/" + organization.getId()));
-    List<Reference> authorList = new ArrayList<>();
-    HumanName practitionerName = null;
-    for (Practitioner author : practitionerList) {
-      practitionerName = author.getName().get(0);
-      authorList.add(
-          new Reference()
-              .setReference(BundleResourceIdentifier.PRACTITIONER + "/" + author.getId())
-              .setDisplay(practitionerName.getText()));
+
+    composition.setMeta(
+        new Meta().setVersionId("1").setLastUpdatedElement(Utils.getCurrentTimeStamp()));
+
+    composition
+        .setType(
+            new CodeableConcept()
+                .addCoding(
+                    new Coding()
+                        .setSystem(BundleUrlIdentifier.SNOMED_URL)
+                        .setCode(BundleCompositionIdentifier.INVOICE_RECORD)
+                        .setDisplay(BundleCompositionIdentifier.INVOICE_RECORD)))
+        .setTitle(BundleCompositionIdentifier.INVOICE_RECORD);
+
+    if (organization != null) {
+      composition.setCustodian(ref(BundleResourceIdentifier.ORGANISATION, organization.getId()));
     }
-    composition.setAuthor(authorList);
-    HumanName patientName = patient.getName().get(0);
-    composition.setSubject(
-        new Reference()
-            .setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
-            .setDisplay(patientName.getText()));
-    //        composition.setDateElement(Utils.getFormattedDateTime(authoredOn));//TODO
-    Composition.SectionComponent invoiceSection = new Composition.SectionComponent();
-    invoiceSection.setTitle(BundleResourceIdentifier.INVOICE);
-    invoiceSection.setCode(
-        new CodeableConcept()
-            .setText(BundleCompositionIdentifier.INVOICE_RECORD)
-            .addCoding(
-                new Coding()
-                    .setCode(BundleCompositionIdentifier.INVOICE_RECORD)
-                    .setDisplay(BundleCompositionIdentifier.INVOICE_RECORD)
-                    .setSystem(BundleUrlIdentifier.SNOMED_URL)));
-    Reference invoiceEntryReference =
-        new Reference()
-            .setReference(BundleResourceIdentifier.INVOICE + "/" + invoice.getId())
-            .setType(BundleResourceIdentifier.INVOICE);
-    invoiceSection.addEntry(invoiceEntryReference);
-    for (ChargeItem item : chargeItemList) {
-      Reference entryReference =
-          new Reference()
-              .setReference(BundleResourceIdentifier.CHARGE_ITEM + "/" + item.getId())
-              .setType(BundleResourceIdentifier.CHARGE_ITEM);
-      invoiceSection.addEntry(entryReference);
+
+    if (practitionerList != null && !practitionerList.isEmpty()) {
+      composition.setAuthor(
+          practitionerList.stream()
+              .map(
+                  p ->
+                      ref(
+                          BundleResourceIdentifier.PRACTITIONER,
+                          p.getId(),
+                          p.getName().get(0).getText()))
+              .toList());
+    }
+
+    if (patient != null) {
+      composition.setSubject(
+          ref(
+              BundleResourceIdentifier.PATIENT,
+              patient.getId(),
+              patient.getName().get(0).getText()));
+    }
+
+    if (invoice != null) {
+      composition.setDateElement(invoice.getDateElement());
+    }
+
+    Composition.SectionComponent invoiceSection =
+        new Composition.SectionComponent()
+            .setTitle(BundleResourceIdentifier.INVOICE)
+            .setCode(
+                new CodeableConcept()
+                    .setText(BundleCompositionIdentifier.INVOICE_RECORD)
+                    .addCoding(
+                        new Coding()
+                            .setCode(BundleCompositionIdentifier.INVOICE_RECORD)
+                            .setDisplay(BundleCompositionIdentifier.INVOICE_RECORD)
+                            .setSystem(BundleUrlIdentifier.SNOMED_URL)));
+
+    if (invoice != null) {
+      invoiceSection.addEntry(ref(BundleResourceIdentifier.INVOICE, invoice.getId()));
+    }
+
+    if (chargeItemList != null && !chargeItemList.isEmpty()) {
+      chargeItemList.forEach(
+          item -> invoiceSection.addEntry(ref(BundleResourceIdentifier.CHARGE_ITEM, item.getId())));
+    }
+
+    if (deviceList != null && !deviceList.isEmpty()) {
+      deviceList.forEach(
+          device -> invoiceSection.addEntry(ref(BundleResourceIdentifier.DEVICE, device.getId())));
+    }
+
+    if (substanceList != null && !substanceList.isEmpty()) {
+      substanceList.forEach(
+          substance ->
+              invoiceSection.addEntry(ref(BundleResourceIdentifier.SUBSTANCE, substance.getId())));
+    }
+
+    if (medicationList != null && !medicationList.isEmpty()) {
+      medicationList.forEach(
+          medication ->
+              invoiceSection.addEntry(
+                  ref(BundleResourceIdentifier.MEDICATION, medication.getId())));
+    }
+
+    if (paymentReconciliation != null) {
+      invoiceSection.addEntry(
+          ref(
+              BundleResourceIdentifier.INVOICE_PAYMENT_RECONCILIATION,
+              paymentReconciliation.getId()));
     }
 
     composition.addSection(invoiceSection);
+
     composition.setStatus(Composition.CompositionStatus.FINAL);
-    Identifier identifier = new Identifier();
-    identifier.setSystem(BundleUrlIdentifier.WRAPPER_URL);
-    identifier.setValue(UUID.randomUUID().toString());
-    composition.setIdentifier(identifier);
-    composition.setId(UUID.randomUUID().toString());
+    String compositionId = UUID.randomUUID().toString();
+    composition.setIdentifier(
+        new Identifier().setSystem(BundleUrlIdentifier.WRAPPER_URL).setValue(compositionId));
+    composition.setId(compositionId);
+
     return composition;
+  }
+
+  private Reference ref(String resourceType, String id) {
+    return new Reference().setReference(resourceType + "/" + id).setType(resourceType);
+  }
+
+  private Reference ref(String resourceType, String id, String display) {
+    return ref(resourceType, id).setDisplay(display);
   }
 }

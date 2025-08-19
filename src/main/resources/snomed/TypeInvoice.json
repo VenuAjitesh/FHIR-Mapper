@@ -1,0 +1,22 @@
+[
+  {
+    "code" : "00",
+    "display" : "Consultation"
+  },
+  {
+    "code" : "01",
+    "display" : "Pharmacy"
+  },
+  {
+    "code" : "02",
+    "display" : "IPD"
+  },
+  {
+    "code" : "03",
+    "display" : "OPD"
+  },
+  {
+    "code" : "99",
+    "display" : "Others"
+  }
+]

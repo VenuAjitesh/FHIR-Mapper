@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class InvoicePaymentResource {
   private String method;
+  private String paymentDate;
+  private String status;
   private BigDecimal paidAmount;
   private String transactionId;
 }

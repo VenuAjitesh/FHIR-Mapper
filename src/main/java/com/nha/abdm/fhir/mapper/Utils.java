@@ -24,6 +24,10 @@ public class Utils {
   }
 
   public static DateTimeType getFormattedDateTime(String dateTimeString) throws ParseException {
+    if (dateTimeString == null || dateTimeString.isEmpty()) {
+      log.error("DateTime string is null or empty");
+      return null;
+    }
     dateTimeString = dateTimeString.trim();
     if (dateTimeString.length() <= 10) {
       return new DateTimeType(dateTimeString);
@@ -34,6 +38,10 @@ public class Utils {
   }
 
   public static Date getFormattedDate(String dateTimeString) throws ParseException {
+    if (dateTimeString == null || dateTimeString.isEmpty()) {
+      log.error("DateTime string is null or empty");
+      return null;
+    }
     dateTimeString = dateTimeString.trim();
     return new DateTimeType(dateTimeString).getValue();
   }

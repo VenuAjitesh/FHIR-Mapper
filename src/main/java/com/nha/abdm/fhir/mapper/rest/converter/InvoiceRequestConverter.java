@@ -37,6 +37,7 @@ public class InvoiceRequestConverter {
   private final MakeInvoiceDeviceResource makeInvoiceDeviceResource;
   private final MakeInvoiceSubstanceResource makeInvoiceSubstanceResource;
   private final MakeInvoiceMedicationResource makeInvoiceMedicationResource;
+  private final MakeInvoicePaymentResource makeInvoicePaymentResource;
 
   @Autowired
   public InvoiceRequestConverter(
@@ -50,7 +51,8 @@ public class InvoiceRequestConverter {
       MakeInvoiceResource makeInvoiceResource,
       MakeInvoiceDeviceResource makeInvoiceDeviceResource,
       MakeInvoiceSubstanceResource makeInvoiceSubstanceResource,
-      MakeInvoiceMedicationResource makeInvoiceMedicationResource) {
+      MakeInvoiceMedicationResource makeInvoiceMedicationResource,
+      MakeInvoicePaymentResource makeInvoicePaymentResource) {
     this.makePatientResource = makePatientResource;
     this.makePractitionerResource = makePractitionerResource;
     this.makeOrganisationResource = makeOrganisationResource;
@@ -62,12 +64,23 @@ public class InvoiceRequestConverter {
     this.makeInvoiceDeviceResource = makeInvoiceDeviceResource;
     this.makeInvoiceSubstanceResource = makeInvoiceSubstanceResource;
     this.makeInvoiceMedicationResource = makeInvoiceMedicationResource;
+    this.makeInvoicePaymentResource = makeInvoicePaymentResource;
   }
 
   public BundleResponse makeInvoiceBundle(InvoiceBundleRequest invoiceBundleRequest) {
     try {
       Bundle bundle = new Bundle();
+      bundle.setId(UUID.randomUUID().toString());
+      bundle.setType(Bundle.BundleType.DOCUMENT);
+      bundle.setTimestampElement(Utils.getCurrentTimeStamp());
+      bundle.setMeta(makeBundleMetaResource.getMeta());
+      bundle.setIdentifier(
+          new Identifier()
+              .setSystem(BundleUrlIdentifier.WRAPPER_URL)
+              .setValue(invoiceBundleRequest.getCareContextReference()));
+
       Patient patient = makePatientResource.getPatient(invoiceBundleRequest.getPatient());
+
       List<Practitioner> practitionerList =
           Optional.ofNullable(invoiceBundleRequest.getPractitioners())
               .orElse(Collections.emptyList())
@@ -77,6 +90,7 @@ public class InvoiceRequestConverter {
 
       Organization organization =
           makeOrganisationResource.getOrganization(invoiceBundleRequest.getOrganisation());
+
       Encounter encounter =
           makeEncounterResource.getEncounter(
               patient,
@@ -84,10 +98,12 @@ public class InvoiceRequestConverter {
                   ? invoiceBundleRequest.getEncounter()
                   : null,
               invoiceBundleRequest.getInvoiceDate());
+
       List<Organization> manufactureList = new ArrayList<>();
       List<Device> deviceList = new ArrayList<>();
       List<Substance> substanceList = new ArrayList<>();
       List<Medication> medicationList = new ArrayList<>();
+
       List<ChargeItem> chargeItemList =
           Optional.ofNullable(invoiceBundleRequest.getChargeItems())
               .orElse(Collections.emptyList())
@@ -107,9 +123,16 @@ public class InvoiceRequestConverter {
                     }
                   })
               .toList();
+
       Invoice invoice =
           makeInvoiceResource.buildInvoice(
               invoiceBundleRequest, chargeItemList, patient, organization);
+
+      PaymentReconciliation paymentReconciliation = null;
+      if (Objects.nonNull(invoiceBundleRequest.getPayment())) {
+        paymentReconciliation =
+            makeInvoicePaymentResource.buildInvoicePayment(invoiceBundleRequest);
+      }
 
       Composition composition =
           makeInvoiceComposition.makeCompositionResource(
@@ -120,79 +143,40 @@ public class InvoiceRequestConverter {
               chargeItemList,
               deviceList,
               substanceList,
-              medicationList);
+              medicationList,
+              paymentReconciliation);
 
-      bundle.setId(UUID.randomUUID().toString());
-      bundle.setType(Bundle.BundleType.DOCUMENT);
-      bundle.setTimestampElement(Utils.getCurrentTimeStamp());
-      bundle.setMeta(makeBundleMetaResource.getMeta());
       List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
-      bundle.setIdentifier(
-          new Identifier()
-              .setSystem(BundleUrlIdentifier.WRAPPER_URL)
-              .setValue(invoiceBundleRequest.getCareContextReference()));
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(BundleResourceIdentifier.COMPOSITION + "/" + composition.getId())
-              .setResource(composition));
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
-              .setResource(patient));
-      for (Practitioner practitioner : practitionerList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.PRACTITIONER + "/" + practitioner.getId())
-                .setResource(practitioner));
+
+      addEntry(entries, BundleResourceIdentifier.COMPOSITION, composition);
+      addEntry(entries, BundleResourceIdentifier.PATIENT, patient);
+      practitionerList.forEach(
+          practitioner -> addEntry(entries, BundleResourceIdentifier.PRACTITIONER, practitioner));
+      if (organization != null)
+        addEntry(entries, BundleResourceIdentifier.ORGANISATION, organization);
+      if (encounter != null) addEntry(entries, BundleResourceIdentifier.ENCOUNTER, encounter);
+      manufactureList.forEach(
+          manufacturer -> addEntry(entries, BundleResourceIdentifier.MANUFACTURER, manufacturer));
+      addEntry(entries, BundleResourceIdentifier.INVOICE, invoice);
+
+      chargeItemList.forEach(
+          chargeItem -> addEntry(entries, BundleResourceIdentifier.CHARGE_ITEM, chargeItem));
+      deviceList.forEach(device -> addEntry(entries, BundleResourceIdentifier.DEVICE, device));
+      substanceList.forEach(
+          substance -> addEntry(entries, BundleResourceIdentifier.SUBSTANCE, substance));
+      medicationList.forEach(
+          medication -> addEntry(entries, BundleResourceIdentifier.MEDICATION, medication));
+      if (paymentReconciliation != null) {
+        addEntry(
+            entries,
+            BundleResourceIdentifier.INVOICE_PAYMENT_RECONCILIATION,
+            paymentReconciliation);
       }
-      if (Objects.nonNull(organization)) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.ORGANISATION + "/" + organization.getId())
-                .setResource(organization));
-      }
-      if (Objects.nonNull(encounter)) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.ENCOUNTER + "/" + encounter.getId())
-                .setResource(encounter));
-      }
-      for (Organization manufacturer : manufactureList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.MANUFACTURER + "/" + manufacturer.getId())
-                .setResource(manufacturer));
-      }
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(BundleResourceIdentifier.INVOICE + "/" + invoice.getId())
-              .setResource(invoice));
-      for (ChargeItem item : chargeItemList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.CHARGE_ITEM + "/" + item.getId())
-                .setResource(item));
-      }
-      for (Device item : deviceList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.DEVICE + "/" + item.getId())
-                .setResource(item));
-      }
-      for (Substance item : substanceList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.SUBSTANCE + "/" + item.getId())
-                .setResource(item));
-      }
-      for (Medication item : medicationList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.MEDICATION + "/" + item.getId())
-                .setResource(item));
-      }
+
       bundle.setEntry(entries);
+
       return BundleResponse.builder().bundle(bundle).build();
+
     } catch (Exception e) {
       if (e instanceof InvalidDataAccessResourceUsageException) {
         log.error(e.getMessage());
@@ -209,6 +193,14 @@ public class InvoiceRequestConverter {
     }
   }
 
+  private void addEntry(
+      List<Bundle.BundleEntryComponent> entries, String resourceType, Resource resource) {
+    entries.add(
+        new Bundle.BundleEntryComponent()
+            .setFullUrl(resourceType + "/" + resource.getId())
+            .setResource(resource));
+  }
+
   private ChargeItem generateProductAndChargeItem(
       ChargeItemResource item,
       List<Device> deviceList,
@@ -217,15 +209,15 @@ public class InvoiceRequestConverter {
       List<Organization> manufactureList,
       InvoiceBundleRequest invoiceBundleRequest)
       throws ParseException {
-    if (item.getType().equalsIgnoreCase(BundleResourceIdentifier.DEVICE)) {
+    if (item.getProductType().equalsIgnoreCase(BundleResourceIdentifier.DEVICE)) {
       Device device = makeInvoiceDeviceResource.getDevice(item.getDevice());
       deviceList.add(device);
       return makeChargeItemResource.getChargeItems(item, device.getId());
-    } else if (item.getType().equalsIgnoreCase(BundleResourceIdentifier.SUBSTANCE)) {
+    } else if (item.getProductType().equalsIgnoreCase(BundleResourceIdentifier.SUBSTANCE)) {
       Substance substance = makeInvoiceSubstanceResource.getSubstance(item.getSubstance());
       substanceList.add(substance);
       return makeChargeItemResource.getChargeItems(item, substance.getId());
-    } else if (item.getType().equalsIgnoreCase(BundleResourceIdentifier.MEDICATION)) {
+    } else if (item.getProductType().equalsIgnoreCase(BundleResourceIdentifier.MEDICATION)) {
       Organization manufacturer = new Organization();
       if (Objects.nonNull(item.getMedication().getManufacturer())) {
         manufacturer =
@@ -240,7 +232,7 @@ public class InvoiceRequestConverter {
       medicationList.add(medication);
       return makeChargeItemResource.getChargeItems(item, medication.getId());
     } else {
-      throw new IllegalArgumentException("Unknown product type: " + item.getType());
+      throw new IllegalArgumentException("Unknown product type: " + item.getProductType());
     }
   }
 }
