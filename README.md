@@ -46,7 +46,7 @@ Recommended RAM: Systems with more than 8 GB RAM
 | InvoiceRecord          | The billing artifact represents the invoice details such as pharmacy invoice, consultation invoice etc. along with the support for scanned documents attached for the patient which can be shared across the health ecosystem.                                                                                                                                                                                                                                                                                                             |
 
 ### APIs for generating the FHIR bundle
-- For Swagger-ui, check [here](https://venuajitesh.github.io/FHIR-Mrapper/)
+- For Swagger-ui, check [here](https://venuajitesh.github.io/FHIR-Mapper/)
 #### DiagnosticReportRecord
 - for the DiagnosticReportRecord bundle you need to 
   * `POST` Request `/v1/bundle/diagnostic-report`
