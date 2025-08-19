@@ -56,8 +56,8 @@ public class MakeInvoicePriceComponent {
               .addCoding(
                   new Coding()
                       .setSystem(ResourceProfileIdentifier.PROFILE_PRICE_COMPONENT_TYPE)
-                      .setCode(price.getPriceType().getValue())
-                      .setDisplay(price.getPriceType().getValue()))
+                      .setCode(price.getPriceType().getCode())
+                      .setDisplay(price.getPriceType().getDisplay()))
               .setText(price.getPriceType().getValue());
       priceComponent.setCode(codeConcept);
     }
