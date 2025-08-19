@@ -4,13 +4,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: fhir-mapper
+    image: fhir-mapper:latest
     ports:
       - '8085:8085'
     networks:
       - docker_network
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    environment:
+      JAVA_OPTS: "-Xms256m -Xmx512m"
 
 networks:
   docker_network:
