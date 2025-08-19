@@ -34,15 +34,16 @@ Recommended RAM: Systems with more than 8 GB RAM
 - The HI type is primarily defined based on the data being collected. However the type of interaction should also be considered.
 - If the data which is collected is not defined in the structured field for any HI-type you can create a pdf and attach to the particular bundle in the documents.
 
-| Name                    | Definition                                                                                                                                                |
-|-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| DiagnosticReportRecord  | The Clinical Artifact represents diagnostic reports including Radiology and Laboratory reports that can be shared across the health ecosystem.              |
-| DischargeSummaryRecord  | Clinical document used to represent the discharge summary record for ABDM HDE data set.                                                                     |
-| HealthDocumentRecord    | The Clinical Artifact represents the unstructured historical health records as a single or multiple Health Record Documents generally uploaded by the patients through the Health Locker and can be shared across the health ecosystem.  |
-| ImmunizationRecord      | The Clinical Artifact represents the Immunization records with any additional documents such as vaccine certificate, the next immunization recommendations, etc. This can be further shared across the health ecosystem.               |
-| OPConsultRecord         | The Clinical Artifact represents the outpatient visit consultation note which may include clinical information on any OP examinations, procedures along with medication administered, and advice that can be shared across the health ecosystem. |
-| PrescriptionRecord      | The Clinical Artifact represents the medication advice to the patient in compliance with the Pharmacy Council of India (PCI) guidelines, which can be shared across the health ecosystem.                                                |
-| WellnessRecord          | The Clinical Artifact represents regular wellness information of patients typically through the Patient Health Record (PHR) application covering clinical information such as vitals, physical examination, general wellness, women wellness, etc., that can be shared across the health ecosystem.                            |
+| Name                   | Definition                                                                                                                                                |
+|------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| DiagnosticReportRecord | The Clinical Artifact represents diagnostic reports including Radiology and Laboratory reports that can be shared across the health ecosystem.              |
+| DischargeSummaryRecord | Clinical document used to represent the discharge summary record for ABDM HDE data set.                                                                     |
+| HealthDocumentRecord   | The Clinical Artifact represents the unstructured historical health records as a single or multiple Health Record Documents generally uploaded by the patients through the Health Locker and can be shared across the health ecosystem.  |
+| ImmunizationRecord     | The Clinical Artifact represents the Immunization records with any additional documents such as vaccine certificate, the next immunization recommendations, etc. This can be further shared across the health ecosystem.               |
+| OPConsultRecord        | The Clinical Artifact represents the outpatient visit consultation note which may include clinical information on any OP examinations, procedures along with medication administered, and advice that can be shared across the health ecosystem. |
+| PrescriptionRecord     | The Clinical Artifact represents the medication advice to the patient in compliance with the Pharmacy Council of India (PCI) guidelines, which can be shared across the health ecosystem.                                                |
+| WellnessRecord         | The Clinical Artifact represents regular wellness information of patients typically through the Patient Health Record (PHR) application covering clinical information such as vitals, physical examination, general wellness, women wellness, etc., that can be shared across the health ecosystem.                            |
+| InvoiceRecord          | The billing artifact represents the invoice details such as pharmacy invoice, consultation invoice etc. along with the support for scanned documents attached for the patient which can be shared across the health ecosystem.                                                                                                                                                                                                                                                                                                             |
 
 ### APIs for generating the FHIR bundle
 - For Swagger-ui, check [here](https://wrapper-sbx.abdm.gov.in/swagger/fhir)
@@ -551,6 +552,128 @@ Recommended RAM: Systems with more than 8 GB RAM
       }]
   }
   ```
+#### InvoiceRecord
+  - for the InvoiceRecord bundle you need to
+      * `POST` Request `/v1/bundle/invoice`
+    ```
+    {
+      "bundleType": "Invoice",
+      "careContextReference": "visit-{{$isoTimestamp}}",
+      "invoiceDate": "2024-05-01T06:33:37.361Z",
+      "status": "issued",
+      "encounter": "",
+      "patient": {
+          "name": "Venu Ajitesh",
+          "patientReference": "ajitesh6x",
+          "gender": "male",
+          "birthDate": "1940-04-27"
+      },
+      "practitioners": [
+          {
+              "name": "Dr.Venu Ajitesh",
+              "practitionerId": "Predator"
+          }
+      ],
+      "organisation": {
+          "facilityName": "Predator_HIP",
+          "facilityId": "Predator_HIP"
+      },
+      "invoice": {
+          "id": "INV-12345", // Required
+          "status": "issued", // Required - issued | balanced | cancelled | draft | entered-in-error
+          "type": "Pharmacy", // Required - Consultation | Pharmacy | IPD | OPD | Others
+          "date": "2025-08-12T10:30:00+05:30", // Required
+          "totalNet": 2000.00, // Required
+          "totalGross": 2200.00, // Required
+          "currency": "INR", // Required
+          "paymentTerms": "Due in 15 days", // Optional
+          "note": "Surgery + post-op medicines" // Optional
+      },
+      "chargeItems": [ // Required - at least one
+          {
+              "id": "CHG-002",
+              "productType": "medication", // medication | device | substance
+              "chargeType": "Pharmacy",
+              "status": "billed", // planned | billable | not-billable | aborted | billed | entered-in-error | unknown
+              "description": "Amoxicillin 500mg",
+              "quantity": 14,
+              "price": [
+                  {
+                      "priceType": "base", // base | surcharge | deduction | discount | SGST | CGST | informational
+                      "amount": "100"
+                  }
+              ],
+              "medication": { // Only for type=medication
+                  "medicineName": "AMOX500",
+                  "manufacturer": "ABC Pharma",
+                  "medicationForm": "tablet",
+                  "lotNumber": "ABC123",
+                  "expiryDate": "{{$isoTimestamp}}"
+              }
+          },
+          {
+              "id": "CHG-003",
+              "productType": "device", // medication | device | substance
+              "chargeType": "OPD",
+              "status": "billed",
+              "description": "Surgical Gloves",
+              "quantity": 5,
+              "price": [
+                  {
+                      "priceType": "base", // base | surcharge | deduction | discount | SGST | CGST | informational
+                      "amount": "200"
+                  }
+              ],
+              "device": { // Only for type=device
+                  "udiCarrier": "UDI-GLV-001",
+                  "manufacturer": "MedGlove Inc.",
+                  "modelNumber": "MG-GLV-SRG",
+                  "lotNumber": "194847-0",
+                  "serialNumber": "SN-98347",
+                  "manufactureDate": "2025-01-10",
+                  "expirationDate": "2028-01-10",
+                  "status": "active",
+                  "safety": [
+                      "Latex Free",
+                      "Sterile"
+                  ],
+                  "deviceName": "Surgical Gloves",
+                  "note": "Used for major surgery"
+              }
+          },
+          {
+              "id": "CHG-004",
+              "productType": "substance", // medication | device | substance
+              "chargeType": "IPD",
+              "status": "billed",
+              "description": "Lab Reagent Kit",
+              "quantity": 1,
+              "price": [
+                  {
+                      "priceType": "base", // base | surcharge | deduction | discount | SGST | CGST | informational
+                      "amount": "300"
+                  }
+              ],
+              "substance": { // Only for type=substance
+                  "id": "",
+                  "code": "LAB-REAGENT-001",
+                  "category": "chemical",
+                  "description": "Used to treat infections",
+                  "expiry": "{{$isoTimestamp}}",
+                  "quantity": "2.0"
+              }
+          }
+      ],
+      "payment": {
+          "method": "upi", // Optional
+          "status":"active", // Optional
+          "paymentDate":"", /// Optional
+          "paidAmount": 2200.00, // Optional
+          "transactionId": "TXN-98765" // Optional
+      },
+    }
+      ```
+
 #### Error response in 400 BadRequest
 - There are two kinds of error
   * Validation errors : The errors are thrown when mandatory fields are missing
