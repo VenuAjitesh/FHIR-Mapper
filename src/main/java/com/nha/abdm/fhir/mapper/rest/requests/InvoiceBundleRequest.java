@@ -1,6 +1,7 @@
 /* (C) 2025 */
 package com.nha.abdm.fhir.mapper.rest.requests;
 
+import com.nha.abdm.fhir.mapper.rest.common.constants.InvoiceStatus;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.OrganisationResource;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.PatientResource;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.PractitionerResource;
@@ -47,11 +48,10 @@ public class InvoiceBundleRequest {
 
   @NotNull(message = "invoice is mandatory") private InvoiceResource invoice;
 
-  @NotNull(message = "status is mandatory") private String status;
+  @NotNull(message = "status is mandatory") private InvoiceStatus status;
 
   @Valid
   @NotNull(message = "chargeItems are mandatory and must not be empty") private List<ChargeItemResource> chargeItems;
 
-  @Valid
-  @NotNull(message = "payment is mandatory and must not be empty") private InvoicePaymentResource payment;
+  @Valid private InvoicePaymentResource payment;
 }

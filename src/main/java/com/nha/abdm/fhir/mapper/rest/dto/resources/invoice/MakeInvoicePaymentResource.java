@@ -26,7 +26,8 @@ public class MakeInvoicePaymentResource {
 
     if (paymentReq.getStatus() != null) {
       paymentReconciliation.setStatus(
-          PaymentReconciliation.PaymentReconciliationStatus.fromCode(paymentReq.getStatus()));
+          PaymentReconciliation.PaymentReconciliationStatus.fromCode(
+              paymentReq.getStatus().getValue()));
     }
 
     if (paymentReq.getPaymentDate() != null) {

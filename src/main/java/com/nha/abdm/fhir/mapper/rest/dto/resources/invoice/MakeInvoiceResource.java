@@ -44,8 +44,9 @@ public class MakeInvoiceResource {
       invoice.setId(UUID.randomUUID().toString());
     }
 
-    if (StringUtils.isNotBlank(invoiceBundleRequest.getStatus())) {
-      invoice.setStatus(Invoice.InvoiceStatus.fromCode(invoiceBundleRequest.getStatus()));
+    if (StringUtils.isNotBlank(invoiceBundleRequest.getStatus().getValue())) {
+      invoice.setStatus(
+          Invoice.InvoiceStatus.fromCode(invoiceBundleRequest.getStatus().getValue()));
     }
 
     if (StringUtils.isNotBlank(invoiceBundleRequest.getInvoiceDate())) {

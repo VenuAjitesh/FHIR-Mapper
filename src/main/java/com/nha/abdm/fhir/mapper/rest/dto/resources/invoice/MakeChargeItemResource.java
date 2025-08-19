@@ -30,17 +30,17 @@ public class MakeChargeItemResource {
       chargeItem.setId(UUID.randomUUID().toString());
     }
 
-    if (StringUtils.isNotBlank(resource.getStatus())) {
+    if (StringUtils.isNotBlank(resource.getStatus().getValue())) {
       try {
         chargeItem.setStatus(
-            ChargeItem.ChargeItemStatus.valueOf(resource.getStatus().toUpperCase()));
+            ChargeItem.ChargeItemStatus.valueOf(resource.getStatus().getValue().toUpperCase()));
       } catch (IllegalArgumentException e) {
         chargeItem.setStatus(ChargeItem.ChargeItemStatus.NULL);
       }
     }
 
-    if (StringUtils.isNotBlank(resource.getProductType())) {
-      chargeItem.addIdentifier(new Identifier().setValue(resource.getProductType()));
+    if (StringUtils.isNotBlank(resource.getProductType().getValue())) {
+      chargeItem.addIdentifier(new Identifier().setValue(resource.getProductType().getValue()));
     }
 
     if (StringUtils.isNotBlank(resource.getChargeType())) {

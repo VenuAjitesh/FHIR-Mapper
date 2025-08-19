@@ -41,24 +41,24 @@ public class MakeInvoicePriceComponent {
         new Invoice.InvoiceLineItemPriceComponentComponent();
 
     Invoice.InvoicePriceComponentType type = Invoice.InvoicePriceComponentType.INFORMATIONAL;
-    if (price.getPriceType() != null && !price.getPriceType().isBlank()) {
+    if (price.getPriceType() != null && !price.getPriceType().getValue().isBlank()) {
       try {
-        type = Invoice.InvoicePriceComponentType.fromCode(price.getPriceType());
+        type = Invoice.InvoicePriceComponentType.fromCode(price.getPriceType().getValue());
       } catch (Exception ignored) {
 
       }
     }
     priceComponent.setType(type);
 
-    if (price.getPriceType() != null && !price.getPriceType().isBlank()) {
+    if (price.getPriceType() != null && !price.getPriceType().getValue().isBlank()) {
       CodeableConcept codeConcept =
           new CodeableConcept()
               .addCoding(
                   new Coding()
                       .setSystem(ResourceProfileIdentifier.PROFILE_PRICE_COMPONENT_TYPE)
-                      .setCode(price.getPriceType())
-                      .setDisplay(price.getPriceType()))
-              .setText(price.getPriceType());
+                      .setCode(price.getPriceType().getValue())
+                      .setDisplay(price.getPriceType().getValue()))
+              .setText(price.getPriceType().getValue());
       priceComponent.setCode(codeConcept);
     }
 

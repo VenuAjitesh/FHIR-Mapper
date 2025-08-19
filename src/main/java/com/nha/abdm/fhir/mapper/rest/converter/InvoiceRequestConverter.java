@@ -209,15 +209,19 @@ public class InvoiceRequestConverter {
       List<Organization> manufactureList,
       InvoiceBundleRequest invoiceBundleRequest)
       throws ParseException {
-    if (item.getProductType().equalsIgnoreCase(BundleResourceIdentifier.DEVICE)) {
+    if (item.getProductType().getValue().equalsIgnoreCase(BundleResourceIdentifier.DEVICE)) {
       Device device = makeInvoiceDeviceResource.getDevice(item.getDevice());
       deviceList.add(device);
       return makeChargeItemResource.getChargeItems(item, device.getId());
-    } else if (item.getProductType().equalsIgnoreCase(BundleResourceIdentifier.SUBSTANCE)) {
+    } else if (item.getProductType()
+        .getValue()
+        .equalsIgnoreCase(BundleResourceIdentifier.SUBSTANCE)) {
       Substance substance = makeInvoiceSubstanceResource.getSubstance(item.getSubstance());
       substanceList.add(substance);
       return makeChargeItemResource.getChargeItems(item, substance.getId());
-    } else if (item.getProductType().equalsIgnoreCase(BundleResourceIdentifier.MEDICATION)) {
+    } else if (item.getProductType()
+        .getValue()
+        .equalsIgnoreCase(BundleResourceIdentifier.MEDICATION)) {
       Organization manufacturer = new Organization();
       if (Objects.nonNull(item.getMedication().getManufacturer())) {
         manufacturer =
