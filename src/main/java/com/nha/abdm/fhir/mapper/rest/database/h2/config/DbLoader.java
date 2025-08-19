@@ -102,6 +102,8 @@ public class DbLoader {
       case "SnomedObservation" -> new TypeReference<List<SnomedObservation>>() {};
       case "SnomedSpecimen" -> new TypeReference<List<SnomedSpecimen>>() {};
       case "SnomedVaccine" -> new TypeReference<List<SnomedVaccine>>() {};
+      case "TypeChargeItem" -> new TypeReference<List<TypeChargeItem>>() {};
+      case "TypeInvoice" -> new TypeReference<List<TypeChargeItem>>() {};
       default -> throw new IllegalArgumentException("Unknown entity name: " + entityName);
     };
   }
@@ -128,6 +130,10 @@ public class DbLoader {
           case "SnomedSpecimen" ->
               "CREATE INDEX " + indexName + " ON " + tableName + " (\"code\", \"display\");";
           case "SnomedVaccine" ->
+              "CREATE INDEX " + indexName + " ON " + tableName + " (\"code\", \"display\");";
+          case "TypeChargeItem" ->
+              "CREATE INDEX " + indexName + " ON " + tableName + " (\"code\", \"display\");";
+          case "TypeInvoice" ->
               "CREATE INDEX " + indexName + " ON " + tableName + " (\"code\", \"display\");";
           default -> null;
         };

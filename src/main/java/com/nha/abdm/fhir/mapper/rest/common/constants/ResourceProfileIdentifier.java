@@ -47,4 +47,10 @@ public class ResourceProfileIdentifier {
       "https://nrces.in/ndhm/fhir/r4/StructureDefinition/HealthDocumentRecord";
   public static final String PROFILE_PRESCRIPTION_RECORD =
       "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PrescriptionRecord";
+  public static final String PROFILE_CHARGE_ITEM_BILLING_CODES =
+      "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-billing-codes";
+  public static final String PROFILE_PRICE_COMPONENT_TYPE =
+      "http://hl7.org/fhir/invoice-priceComponentType";
+  public static final String PROFILE_INVOICE_PAYMENT_TYPE =
+      "http://terminology.hl7.org/CodeSystem/payment-type";
 }

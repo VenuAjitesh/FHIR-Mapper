@@ -1,0 +1,18 @@
+/* (C) 2025 */
+package com.nha.abdm.fhir.mapper.rest.database.h2.repositories;
+
+import com.nha.abdm.fhir.mapper.rest.database.h2.tables.TypeInvoice;
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface TypeInvoiceRepo extends JpaRepository<TypeInvoice, String> {
+  @Query(
+      value =
+          "SELECT * FROM \"type_invoice\" sp WHERE sp.\"display\" ILIKE CONCAT('%', :display, '%') LIMIT 20",
+      nativeQuery = true)
+  List<TypeInvoice> findByDisplay(@Param("display") String display);
+}
