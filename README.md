@@ -45,172 +45,185 @@ Recommended RAM: Systems with more than 8 GB RAM
 | WellnessRecord         | The Clinical Artifact represents regular wellness information of patients typically through the Patient Health Record (PHR) application covering clinical information such as vitals, physical examination, general wellness, women wellness, etc., that can be shared across the health ecosystem.                            |
 | InvoiceRecord          | The billing artifact represents the invoice details such as pharmacy invoice, consultation invoice etc. along with the support for scanned documents attached for the patient which can be shared across the health ecosystem.                                                                                                                                                                                                                                                                                                             |
 
+---
 ### APIs for generating the FHIR bundle
 - For Swagger-ui, check [here](https://venuajitesh.github.io/FHIR-Mapper/)
-#### DiagnosticReportRecord
-- for the DiagnosticReportRecord bundle you need to 
-  * `POST` Request `/v1/bundle/diagnostic-report`
-    ```
-      {
-        "bundleType":"DiagnosticReportRecord", //mandatory
-        "careContextReference":"visist 21-03-2024", //mandatory
-        "authoredOn":"2006-04-22", //mandatory
-        "patient":{ //mandatory
-            "name":"Venu Ajitesh", //mandatory
-            "patientReference":"ajitesh6x", //mandatory
-            "gender":"male",
-            "birthDate":"2001-04-27"
-        },
-        "practitioners":[{  //mandatory
-            "name":"Dr.Venu Ajitesh", //mandatory
-            "practitionerId":"Predator"
-        }],
-        "organisation":{
-            "facilityName":"Predator_HIP", //mandatory
-            "facilityId":"Predator_HIP"
-        },
-        "encounter":"Ambula",
-        "diagnostics":[{
-            "serviceName":"BloodTest", //mandatory
-            "serviceCategory":"Hematography", //mandatory
-            "result":[{ //you can pass either result or valueQuantity not both
-                "observation":"Height", //mandatory
-                "result":"Normal",
-                "valueQuantity": {
-                        "unit": "CM",
-                        "value": 170
-                }
-            }],
-            "conclusion":"Normal", //mandatory
-            "presentedForm":{
-                "contentType":"application/pdf",
-                "data":"Base64 data of the pdf"
-            }
-        }],
-        "documents":[{
-            "type":"diagnosticReport", //mandatory 
-            "contentType":"application/pdf", //mandatory
-            "data":"Base64 data of the pdf" //mandatory
-      }]
-      }
-    ```
-#### DischargeSummaryRecord
-  - for the DischargeSummaryRecord bundle you need to
-    * `POST` Request `/v1/bundle/discharge-summary`
-    ```
-    {
-      "bundleType":"DischargeSummaryRecord", //mandatory
-      "careContextReference":"visist 21-03-2024", //mandatory
-      "patient":{ //mandatory
-          "name":"Venu Ajitesh", //mandatory
-          "patientReference":"ajitesh6x", //mandatory
-          "gender":"male",
-          "birthDate":"2001-04-27"
-      },
-      "practitioners":[{ //mandatory
-          "name":"Dr.Venu Ajitesh", //mandatory
-          "practitionerId":"Predator"
-      }],
-      "organisation":{ //mandatory
-          "facilityName":"Predator_HIP", //mandatory
-          "facilityId":"Predator_HIP"
-      },
-      "chiefComplaints":[
-          {
-              "complaint":"Sugar", //mandatory
-              "recordedDate":"2024-05-20", //mandatory
-              "dateRange":{
-                  "from":"2018-04-27",
-                  "to":"2018-05-26"
-              }
-          }
-      ],
-      "physicalExaminations":[
-          {
-              "observation":"Height", //mandatory
-              "result":"Normal", //you can pass either result or valueQuantity not both
-              "valueQuantity": {
-                      "unit": "CM",
-                      "value": 170
-              }
-          }
-      ],
-      "allergies":[
-          "Walnuts"
-      ],
-      "medicalHistories":[
-          {
-              "complaint":"Sugar", //mandatory
-              "recordedDate":"2024-05-20", //mandatory
-              "dateRange":{
-                  "from":"2018-04-27",
-                  "to":"2018-05-26"
-              }
-          }
-      ],
-      "familyHistories":[
-          {
-              "relationship":"Friend", //mandatory
-              "observation":"Toxic" //mandatory
-          }
-      ],
-      "authoredOn":"2024-02-03", //mandatory
-      "medications":[
-          {
-            "medicine":"Aspirin 75 mg oral tablet", //mandatory
-            "dosage":"1-0-1", //mandatory
-            "timing":"2-5-d",
-            "route":"Oral",
-            "method":"swallow",
-            "additionalInstructions":"Take them after food",
-            "reason": "fever"
-        }
-        ,{
-            "medicine":"Disprin",  //mandatory
-            "dosage":"0-0-1", //mandatory
-            "timing":"1-2-d",
-            "route":"Syrup",
-            "method":"drink",
-            "additionalInstructions":"Take them before food",
-            "reason": "Cough"
-        }
-      ],
-      "diagnostics":[{
-          "serviceName":"BloodTest", //mandatory
-          "serviceCategory":"Hematography", //mandatory
-          "result":[{ 
-              "observation":"Height", //mandatory
-              "result":"Normal", //you can pass either result or valueQuantity not both
-              "valueQuantity": {
-                      "unit": "CM",
-                      "value": 170
-              }
-          }],
-          "conclusion":"Normal", //mandatory
-          "presentedForm":{
-              "contentType":"application/pdf",
-              "data":"Base64 data of the pdf"
-            }
-      }],
-    
-      "procedures":[
-          {
-              "date":"2001-04-20", //mandatory
-              "status":"INPROGRESS", //mandatory
-              "procedureReason":"Severe", //mandatory
-              "outcome":"Healthy",
-              "procedureName":"Operation" //mandatory
-          }
-      ],
 
-      "documents":[{
-          "type":"Discharge record", //mandatory
-          "contentType":"application/pdf", //mandatory
-          "data":"Base64 data of the pdf" //mandatory
+<details>
+  <summary><span style="font-weight:bold; font-size:16px;"> 📄 DiagnosticReportRecord </span></summary>
+
+- for the DiagnosticReportRecord bundle you need to 
+   * `POST` Request `/v1/bundle/diagnostic-report`
+
+    ``` 
+    {
+      "bundleType": "DiagnosticReportRecord", 
+      "careContextReference": "visist 21-03-2024", 
+      "authoredOn": "2006-04-22", 
+      "patient": { 
+        "name": "Venu Ajitesh", 
+        "patientReference": "ajitesh6x", 
+        "gender": "male",
+        "birthDate": "2001-04-27"
+      },
+      "practitioners": [{  
+        "name": "Dr.Venu Ajitesh", 
+        "practitionerId": "Predator"
+      }],
+      "organisation": {
+        "facilityName": "Predator_HIP", 
+        "facilityId": "Predator_HIP"
+      },
+      "encounter": "Ambula",
+      "diagnostics": [{
+        "serviceName": "BloodTest", 
+        "serviceCategory": "Hematography", 
+        "result": [{ 
+          "observation": "Height", 
+          "result": "Normal",
+          "valueQuantity": {
+            "unit": "CM",
+            "value": 170
+          }
+        }],
+        "conclusion": "Normal", 
+        "presentedForm": {
+          "contentType": "application/pdf",
+          "data": "Base64 data of the pdf"
+        }
+      }],
+      "documents": [{
+        "type": "diagnosticReport",  
+        "contentType": "application/pdf",  
+        "data": "Base64 data of the pdf"  
       }]
-    }
-    ```
-#### HealthDocumentRecord
+    } ```
+</details> 
+
+<details>
+  <summary> <span style="font-weight:bold; font-size:16px;"> 🏥 DischargeSummaryRecord </span></summary>
+
+- For the DischargeSummaryRecord bundle you need to
+  * `POST` Request `/v1/bundle/discharge-summary`
+
+  ```
+  {
+    "bundleType":"DischargeSummaryRecord", //mandatory
+    "careContextReference":"visist 21-03-2024", //mandatory
+    "patient":{ //mandatory
+        "name":"Venu Ajitesh", //mandatory
+        "patientReference":"ajitesh6x", //mandatory
+        "gender":"male",
+        "birthDate":"2001-04-27"
+    },
+    "practitioners":[{ //mandatory
+        "name":"Dr.Venu Ajitesh", //mandatory
+        "practitionerId":"Predator"
+    }],
+    "organisation":{ //mandatory
+        "facilityName":"Predator_HIP", //mandatory
+        "facilityId":"Predator_HIP"
+    },
+    "chiefComplaints":[
+        {
+            "complaint":"Sugar", //mandatory
+            "recordedDate":"2024-05-20", //mandatory
+            "dateRange":{
+                "from":"2018-04-27",
+                "to":"2018-05-26"
+            }
+        }
+    ],
+    "physicalExaminations":[
+        {
+            "observation":"Height", //mandatory
+            "result":"Normal", //you can pass either result or valueQuantity not both
+            "valueQuantity": {
+                    "unit": "CM",
+                    "value": 170
+            }
+        }
+    ],
+    "allergies":[
+        "Walnuts"
+    ],
+    "medicalHistories":[
+        {
+            "complaint":"Sugar", //mandatory
+            "recordedDate":"2024-05-20", //mandatory
+            "dateRange":{
+                "from":"2018-04-27",
+                "to":"2018-05-26"
+            }
+        }
+    ],
+    "familyHistories":[
+        {
+            "relationship":"Friend", //mandatory
+            "observation":"Toxic" //mandatory
+        }
+    ],
+    "authoredOn":"2024-02-03", //mandatory
+    "medications":[
+        {
+          "medicine":"Aspirin 75 mg oral tablet", //mandatory
+          "dosage":"1-0-1", //mandatory
+          "timing":"2-5-d",
+          "route":"Oral",
+          "method":"swallow",
+          "additionalInstructions":"Take them after food",
+          "reason": "fever"
+      }
+      ,{
+          "medicine":"Disprin",  //mandatory
+          "dosage":"0-0-1", //mandatory
+          "timing":"1-2-d",
+          "route":"Syrup",
+          "method":"drink",
+          "additionalInstructions":"Take them before food",
+          "reason": "Cough"
+      }
+    ],
+    "diagnostics":[{
+        "serviceName":"BloodTest", //mandatory
+        "serviceCategory":"Hematography", //mandatory
+        "result":[{ 
+            "observation":"Height", //mandatory
+            "result":"Normal", //you can pass either result or valueQuantity not both
+            "valueQuantity": {
+                    "unit": "CM",
+                    "value": 170
+            }
+        }],
+        "conclusion":"Normal", //mandatory
+        "presentedForm":{
+            "contentType":"application/pdf",
+            "data":"Base64 data of the pdf"
+          }
+    }],
+    
+    "procedures":[
+        {
+            "date":"2001-04-20", //mandatory
+            "status":"INPROGRESS", //mandatory
+            "procedureReason":"Severe", //mandatory
+            "outcome":"Healthy",
+            "procedureName":"Operation" //mandatory
+        }
+    ],
+
+    "documents":[{
+        "type":"Discharge record", //mandatory
+        "contentType":"application/pdf", //mandatory
+        "data":"Base64 data of the pdf" //mandatory
+    }]
+  }
+  ```
+  </details>
+
+<details>
+  <summary><span style="font-weight:bold; font-size:16px;"> 📑 HealthDocumentRecord </span></summary>
+
 - for the HealthDocumentRecord bundle you need to
   * `POST` Request `/v1/bundle/health-document`
   ```
@@ -240,7 +253,10 @@ Recommended RAM: Systems with more than 8 GB RAM
     }]
   }
   ```
-#### ImmunizationRecord
+  </details>
+<details>
+  <summary><span style="font-weight:bold; font-size:16px;"> 💉 ImmunizationRecord </span></summary>
+
 - for the ImmunizationRecord bundle you need to
   * `POST` Request `/v1/bundle/immunization`
   ```
@@ -276,7 +292,10 @@ Recommended RAM: Systems with more than 8 GB RAM
       }]
   }
   ```
-#### OPConsultRecord
+  </details>
+<details>
+  <summary><span style="font-weight:bold; font-size:16px;"> 👨‍⚕️ OPConsultRecord </span></summary>
+
 - for the OPConsultRecord bundle you need to
   * `POST` Request `/v1/bundle/op-consultation`
   ```
@@ -404,7 +423,10 @@ Recommended RAM: Systems with more than 8 GB RAM
       }]
   }
   ```
-#### PrescriptionRecord
+    </details>
+<details>
+  <summary><span style="font-weight:bold; font-size:16px;"> 💊 PrescriptionRecord </span></summary>
+
 - for the PrescriptionRecord bundle you need to
   * `POST` Request `/v1/bundle/prescription`
   ```
@@ -454,7 +476,10 @@ Recommended RAM: Systems with more than 8 GB RAM
       }]
   }
   ```
-#### WellnessRecord
+  </details>
+<details>
+  <summary><span style="font-weight:bold; font-size:16px;"> 🌿 WellnessRecord </span></summary>
+
 - for the WellnessRecord bundle you need to
   * `POST` Request `/v1/bundle/wellness-record`
   ```
@@ -552,7 +577,10 @@ Recommended RAM: Systems with more than 8 GB RAM
       }]
   }
   ```
-#### InvoiceRecord
+  </details>
+<details>
+  <summary><span style="font-weight:bold; font-size:16px;"> 🧾 InvoiceRecord </span></summary>
+
   - for the InvoiceRecord bundle you need to
       * `POST` Request `/v1/bundle/invoice`
     ```
@@ -673,8 +701,10 @@ Recommended RAM: Systems with more than 8 GB RAM
       },
     }
       ```
+    </details>
 
-#### Error response in 400 BadRequest
+---
+### Error response in 400 BadRequest
 - There are two kinds of error
   * Validation errors : The errors are thrown when mandatory fields are missing
     ```
@@ -699,6 +729,7 @@ Recommended RAM: Systems with more than 8 GB RAM
        }
     }
     ```
+---
 ### Things To Consider
 - If the FHIR bundle is generated the HttpStatus will be `201 created`
 - The authoredOn will accept date in the format of string in format : `yyyy-MM-dd` or `yyyy-MM-dd'T'HH:mm:ss.SSSX` - UTC iso time format
