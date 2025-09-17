@@ -1030,6 +1030,9 @@ components:
         careContextReference:
           type: string
           example: visist 21-03-2024
+        authoredOn:
+          type: string
+          format: date
         patient:
           $ref: '#/components/schemas/Patient'
         practitioners:
@@ -1042,6 +1045,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ChiefComplaint'
+        carePlan:
+          type: array
+          items:
+            $ref: '#/components/schemas/CarePlan'
         physicalExaminations:
           type: array
           items:
@@ -1058,9 +1065,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FamilyHistory'
-        authoredOn:
-          type: string
-          format: date
         medications:
           type: array
           items:
@@ -1103,6 +1107,12 @@ components:
             dateRange:
               from: 2018-04-27
               to: 2018-05-26
+        carePlan:
+          - intent: plan
+            type: Regular check up
+            goal: Reduce BP
+            description: Normal
+            notes: The patient has an HIGH BP, recommended to revisit on 29-10-2024
         medications:
           - medicine: Dolo
             dosage: 1-0-1
@@ -1406,7 +1416,25 @@ components:
         dateRange:
           from: 2018-04-27
           to: 2018-05-26
-
+    CarePlan:
+      type: object
+      properties:
+        intent:
+          type: string
+        type:
+          type: string
+        goal:
+          type: string
+        description:
+          type: string
+        notes:
+          type: string
+      example:
+        intent: plan
+        type: Regular check up
+        goal: Reduce BP
+        description: Normal
+        notes: The patient has an HIGH BP, recommended to revisit on 29-10-2024
     DateRange:
       type: object
       properties:
