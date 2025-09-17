@@ -1421,6 +1421,11 @@ components:
       properties:
         intent:
           type: string
+          enum:
+            - proposal
+            - plan
+            - order
+            - option
         type:
           type: string
         goal:
