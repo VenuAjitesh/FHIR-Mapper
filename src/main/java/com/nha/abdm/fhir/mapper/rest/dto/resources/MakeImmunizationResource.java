@@ -4,6 +4,7 @@ package com.nha.abdm.fhir.mapper.rest.dto.resources;
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
+import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import com.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedVaccine;
@@ -37,7 +38,9 @@ public class MakeImmunizationResource {
     immunization.setStatus(Immunization.ImmunizationStatus.COMPLETED);
 
     immunization.setPatient(
-        new Reference().setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId()));
+        new Reference()
+            .setReference(
+                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId()));
     if (Objects.nonNull(immunizationResource.getDate())) {
       immunization.setOccurrence((Utils.getFormattedDateTime(immunizationResource.getDate())));
     }
@@ -62,7 +65,10 @@ public class MakeImmunizationResource {
     if (Objects.nonNull(immunizationResource.getManufacturer())) {
       immunization.setManufacturer(
           new Reference()
-              .setReference(BundleResourceIdentifier.MANUFACTURER + "/" + organization.getId())
+              .setReference(
+                  BundleResourceIdentifier.MANUFACTURER
+                      + MapperConstants.SLASH
+                      + organization.getId())
               .setDisplay(organization.getName()));
     }
     if (Objects.nonNull(immunizationResource.getLotNumber())) {
@@ -83,7 +89,9 @@ public class MakeImmunizationResource {
               .setActor(
                   new Reference()
                       .setReference(
-                          BundleResourceIdentifier.PRACTITIONER + "/" + practitioner.getId())));
+                          BundleResourceIdentifier.PRACTITIONER
+                              + MapperConstants.SLASH
+                              + practitioner.getId())));
     }
     return immunization;
   }

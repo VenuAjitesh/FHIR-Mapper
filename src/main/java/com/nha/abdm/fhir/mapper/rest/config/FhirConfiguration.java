@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class FhirConfiguration {
-  
+
   @Bean
   public FhirContext fhirContext() {
     return FhirContext.forR4();

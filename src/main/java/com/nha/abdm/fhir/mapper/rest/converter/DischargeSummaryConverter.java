@@ -2,10 +2,7 @@
 package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleCompositionIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.ErrorCode;
+import com.nha.abdm.fhir.mapper.rest.common.constants.*;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.BundleResponse;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.DocumentResource;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.ErrorResponse;
@@ -227,31 +224,45 @@ public class DischargeSummaryConverter {
               .setValue(dischargeSummaryRequest.getCareContextReference()));
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(BundleResourceIdentifier.COMPOSITION + "/" + composition.getId())
+              .setFullUrl(
+                  BundleResourceIdentifier.COMPOSITION
+                      + MapperConstants.SLASH
+                      + composition.getId())
               .setResource(composition));
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
+              .setFullUrl(
+                  BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
               .setResource(patient));
       for (Practitioner practitioner : practitionerList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.PRACTITIONER + "/" + practitioner.getId())
+                .setFullUrl(
+                    BundleResourceIdentifier.PRACTITIONER
+                        + MapperConstants.SLASH
+                        + practitioner.getId())
                 .setResource(practitioner));
       }
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(BundleResourceIdentifier.ENCOUNTER + "/" + encounter.getId())
+              .setFullUrl(
+                  BundleResourceIdentifier.ENCOUNTER + MapperConstants.SLASH + encounter.getId())
               .setResource(encounter));
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(BundleResourceIdentifier.ORGANISATION + "/" + organization.getId())
+              .setFullUrl(
+                  BundleResourceIdentifier.ORGANISATION
+                      + MapperConstants.SLASH
+                      + organization.getId())
               .setResource(organization));
 
       for (Condition complaint : chiefComplaintList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.CHIEF_COMPLAINTS + "/" + complaint.getId())
+                .setFullUrl(
+                    BundleResourceIdentifier.CHIEF_COMPLAINTS
+                        + MapperConstants.SLASH
+                        + complaint.getId())
                 .setResource(complaint));
       }
       for (Observation physicalObservation : physicalObservationList) {
@@ -259,7 +270,7 @@ public class DischargeSummaryConverter {
             new Bundle.BundleEntryComponent()
                 .setFullUrl(
                     BundleResourceIdentifier.PHYSICAL_EXAMINATION
-                        + "/"
+                        + MapperConstants.SLASH
                         + physicalObservation.getId())
                 .setResource(physicalObservation));
       }
@@ -267,39 +278,52 @@ public class DischargeSummaryConverter {
         entries.add(
             new Bundle.BundleEntryComponent()
                 .setFullUrl(
-                    BundleResourceIdentifier.ALLERGY_INTOLERANCE + "/" + allergyIntolerance.getId())
+                    BundleResourceIdentifier.ALLERGY_INTOLERANCE
+                        + MapperConstants.SLASH
+                        + allergyIntolerance.getId())
                 .setResource(allergyIntolerance));
       }
       for (Condition medicalHistory : medicalHistoryList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.MEDICAL_HISTORY + "/" + medicalHistory.getId())
+                .setFullUrl(
+                    BundleResourceIdentifier.MEDICAL_HISTORY
+                        + MapperConstants.SLASH
+                        + medicalHistory.getId())
                 .setResource(medicalHistory));
       }
       for (Condition medicationCondition : medicationConditionList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.CONDITION + "/" + medicationCondition.getId())
+                .setFullUrl(
+                    BundleResourceIdentifier.CONDITION
+                        + MapperConstants.SLASH
+                        + medicationCondition.getId())
                 .setResource(medicationCondition));
       }
       for (FamilyMemberHistory familyMemberHistory : familyMemberHistoryList) {
         entries.add(
             new Bundle.BundleEntryComponent()
                 .setFullUrl(
-                    BundleResourceIdentifier.FAMILY_HISTORY + "/" + familyMemberHistory.getId())
+                    BundleResourceIdentifier.FAMILY_HISTORY
+                        + MapperConstants.SLASH
+                        + familyMemberHistory.getId())
                 .setResource(familyMemberHistory));
       }
       if (Objects.nonNull(carePlan)) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.CARE_PLAN + "/" + carePlan.getId())
+                .setFullUrl(
+                    BundleResourceIdentifier.CARE_PLAN + MapperConstants.SLASH + carePlan.getId())
                 .setResource(carePlan));
       }
       for (MedicationRequest medicationRequest : medicationList) {
         entries.add(
             new Bundle.BundleEntryComponent()
                 .setFullUrl(
-                    BundleResourceIdentifier.FAMILY_HISTORY + "/" + medicationRequest.getId())
+                    BundleResourceIdentifier.FAMILY_HISTORY
+                        + MapperConstants.SLASH
+                        + medicationRequest.getId())
                 .setResource(medicationRequest));
       }
 
@@ -307,27 +331,35 @@ public class DischargeSummaryConverter {
         entries.add(
             new Bundle.BundleEntryComponent()
                 .setFullUrl(
-                    BundleResourceIdentifier.DIAGNOSTIC_REPORT + "/" + diagnosticReport.getId())
+                    BundleResourceIdentifier.DIAGNOSTIC_REPORT
+                        + MapperConstants.SLASH
+                        + diagnosticReport.getId())
                 .setResource(diagnosticReport));
       }
 
       for (Procedure procedure : procedureList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.PROCEDURE + "/" + procedure.getId())
+                .setFullUrl(
+                    BundleResourceIdentifier.PROCEDURE + MapperConstants.SLASH + procedure.getId())
                 .setResource(procedure));
       }
       for (Observation observation : diagnosticObservationList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.OBSERVATION + "/" + observation.getId())
+                .setFullUrl(
+                    BundleResourceIdentifier.OBSERVATION
+                        + MapperConstants.SLASH
+                        + observation.getId())
                 .setResource(observation));
       }
       for (DocumentReference documentReference : documentReferenceList) {
         entries.add(
             new Bundle.BundleEntryComponent()
                 .setFullUrl(
-                    BundleResourceIdentifier.DOCUMENT_REFERENCE + "/" + documentReference.getId())
+                    BundleResourceIdentifier.DOCUMENT_REFERENCE
+                        + MapperConstants.SLASH
+                        + documentReference.getId())
                 .setResource(documentReference));
       }
       bundle.setEntry(entries);
@@ -337,13 +369,12 @@ public class DischargeSummaryConverter {
         log.error(e.getMessage());
         return BundleResponse.builder()
             .error(
-                new ErrorResponse(
-                    ErrorCode.DB_ERROR,
-                    " JDBCException Generic SQL Related Error, kindly check logs."))
+                new ErrorResponse(ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE))
             .build();
       }
       return BundleResponse.builder()
-          .error(ErrorResponse.builder().code("1000").message(e.getMessage()).build())
+          .error(
+              ErrorResponse.builder().code(ErrorCode.UNKNOWN_ERROR).message(e.getMessage()).build())
           .build();
     }
   }

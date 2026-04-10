@@ -4,6 +4,7 @@ package com.nha.abdm.fhir.mapper.rest.dto.resources;
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
+import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import com.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedDiagnostic;
@@ -48,17 +49,25 @@ public class MakeDiagnosticLabResource {
                     .setDisplay(snomed.getDisplay())));
     diagnosticReport.setSubject(
         new Reference()
-            .setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
+            .setReference(
+                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
             .setDisplay(patientName.getText()));
     if (Objects.nonNull(encounter))
-      diagnosticReport.setEncounter(new Reference().setReference("/" + encounter.getId()));
+      diagnosticReport.setEncounter(
+          new Reference().setReference(MapperConstants.SLASH + encounter.getId()));
     for (Practitioner practitioner : practitionerList) {
       diagnosticReport.addPerformer(
           new Reference()
-              .setReference(BundleResourceIdentifier.PRACTITIONER + "/" + practitioner.getId()));
+              .setReference(
+                  BundleResourceIdentifier.PRACTITIONER
+                      + MapperConstants.SLASH
+                      + practitioner.getId()));
       diagnosticReport.addResultsInterpreter(
           new Reference()
-              .setReference(BundleResourceIdentifier.PRACTITIONER + "/" + practitioner.getId()));
+              .setReference(
+                  BundleResourceIdentifier.PRACTITIONER
+                      + MapperConstants.SLASH
+                      + practitioner.getId()));
     }
     SnomedDiagnostic snomedDiagnostic =
         snomedService.getSnomedDiagnosticCode(diagnosticResource.getServiceCategory());
@@ -73,7 +82,10 @@ public class MakeDiagnosticLabResource {
     for (Observation observation : observationList) {
       diagnosticReport.addResult(
           new Reference()
-              .setReference(BundleResourceIdentifier.OBSERVATION + "/" + observation.getId()));
+              .setReference(
+                  BundleResourceIdentifier.OBSERVATION
+                      + MapperConstants.SLASH
+                      + observation.getId()));
     }
     diagnosticReport.setIssued(encounter.getPeriod().getStart()); // TODO Conversion of UTC
     diagnosticReport.setConclusion(diagnosticResource.getConclusion());

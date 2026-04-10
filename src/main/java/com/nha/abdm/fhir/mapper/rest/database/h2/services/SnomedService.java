@@ -9,19 +9,18 @@ import com.nha.abdm.fhir.mapper.rest.database.h2.tables.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.text.similarity.CosineSimilarity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SnomedService {
-  @Autowired private final SnomedMedicineRepo snomedMedicineRepo;
-  @Autowired private final SnomedConditionProcedureRepo snomedConditionProcedureRepo;
-  @Autowired private final SnomedEncounterRepo snomedEncounterRepo;
-  @Autowired private final SnomedSpecimenRepo snomedSpecimenRepo;
-  @Autowired private final SnomedObservationRepo snomedObservationRepo;
-  @Autowired private final SnomedVaccineRepo snomedVaccineRepo;
-  @Autowired private final SnomedDiagnosticRepo snomedDiagnosticRepo;
-  @Autowired private final SnomedMedicineRouteRepo snomedMedicineRouteRepo;
+  private final SnomedMedicineRepo snomedMedicineRepo;
+  private final SnomedConditionProcedureRepo snomedConditionProcedureRepo;
+  private final SnomedEncounterRepo snomedEncounterRepo;
+  private final SnomedSpecimenRepo snomedSpecimenRepo;
+  private final SnomedObservationRepo snomedObservationRepo;
+  private final SnomedVaccineRepo snomedVaccineRepo;
+  private final SnomedDiagnosticRepo snomedDiagnosticRepo;
+  private final SnomedMedicineRouteRepo snomedMedicineRouteRepo;
 
   public SnomedService(
       SnomedMedicineRepo snomedMedicineRepo,
@@ -46,7 +45,7 @@ public class SnomedService {
     SnomedConditionProcedure snomedCode =
         (SnomedConditionProcedure)
             fuzzyMatch(
-                snomedConditionProcedureRepo.findByDisplay(display),
+                snomedConditionProcedureRepo.findTop20ByDisplayContainingIgnoreCase(display),
                 display,
                 SnomedConditionProcedure.class);
     return snomedCode == null
@@ -65,7 +64,9 @@ public class SnomedService {
     SnomedDiagnostic snomedCode =
         (SnomedDiagnostic)
             fuzzyMatch(
-                snomedDiagnosticRepo.findByDisplay(display), display, SnomedDiagnostic.class);
+                snomedDiagnosticRepo.findTop20ByDisplayContainingIgnoreCase(display),
+                display,
+                SnomedDiagnostic.class);
     return snomedCode != null
         ? snomedCode
         : SnomedDiagnostic.builder()
@@ -87,7 +88,10 @@ public class SnomedService {
     }
     SnomedEncounter snomedCode =
         (SnomedEncounter)
-            fuzzyMatch(snomedEncounterRepo.findByDisplay(display), display, SnomedEncounter.class);
+            fuzzyMatch(
+                snomedEncounterRepo.findTop20ByDisplayContainingIgnoreCase(display),
+                display,
+                SnomedEncounter.class);
     return snomedCode != null
         ? snomedCode
         : SnomedEncounter.builder()
@@ -103,7 +107,10 @@ public class SnomedService {
   public SnomedMedicine getSnomedMedicineCode(String display) {
     SnomedMedicine snomedCode =
         (SnomedMedicine)
-            fuzzyMatch(snomedMedicineRepo.findByDisplay(display), display, SnomedMedicine.class);
+            fuzzyMatch(
+                snomedMedicineRepo.findTop20ByDisplayContainingIgnoreCase(display),
+                display,
+                SnomedMedicine.class);
     return snomedCode != null
         ? snomedCode
         : SnomedMedicine.builder()
@@ -120,7 +127,9 @@ public class SnomedService {
     SnomedObservation snomedObservation =
         (SnomedObservation)
             fuzzyMatch(
-                snomedObservationRepo.findByDisplay(display), display, SnomedObservation.class);
+                snomedObservationRepo.findTop20ByDisplayContainingIgnoreCase(display),
+                display,
+                SnomedObservation.class);
     return snomedObservation != null
         ? snomedObservation
         : SnomedObservation.builder()
@@ -136,7 +145,10 @@ public class SnomedService {
   public SnomedSpecimen getSnomedSpecimenCode(String display) {
     SnomedSpecimen snomedCode =
         (SnomedSpecimen)
-            fuzzyMatch(snomedSpecimenRepo.findByDisplay(display), display, SnomedSpecimen.class);
+            fuzzyMatch(
+                snomedSpecimenRepo.findTop20ByDisplayContainingIgnoreCase(display),
+                display,
+                SnomedSpecimen.class);
     return snomedCode != null
         ? snomedCode
         : SnomedSpecimen.builder()
@@ -152,7 +164,10 @@ public class SnomedService {
   public SnomedVaccine getSnomedVaccineCode(String display) {
     SnomedVaccine snomedCode =
         (SnomedVaccine)
-            fuzzyMatch(snomedVaccineRepo.findByDisplay(display), display, SnomedVaccine.class);
+            fuzzyMatch(
+                snomedVaccineRepo.findTop20ByDisplayContainingIgnoreCase(display),
+                display,
+                SnomedVaccine.class);
     return snomedCode != null
         ? snomedCode
         : SnomedVaccine.builder()
@@ -169,7 +184,9 @@ public class SnomedService {
     SnomedMedicineRoute snomedCode =
         (SnomedMedicineRoute)
             fuzzyMatch(
-                snomedMedicineRouteRepo.findByDisplay(display), display, SnomedMedicineRoute.class);
+                snomedMedicineRouteRepo.findTop20ByDisplayContainingIgnoreCase(display),
+                display,
+                SnomedMedicineRoute.class);
     return snomedCode != null
         ? snomedCode
         : SnomedMedicineRoute.builder()

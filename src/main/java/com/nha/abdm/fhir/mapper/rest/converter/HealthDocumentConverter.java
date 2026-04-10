@@ -2,10 +2,7 @@
 package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleCompositionIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.ErrorCode;
+import com.nha.abdm.fhir.mapper.rest.common.constants.*;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.BundleResponse;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.ErrorResponse;
 import com.nha.abdm.fhir.mapper.rest.dto.compositions.MakeHealthDocumentComposition;
@@ -107,35 +104,48 @@ public class HealthDocumentConverter {
       List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(BundleResourceIdentifier.COMPOSITION + "/" + composition.getId())
+              .setFullUrl(
+                  BundleResourceIdentifier.COMPOSITION
+                      + MapperConstants.SLASH
+                      + composition.getId())
               .setResource(composition));
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
+              .setFullUrl(
+                  BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
               .setResource(patient));
       for (Practitioner practitioner : practitionerList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.PRACTITIONER + "/" + practitioner.getId())
+                .setFullUrl(
+                    BundleResourceIdentifier.PRACTITIONER
+                        + MapperConstants.SLASH
+                        + practitioner.getId())
                 .setResource(practitioner));
       }
       if (Objects.nonNull(organization)) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.ORGANISATION + "/" + organization.getId())
+                .setFullUrl(
+                    BundleResourceIdentifier.ORGANISATION
+                        + MapperConstants.SLASH
+                        + organization.getId())
                 .setResource(organization));
       }
       if (Objects.nonNull(encounter)) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.ENCOUNTER + "/" + encounter.getId())
+                .setFullUrl(
+                    BundleResourceIdentifier.ENCOUNTER + MapperConstants.SLASH + encounter.getId())
                 .setResource(encounter));
       }
       for (DocumentReference documentReference : documentReferenceList) {
         entries.add(
             new Bundle.BundleEntryComponent()
                 .setFullUrl(
-                    BundleResourceIdentifier.DOCUMENT_REFERENCE + "/" + documentReference.getId())
+                    BundleResourceIdentifier.DOCUMENT_REFERENCE
+                        + MapperConstants.SLASH
+                        + documentReference.getId())
                 .setResource(documentReference));
       }
       bundle.setEntry(entries);
@@ -145,13 +155,12 @@ public class HealthDocumentConverter {
         log.error(e.getMessage());
         return BundleResponse.builder()
             .error(
-                new ErrorResponse(
-                    ErrorCode.DB_ERROR,
-                    " JDBCException Generic SQL Related Error, kindly check logs."))
+                new ErrorResponse(ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE))
             .build();
       }
       return BundleResponse.builder()
-          .error(ErrorResponse.builder().code("1000").message(e.getMessage()).build())
+          .error(
+              ErrorResponse.builder().code(ErrorCode.UNKNOWN_ERROR).message(e.getMessage()).build())
           .build();
     }
   }

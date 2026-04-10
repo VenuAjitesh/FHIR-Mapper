@@ -4,6 +4,7 @@ package com.nha.abdm.fhir.mapper.rest.dto.resources;
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
+import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import com.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedConditionProcedure;
@@ -29,7 +30,9 @@ public class MakeProcedureResource {
       procedure.setStatus(Procedure.ProcedureStatus.COMPLETED);
     }
     procedure.setSubject(
-        new Reference().setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId()));
+        new Reference()
+            .setReference(
+                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId()));
     SnomedConditionProcedure snomedProcedure =
         snomedService.getConditionProcedureCode(procedureResource.getProcedureName());
     procedure.setCode(

@@ -5,6 +5,7 @@ import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleCompositionIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
+import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import java.text.ParseException;
 import java.util.List;
 import java.util.UUID;
@@ -127,7 +128,9 @@ public class MakeInvoiceComposition {
   }
 
   private Reference ref(String resourceType, String id) {
-    return new Reference().setReference(resourceType + "/" + id).setType(resourceType);
+    return new Reference()
+        .setReference(resourceType + MapperConstants.SLASH + id)
+        .setType(resourceType);
   }
 
   private Reference ref(String resourceType, String id, String display) {

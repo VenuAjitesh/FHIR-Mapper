@@ -5,6 +5,7 @@ import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleCompositionIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
+import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,19 +51,28 @@ public class MakeOpComposition {
       practitionerName = practitioner.getName().get(0);
       authorList.add(
           new Reference()
-              .setReference(BundleResourceIdentifier.PRACTITIONER + "/" + practitioner.getId())
+              .setReference(
+                  BundleResourceIdentifier.PRACTITIONER
+                      + MapperConstants.SLASH
+                      + practitioner.getId())
               .setDisplay(practitionerName != null ? practitionerName.getText() : null));
     }
     composition.setEncounter(
-        new Reference().setReference(BundleResourceIdentifier.ENCOUNTER + "/" + encounter.getId()));
+        new Reference()
+            .setReference(
+                BundleResourceIdentifier.ENCOUNTER + MapperConstants.SLASH + encounter.getId()));
     composition.setCustodian(
         new Reference()
-            .setReference(BundleResourceIdentifier.ORGANISATION + "/" + organization.getId())
+            .setReference(
+                BundleResourceIdentifier.ORGANISATION
+                    + MapperConstants.SLASH
+                    + organization.getId())
             .setDisplay(organization.getName()));
     composition.setAuthor(authorList);
     composition.setSubject(
         new Reference()
-            .setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
+            .setReference(
+                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
             .setDisplay(patientName.getText()));
     composition.setDateElement(Utils.getFormattedDateTime(visitDate));
     composition.setStatus(Composition.CompositionStatus.FINAL);
@@ -125,7 +135,9 @@ public class MakeOpComposition {
         sectionComponent.addEntry(
             new Reference()
                 .setReference(
-                    BundleResourceIdentifier.CHIEF_COMPLAINTS + "/" + chiefComplaint.getId()));
+                    BundleResourceIdentifier.CHIEF_COMPLAINTS
+                        + MapperConstants.SLASH
+                        + chiefComplaint.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -144,7 +156,7 @@ public class MakeOpComposition {
             new Reference()
                 .setReference(
                     BundleResourceIdentifier.PHYSICAL_EXAMINATION
-                        + "/"
+                        + MapperConstants.SLASH
                         + physicalObservation.getId()));
       }
       sectionComponentList.add(sectionComponent);
@@ -164,7 +176,7 @@ public class MakeOpComposition {
             new Reference()
                 .setReference(
                     BundleResourceIdentifier.ALLERGY_INTOLERANCE
-                        + "/"
+                        + MapperConstants.SLASH
                         + allergyIntolerance.getId()));
       }
       sectionComponentList.add(sectionComponent);
@@ -183,7 +195,9 @@ public class MakeOpComposition {
         sectionComponent.addEntry(
             new Reference()
                 .setReference(
-                    BundleResourceIdentifier.MEDICAL_HISTORY + "/" + medicalHistory.getId()));
+                    BundleResourceIdentifier.MEDICAL_HISTORY
+                        + MapperConstants.SLASH
+                        + medicalHistory.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -201,7 +215,9 @@ public class MakeOpComposition {
         sectionComponent.addEntry(
             new Reference()
                 .setReference(
-                    BundleResourceIdentifier.FAMILY_HISTORY + "/" + familyMemberHistory.getId()));
+                    BundleResourceIdentifier.FAMILY_HISTORY
+                        + MapperConstants.SLASH
+                        + familyMemberHistory.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -219,7 +235,9 @@ public class MakeOpComposition {
         sectionComponent.addEntry(
             new Reference()
                 .setReference(
-                    BundleResourceIdentifier.INVESTIGATION_ADVICE + "/" + investigation.getId()));
+                    BundleResourceIdentifier.INVESTIGATION_ADVICE
+                        + MapperConstants.SLASH
+                        + investigation.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -237,7 +255,9 @@ public class MakeOpComposition {
         sectionComponent.addEntry(
             new Reference()
                 .setReference(
-                    BundleResourceIdentifier.MEDICATION_REQUEST + "/" + medication.getId()));
+                    BundleResourceIdentifier.MEDICATION_REQUEST
+                        + MapperConstants.SLASH
+                        + medication.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -254,7 +274,8 @@ public class MakeOpComposition {
       for (Appointment followUp : followupList) {
         sectionComponent.addEntry(
             new Reference()
-                .setReference(BundleResourceIdentifier.FOLLOW_UP + "/" + followUp.getId()));
+                .setReference(
+                    BundleResourceIdentifier.FOLLOW_UP + MapperConstants.SLASH + followUp.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -271,7 +292,10 @@ public class MakeOpComposition {
       for (Procedure procedure : procedureList) {
         sectionComponent.addEntry(
             new Reference()
-                .setReference(BundleResourceIdentifier.PROCEDURE + "/" + procedure.getId()));
+                .setReference(
+                    BundleResourceIdentifier.PROCEDURE
+                        + MapperConstants.SLASH
+                        + procedure.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -288,7 +312,8 @@ public class MakeOpComposition {
       for (ServiceRequest referral : referralList) {
         sectionComponent.addEntry(
             new Reference()
-                .setReference(BundleResourceIdentifier.REFERRAL + "/" + referral.getId()));
+                .setReference(
+                    BundleResourceIdentifier.REFERRAL + MapperConstants.SLASH + referral.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -306,7 +331,9 @@ public class MakeOpComposition {
         sectionComponent.addEntry(
             new Reference()
                 .setReference(
-                    BundleResourceIdentifier.OTHER_OBSERVATIONS + "/" + otherObservation.getId()));
+                    BundleResourceIdentifier.OTHER_OBSERVATIONS
+                        + MapperConstants.SLASH
+                        + otherObservation.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -325,7 +352,7 @@ public class MakeOpComposition {
             new Reference()
                 .setReference(
                     BundleResourceIdentifier.DOCUMENT_REFERENCE
-                        + "/"
+                        + MapperConstants.SLASH
                         + documentReferenceItem.getId()));
       }
       sectionComponentList.add(sectionComponent);

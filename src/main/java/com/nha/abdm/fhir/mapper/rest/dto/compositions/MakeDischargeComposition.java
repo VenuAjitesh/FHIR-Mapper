@@ -5,6 +5,7 @@ import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleCompositionIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
+import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,19 +51,28 @@ public class MakeDischargeComposition {
       practitionerName = practitioner.getName().get(0);
       authorList.add(
           new Reference()
-              .setReference(BundleResourceIdentifier.PRACTITIONER + "/" + practitioner.getId())
+              .setReference(
+                  BundleResourceIdentifier.PRACTITIONER
+                      + MapperConstants.SLASH
+                      + practitioner.getId())
               .setDisplay(practitionerName != null ? practitionerName.getText() : null));
     }
     composition.setEncounter(
-        new Reference().setReference(BundleResourceIdentifier.ENCOUNTER + "/" + encounter.getId()));
+        new Reference()
+            .setReference(
+                BundleResourceIdentifier.ENCOUNTER + MapperConstants.SLASH + encounter.getId()));
     composition.setCustodian(
         new Reference()
-            .setReference(BundleResourceIdentifier.ORGANISATION + "/" + organization.getId())
+            .setReference(
+                BundleResourceIdentifier.ORGANISATION
+                    + MapperConstants.SLASH
+                    + organization.getId())
             .setDisplay(organization.getName()));
     composition.setAuthor(authorList);
     composition.setSubject(
         new Reference()
-            .setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
+            .setReference(
+                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
             .setDisplay(patientName.getText()));
     composition.setDateElement(Utils.getFormattedDateTime(authoredOn));
     composition.setStatus(Composition.CompositionStatus.FINAL);
@@ -125,7 +135,9 @@ public class MakeDischargeComposition {
         sectionComponent.addEntry(
             new Reference()
                 .setReference(
-                    BundleResourceIdentifier.CHIEF_COMPLAINTS + "/" + chiefComplaint.getId()));
+                    BundleResourceIdentifier.CHIEF_COMPLAINTS
+                        + MapperConstants.SLASH
+                        + chiefComplaint.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -144,7 +156,7 @@ public class MakeDischargeComposition {
             new Reference()
                 .setReference(
                     BundleResourceIdentifier.PHYSICAL_EXAMINATION
-                        + "/"
+                        + MapperConstants.SLASH
                         + physicalObservation.getId()));
       }
       sectionComponentList.add(sectionComponent);
@@ -164,7 +176,7 @@ public class MakeDischargeComposition {
             new Reference()
                 .setReference(
                     BundleResourceIdentifier.ALLERGY_INTOLERANCE
-                        + "/"
+                        + MapperConstants.SLASH
                         + allergyIntolerance.getId()));
       }
       sectionComponentList.add(sectionComponent);
@@ -183,7 +195,9 @@ public class MakeDischargeComposition {
         sectionComponent.addEntry(
             new Reference()
                 .setReference(
-                    BundleResourceIdentifier.MEDICAL_HISTORY + "/" + medicalHistory.getId()));
+                    BundleResourceIdentifier.MEDICAL_HISTORY
+                        + MapperConstants.SLASH
+                        + medicalHistory.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -201,7 +215,9 @@ public class MakeDischargeComposition {
         sectionComponent.addEntry(
             new Reference()
                 .setReference(
-                    BundleResourceIdentifier.FAMILY_HISTORY + "/" + familyMemberHistory.getId()));
+                    BundleResourceIdentifier.FAMILY_HISTORY
+                        + MapperConstants.SLASH
+                        + familyMemberHistory.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -217,7 +233,8 @@ public class MakeDischargeComposition {
                       .setDisplay(BundleCompositionIdentifier.CARE_PLAN)));
       sectionComponent.addEntry(
           new Reference()
-              .setReference(BundleResourceIdentifier.CARE_PLAN + "/" + carePlan.getId()));
+              .setReference(
+                  BundleResourceIdentifier.CARE_PLAN + MapperConstants.SLASH + carePlan.getId()));
       sectionComponentList.add(sectionComponent);
     }
     if (!(medicationRequestList.isEmpty())) {
@@ -236,7 +253,7 @@ public class MakeDischargeComposition {
                 .setReference(
                     BundleResourceIdentifier.MEDICATION_REQUEST
                         + BundleResourceIdentifier.FAMILY_HISTORY
-                        + "/"
+                        + MapperConstants.SLASH
                         + medicationRequest.getId()));
       }
       sectionComponentList.add(sectionComponent);
@@ -255,7 +272,9 @@ public class MakeDischargeComposition {
         sectionComponent.addEntry(
             new Reference()
                 .setReference(
-                    BundleResourceIdentifier.DIAGNOSTIC_REPORT + "/" + diagnosticReport.getId()));
+                    BundleResourceIdentifier.DIAGNOSTIC_REPORT
+                        + MapperConstants.SLASH
+                        + diagnosticReport.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -272,7 +291,10 @@ public class MakeDischargeComposition {
       for (Procedure procedure : procedureList) {
         sectionComponent.addEntry(
             new Reference()
-                .setReference(BundleResourceIdentifier.PROCEDURE + "/" + procedure.getId()));
+                .setReference(
+                    BundleResourceIdentifier.PROCEDURE
+                        + MapperConstants.SLASH
+                        + procedure.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -291,7 +313,7 @@ public class MakeDischargeComposition {
             new Reference()
                 .setReference(
                     BundleResourceIdentifier.DOCUMENT_REFERENCE
-                        + "/"
+                        + MapperConstants.SLASH
                         + documentReferenceItem.getId()));
       }
       sectionComponentList.add(sectionComponent);

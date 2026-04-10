@@ -3,6 +3,7 @@ package com.nha.abdm.fhir.mapper.rest.dto.resources.invoice;
 
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
+import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import com.nha.abdm.fhir.mapper.rest.database.h2.repositories.TypeInvoiceRepo;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.TypeInvoice;
@@ -55,7 +56,7 @@ public class MakeInvoiceResource {
 
     if (patient != null && patient.hasId()) {
       Reference patientRef =
-          new Reference(BundleResourceIdentifier.PATIENT + "/" + patient.getId());
+          new Reference(BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId());
       if (patient.hasName() && patient.getNameFirstRep().hasText()) {
         patientRef.setDisplay(patient.getNameFirstRep().getText());
       }
@@ -64,7 +65,8 @@ public class MakeInvoiceResource {
 
     if (organisation != null && organisation.hasId()) {
       Reference orgRef =
-          new Reference(BundleResourceIdentifier.ORGANISATION + "/" + organisation.getId());
+          new Reference(
+              BundleResourceIdentifier.ORGANISATION + MapperConstants.SLASH + organisation.getId());
       if (StringUtils.isNotBlank(organisation.getName())) {
         orgRef.setDisplay(organisation.getName());
       }
@@ -77,7 +79,9 @@ public class MakeInvoiceResource {
       codeConcept.setText(invoiceBundleRequest.getInvoice().getType());
 
       TypeInvoice typeInvoice =
-          typeInvoiceRepo.findByDisplay(invoiceBundleRequest.getInvoice().getType()).stream()
+          typeInvoiceRepo
+              .findTop20ByDisplayContainingIgnoreCase(invoiceBundleRequest.getInvoice().getType())
+              .stream()
               .findFirst()
               .orElse(null);
 
@@ -121,7 +125,10 @@ public class MakeInvoiceResource {
                       Invoice.InvoiceLineItemComponent lineItem =
                           new Invoice.InvoiceLineItemComponent();
                       lineItem.setChargeItem(
-                          new Reference(BundleResourceIdentifier.CHARGE_ITEM + "/" + item.getId()));
+                          new Reference(
+                              BundleResourceIdentifier.CHARGE_ITEM
+                                  + MapperConstants.SLASH
+                                  + item.getId()));
                       makeInvoicePriceComponent
                           .makeInvoicePriceComponents(item, invoiceBundleRequest)
                           .forEach(lineItem::addPriceComponent);

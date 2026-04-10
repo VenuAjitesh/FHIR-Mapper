@@ -2,10 +2,7 @@
 package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import com.nha.abdm.fhir.mapper.Utils;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.SnomedCodeIdentifier;
+import com.nha.abdm.fhir.mapper.rest.common.constants.*;
 import com.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedObservation;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.FamilyObservationResource;
@@ -33,7 +30,8 @@ public class MakeFamilyMemberResource {
             .addProfile(ResourceProfileIdentifier.PROFILE_FAMILY_MEMBER_HISTORY));
     familyMemberHistory.setPatient(
         new Reference()
-            .setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
+            .setReference(
+                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
             .setDisplay(patientName.getText()));
     if (Objects.nonNull(familyObservationResource.getRelationship())) {
       familyMemberHistory.setRelationship(

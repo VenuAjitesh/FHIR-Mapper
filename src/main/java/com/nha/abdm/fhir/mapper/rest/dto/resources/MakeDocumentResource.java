@@ -4,6 +4,7 @@ package com.nha.abdm.fhir.mapper.rest.dto.resources;
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
+import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.DocumentResource;
 import java.text.ParseException;
@@ -58,7 +59,8 @@ public class MakeDocumentResource {
     Reference documentSubject = new Reference();
     documentReference.setSubject(
         documentSubject
-            .setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
+            .setReference(
+                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
             .setDisplay(patientName.getText()));
     return documentReference;
   }

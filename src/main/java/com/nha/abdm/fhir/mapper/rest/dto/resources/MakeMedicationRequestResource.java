@@ -112,7 +112,9 @@ public class MakeMedicationRequestResource {
           Collections.singletonList(
               new Reference()
                   .setReference(
-                      BundleResourceIdentifier.CONDITION + "/" + medicationCondition.getId())
+                      BundleResourceIdentifier.CONDITION
+                          + MapperConstants.SLASH
+                          + medicationCondition.getId())
                   .setDisplay(BundleFieldIdentifier.MEDICAL_CONDITION)));
     }
     if (!practitioners.isEmpty()) {
@@ -120,12 +122,16 @@ public class MakeMedicationRequestResource {
       HumanName practitionerName = practitioner.getName().get(0);
       medicationRequest.setRequester(
           new Reference()
-              .setReference(BundleResourceIdentifier.PRACTITIONER + "/" + practitioner.getId())
+              .setReference(
+                  BundleResourceIdentifier.PRACTITIONER
+                      + MapperConstants.SLASH
+                      + practitioner.getId())
               .setDisplay(practitionerName.getText()));
     }
     medicationRequest.setSubject(
         new Reference()
-            .setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
+            .setReference(
+                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
             .setDisplay(patientName.getText()));
     if (authoredOn != null)
       medicationRequest.setAuthoredOnElement(Utils.getFormattedDateTime(authoredOn));

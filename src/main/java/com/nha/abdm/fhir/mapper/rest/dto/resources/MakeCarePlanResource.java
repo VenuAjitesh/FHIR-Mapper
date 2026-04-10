@@ -3,6 +3,7 @@ package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
+import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import com.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedEncounter;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.CarePlanResource;
@@ -29,7 +30,8 @@ public class MakeCarePlanResource {
     carePlan.setTitle(carePlanResource.getType());
     carePlan.setSubject(
         new Reference()
-            .setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
+            .setReference(
+                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
             .setDisplay(
                 patient.getName().stream()
                     .map(HumanName::getText)

@@ -2,10 +2,7 @@
 package com.nha.abdm.fhir.mapper.rest.dto.compositions;
 
 import com.nha.abdm.fhir.mapper.Utils;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleCompositionIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
+import com.nha.abdm.fhir.mapper.rest.common.constants.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,21 +39,26 @@ public class MakeImmunizationComposition {
     if (Objects.nonNull(organization))
       composition.setCustodian(
           new Reference()
-              .setReference(BundleResourceIdentifier.ORGANISATION + "/" + organization.getId()));
+              .setReference(
+                  BundleResourceIdentifier.ORGANISATION
+                      + MapperConstants.SLASH
+                      + organization.getId()));
     List<Reference> authorList = new ArrayList<>();
     HumanName practitionerName = null;
     for (Practitioner author : practitionerList) {
       practitionerName = author.getName().get(0);
       authorList.add(
           new Reference()
-              .setReference(BundleResourceIdentifier.PRACTITIONER + "/" + author.getId())
+              .setReference(
+                  BundleResourceIdentifier.PRACTITIONER + MapperConstants.SLASH + author.getId())
               .setDisplay(practitionerName.getText()));
     }
     composition.setAuthor(authorList);
     HumanName patientName = patient.getName().get(0);
     composition.setSubject(
         new Reference()
-            .setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
+            .setReference(
+                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
             .setDisplay(patientName.getText()));
     composition.setDateElement(Utils.getFormattedDateTime(authoredOn));
     Composition.SectionComponent immunizationSection = new Composition.SectionComponent();
@@ -72,7 +74,10 @@ public class MakeImmunizationComposition {
     for (Immunization immunization : immunizationList) {
       Reference entryReference =
           new Reference()
-              .setReference(BundleResourceIdentifier.IMMUNIZATION + "/" + immunization.getId())
+              .setReference(
+                  BundleResourceIdentifier.IMMUNIZATION
+                      + MapperConstants.SLASH
+                      + immunization.getId())
               .setType(BundleResourceIdentifier.IMMUNIZATION);
       immunizationSection.addEntry(entryReference);
     }
@@ -81,7 +86,9 @@ public class MakeImmunizationComposition {
       immunizationSection.addEntry(
           new Reference()
               .setReference(
-                  BundleResourceIdentifier.DOCUMENT_REFERENCE + "/" + documentReference.getId())
+                  BundleResourceIdentifier.DOCUMENT_REFERENCE
+                      + MapperConstants.SLASH
+                      + documentReference.getId())
               .setType(BundleResourceIdentifier.DOCUMENT_REFERENCE));
     composition.setStatus(Composition.CompositionStatus.FINAL);
     Identifier identifier = new Identifier();

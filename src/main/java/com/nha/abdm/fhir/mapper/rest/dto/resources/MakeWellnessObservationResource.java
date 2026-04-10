@@ -1,10 +1,7 @@
 /* (C) 2024 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.SnomedCodeIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.WellnessFieldIdentifiers;
+import com.nha.abdm.fhir.mapper.rest.common.constants.*;
 import com.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedObservation;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.WellnessObservationResource;
@@ -51,7 +48,8 @@ public class MakeWellnessObservationResource {
     observation.setCode(typeCode);
     observation.setSubject(
         new Reference()
-            .setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
+            .setReference(
+                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
             .setDisplay(patientName.getText()));
     List<Reference> performerList = new ArrayList<>();
     HumanName practitionerName = null;
@@ -59,7 +57,10 @@ public class MakeWellnessObservationResource {
       practitionerName = practitioner.getName().get(0);
       performerList.add(
           new Reference()
-              .setReference(BundleResourceIdentifier.PRACTITIONER + "/" + practitioner.getId())
+              .setReference(
+                  BundleResourceIdentifier.PRACTITIONER
+                      + MapperConstants.SLASH
+                      + practitioner.getId())
               .setDisplay(practitionerName.getText()));
     }
     observation.setPerformer(performerList);

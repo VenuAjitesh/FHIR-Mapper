@@ -4,6 +4,7 @@ package com.nha.abdm.fhir.mapper.rest.dto.resources;
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
+import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.DateRange;
 import com.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
@@ -40,7 +41,8 @@ public class MakeConditionResource {
             .addProfile(ResourceProfileIdentifier.PROFILE_CONDITION));
     condition.setSubject(
         new Reference()
-            .setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
+            .setReference(
+                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
             .setDisplay(patientName.getText()));
     if (recordedDate != null)
       condition.setRecordedDateElement(Utils.getFormattedDateTime(recordedDate));

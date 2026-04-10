@@ -2,9 +2,7 @@
 package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.ErrorCode;
+import com.nha.abdm.fhir.mapper.rest.common.constants.*;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.BundleResponse;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.ErrorResponse;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.OrganisationResource;
@@ -14,7 +12,6 @@ import com.nha.abdm.fhir.mapper.rest.dto.resources.invoice.*;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.InvoiceBundleRequest;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.ChargeItemResource;
-import com.nha.abdm.fhir.mapper.rest.common.constants.LogMessageConstants;
 import java.text.ParseException;
 import java.util.*;
 import org.hl7.fhir.r4.model.*;
@@ -183,13 +180,12 @@ public class InvoiceRequestConverter {
         log.error(e.getMessage());
         return BundleResponse.builder()
             .error(
-                new ErrorResponse(
-                    ErrorCode.DB_ERROR,
-                    LogMessageConstants.JDBC_EXCEPTION_MESSAGE))
+                new ErrorResponse(ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE))
             .build();
       }
       return BundleResponse.builder()
-          .error(ErrorResponse.builder().code("1000").message(e.getMessage()).build())
+          .error(
+              ErrorResponse.builder().code(ErrorCode.UNKNOWN_ERROR).message(e.getMessage()).build())
           .build();
     }
   }
@@ -198,7 +194,7 @@ public class InvoiceRequestConverter {
       List<Bundle.BundleEntryComponent> entries, String resourceType, Resource resource) {
     entries.add(
         new Bundle.BundleEntryComponent()
-            .setFullUrl(resourceType + "/" + resource.getId())
+            .setFullUrl(resourceType + MapperConstants.SLASH + resource.getId())
             .setResource(resource));
   }
 
@@ -237,7 +233,8 @@ public class InvoiceRequestConverter {
       medicationList.add(medication);
       return makeChargeItemResource.getChargeItems(item, medication.getId());
     } else {
-      throw new IllegalArgumentException(LogMessageConstants.UNKNOWN_PRODUCT_TYPE + item.getProductType());
+      throw new IllegalArgumentException(
+          LogMessageConstants.UNKNOWN_PRODUCT_TYPE + item.getProductType());
     }
   }
 }

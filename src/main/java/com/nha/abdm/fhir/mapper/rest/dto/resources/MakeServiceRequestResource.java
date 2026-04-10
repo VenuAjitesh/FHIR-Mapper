@@ -4,6 +4,7 @@ package com.nha.abdm.fhir.mapper.rest.dto.resources;
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
+import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import com.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedDiagnostic;
@@ -50,7 +51,8 @@ public class MakeServiceRequestResource {
             .setText(serviceRequestResource.getDetails()));
     serviceRequest.setSubject(
         new Reference()
-            .setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
+            .setReference(
+                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
             .setDisplay(patientName.getText()));
     List<Reference> performerList = new ArrayList<>();
     HumanName practitionerName = null;
@@ -58,7 +60,10 @@ public class MakeServiceRequestResource {
       practitionerName = practitioner.getName().get(0);
       performerList.add(
           new Reference()
-              .setReference(BundleResourceIdentifier.PRACTITIONER + "/" + practitioner.getId())
+              .setReference(
+                  BundleResourceIdentifier.PRACTITIONER
+                      + MapperConstants.SLASH
+                      + practitioner.getId())
               .setDisplay(practitionerName.getText()));
     }
     if (!performerList.isEmpty()) {
@@ -66,7 +71,10 @@ public class MakeServiceRequestResource {
       practitionerName = practitioner.getName().get(0);
       serviceRequest.setRequester(
           new Reference()
-              .setReference(BundleResourceIdentifier.PRACTITIONER + "/" + practitioner.getId())
+              .setReference(
+                  BundleResourceIdentifier.PRACTITIONER
+                      + MapperConstants.SLASH
+                      + practitioner.getId())
               .setDisplay(practitionerName.getText()));
     }
     serviceRequest.setPerformer(performerList);

@@ -50,13 +50,16 @@ public class MakeAllergyToleranceResource {
     allergyIntolerance.setType(AllergyIntolerance.AllergyIntoleranceType.ALLERGY);
     allergyIntolerance.setPatient(
         new Reference()
-            .setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
+            .setReference(
+                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
             .setDisplay(patientName.getText()));
     if (!(practitionerList.isEmpty())) {
       allergyIntolerance.setRecorder(
           new Reference()
               .setReference(
-                  BundleResourceIdentifier.PRACTITIONER + "/" + practitionerList.get(0).getId())
+                  BundleResourceIdentifier.PRACTITIONER
+                      + MapperConstants.SLASH
+                      + practitionerList.get(0).getId())
               .setDisplay(patientName.getText()));
     }
     return allergyIntolerance;

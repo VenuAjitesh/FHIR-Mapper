@@ -2,10 +2,7 @@
 package com.nha.abdm.fhir.mapper.rest.dto.compositions;
 
 import com.nha.abdm.fhir.mapper.Utils;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleCompositionIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
+import com.nha.abdm.fhir.mapper.rest.common.constants.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,13 +45,17 @@ public class MakeDiagnosticComposition {
       sectionComponent.addEntry(
           new Reference()
               .setReference(
-                  BundleResourceIdentifier.DIAGNOSTIC_REPORT + "/" + diagnosticReport.getId()));
+                  BundleResourceIdentifier.DIAGNOSTIC_REPORT
+                      + MapperConstants.SLASH
+                      + diagnosticReport.getId()));
     }
     for (DocumentReference documentReference : documentReferenceList) {
       sectionComponent.addEntry(
           new Reference()
               .setReference(
-                  BundleResourceIdentifier.DOCUMENT_REFERENCE + "/" + documentReference.getId()));
+                  BundleResourceIdentifier.DOCUMENT_REFERENCE
+                      + MapperConstants.SLASH
+                      + documentReference.getId()));
     }
     composition.addSection(sectionComponent);
     List<Reference> authorList = new ArrayList<>();
@@ -63,22 +64,30 @@ public class MakeDiagnosticComposition {
       authorList.add(
           new Reference()
               .setDisplay(practionerName.getText())
-              .setReference(BundleResourceIdentifier.PRACTITIONER + "/" + practitioner.getId()));
+              .setReference(
+                  BundleResourceIdentifier.PRACTITIONER
+                      + MapperConstants.SLASH
+                      + practitioner.getId()));
     }
     composition.setCustodian(
         new Reference()
             .setDisplay(organization.getName())
-            .setReference(BundleResourceIdentifier.ORGANISATION + "/" + organization.getId()));
+            .setReference(
+                BundleResourceIdentifier.ORGANISATION
+                    + MapperConstants.SLASH
+                    + organization.getId()));
     composition.setAuthor(authorList);
     if (Objects.nonNull(encounter))
       composition.setEncounter(
           new Reference()
-              .setReference(BundleResourceIdentifier.ENCOUNTER + "/" + encounter.getId()));
+              .setReference(
+                  BundleResourceIdentifier.ENCOUNTER + MapperConstants.SLASH + encounter.getId()));
     HumanName patientName = patient.getName().get(0);
     composition.setSubject(
         new Reference()
             .setDisplay(patientName.getText())
-            .setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId()));
+            .setReference(
+                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId()));
     composition.setDateElement(Utils.getFormattedDateTime(authoredOn));
     composition.setStatus(Composition.CompositionStatus.FINAL);
     Identifier identifier = new Identifier();

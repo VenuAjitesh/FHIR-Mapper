@@ -5,6 +5,7 @@ import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleCompositionIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
+import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,19 +42,28 @@ public class MakeWellnessComposition {
       practitionerName = practitioner.getName().get(0);
       authorList.add(
           new Reference()
-              .setReference(BundleResourceIdentifier.PRACTITIONER + "/" + practitioner.getId())
+              .setReference(
+                  BundleResourceIdentifier.PRACTITIONER
+                      + MapperConstants.SLASH
+                      + practitioner.getId())
               .setDisplay(practitionerName != null ? practitionerName.getText() : null));
     }
     composition.setEncounter(
-        new Reference().setReference(BundleResourceIdentifier.ENCOUNTER + "/" + encounter.getId()));
+        new Reference()
+            .setReference(
+                BundleResourceIdentifier.ENCOUNTER + MapperConstants.SLASH + encounter.getId()));
     composition.setCustodian(
         new Reference()
-            .setReference(BundleResourceIdentifier.ORGANISATION + "/" + organization.getId())
+            .setReference(
+                BundleResourceIdentifier.ORGANISATION
+                    + MapperConstants.SLASH
+                    + organization.getId())
             .setDisplay(organization.getName()));
     composition.setAuthor(authorList);
     composition.setSubject(
         new Reference()
-            .setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
+            .setReference(
+                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
             .setDisplay(patientName.getText()));
     composition.setDateElement(Utils.getFormattedDateTime(authoredOn));
     List<Composition.SectionComponent> sectionComponentList =
@@ -101,7 +111,10 @@ public class MakeWellnessComposition {
       for (Observation observation : vitalSignsList) {
         sectionComponent.addEntry(
             new Reference()
-                .setReference(BundleResourceIdentifier.VITAL_SIGNS + "/" + observation.getId()));
+                .setReference(
+                    BundleResourceIdentifier.VITAL_SIGNS
+                        + MapperConstants.SLASH
+                        + observation.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -112,7 +125,9 @@ public class MakeWellnessComposition {
         sectionComponent.addEntry(
             new Reference()
                 .setReference(
-                    BundleResourceIdentifier.BODY_MEASUREMENT + "/" + observation.getId()));
+                    BundleResourceIdentifier.BODY_MEASUREMENT
+                        + MapperConstants.SLASH
+                        + observation.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -123,7 +138,9 @@ public class MakeWellnessComposition {
         sectionComponent.addEntry(
             new Reference()
                 .setReference(
-                    BundleResourceIdentifier.PHYSICAL_ACTIVITY + "/" + observation.getId()));
+                    BundleResourceIdentifier.PHYSICAL_ACTIVITY
+                        + MapperConstants.SLASH
+                        + observation.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -134,7 +151,9 @@ public class MakeWellnessComposition {
         sectionComponent.addEntry(
             new Reference()
                 .setReference(
-                    BundleResourceIdentifier.GENERAL_ASSESSMENT + "/" + observation.getId()));
+                    BundleResourceIdentifier.GENERAL_ASSESSMENT
+                        + MapperConstants.SLASH
+                        + observation.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -144,7 +163,10 @@ public class MakeWellnessComposition {
       for (Observation observation : womanHealthList) {
         sectionComponent.addEntry(
             new Reference()
-                .setReference(BundleResourceIdentifier.WOMAN_HEALTH + "/" + observation.getId()));
+                .setReference(
+                    BundleResourceIdentifier.WOMAN_HEALTH
+                        + MapperConstants.SLASH
+                        + observation.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -154,7 +176,10 @@ public class MakeWellnessComposition {
       for (Observation observation : lifeStyleList) {
         sectionComponent.addEntry(
             new Reference()
-                .setReference(BundleResourceIdentifier.LIFE_STYLE + "/" + observation.getId()));
+                .setReference(
+                    BundleResourceIdentifier.LIFE_STYLE
+                        + MapperConstants.SLASH
+                        + observation.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -165,7 +190,9 @@ public class MakeWellnessComposition {
         sectionComponent.addEntry(
             new Reference()
                 .setReference(
-                    BundleResourceIdentifier.OTHER_OBSERVATIONS + "/" + observation.getId()));
+                    BundleResourceIdentifier.OTHER_OBSERVATIONS
+                        + MapperConstants.SLASH
+                        + observation.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -176,7 +203,9 @@ public class MakeWellnessComposition {
         sectionComponent.addEntry(
             new Reference()
                 .setReference(
-                    BundleResourceIdentifier.DOCUMENT_REFERENCE + "/" + documentReference.getId()));
+                    BundleResourceIdentifier.DOCUMENT_REFERENCE
+                        + MapperConstants.SLASH
+                        + documentReference.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }

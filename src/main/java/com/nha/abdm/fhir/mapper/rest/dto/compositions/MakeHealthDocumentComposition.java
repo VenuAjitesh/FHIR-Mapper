@@ -2,10 +2,7 @@
 package com.nha.abdm.fhir.mapper.rest.dto.compositions;
 
 import com.nha.abdm.fhir.mapper.Utils;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleCompositionIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
+import com.nha.abdm.fhir.mapper.rest.common.constants.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,32 +42,43 @@ public class MakeHealthDocumentComposition {
       sectionComponent.addEntry(
           new Reference()
               .setReference(
-                  BundleResourceIdentifier.DOCUMENT_REFERENCE + "/" + documentReference.getId()));
+                  BundleResourceIdentifier.DOCUMENT_REFERENCE
+                      + MapperConstants.SLASH
+                      + documentReference.getId()));
     }
     composition.addSection(sectionComponent);
     composition.setTitle(BundleCompositionIdentifier.HEALTH_DOCUMENT);
     composition.setEncounter(
-        new Reference().setReference(BundleResourceIdentifier.ENCOUNTER + "/" + encounter.getId()));
+        new Reference()
+            .setReference(
+                BundleResourceIdentifier.ENCOUNTER + MapperConstants.SLASH + encounter.getId()));
     List<Reference> authorList = new ArrayList<>();
     for (Practitioner practitioner : practitionerList) {
       HumanName practionerName = practitioner.getName().get(0);
       authorList.add(
           new Reference()
               .setDisplay(practionerName.getText())
-              .setReference(BundleResourceIdentifier.PRACTITIONER + "/" + practitioner.getId()));
+              .setReference(
+                  BundleResourceIdentifier.PRACTITIONER
+                      + MapperConstants.SLASH
+                      + practitioner.getId()));
     }
     if (Objects.nonNull(organization)) {
       composition.setCustodian(
           new Reference()
               .setDisplay(organization.getName())
-              .setReference(BundleResourceIdentifier.ORGANISATION + "/" + organization.getId()));
+              .setReference(
+                  BundleResourceIdentifier.ORGANISATION
+                      + MapperConstants.SLASH
+                      + organization.getId()));
     }
     composition.setAuthor(authorList);
     HumanName patientName = patient.getName().get(0);
     composition.setSubject(
         new Reference()
             .setDisplay(patientName.getText())
-            .setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId()));
+            .setReference(
+                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId()));
     composition.setDateElement(Utils.getFormattedDateTime(authoredOn));
     composition.setStatus(Composition.CompositionStatus.FINAL);
     Identifier identifier = new Identifier();

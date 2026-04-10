@@ -214,74 +214,108 @@ public class WellnessRecordConverter {
       List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(BundleResourceIdentifier.COMPOSITION + "/" + composition.getId())
+              .setFullUrl(
+                  BundleResourceIdentifier.COMPOSITION
+                      + MapperConstants.SLASH
+                      + composition.getId())
               .setResource(composition));
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
+              .setFullUrl(
+                  BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
               .setResource(patient));
       for (Practitioner practitioner : practitionerList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.PRACTITIONER + "/" + practitioner.getId())
+                .setFullUrl(
+                    BundleResourceIdentifier.PRACTITIONER
+                        + MapperConstants.SLASH
+                        + practitioner.getId())
                 .setResource(practitioner));
       }
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(BundleResourceIdentifier.ENCOUNTER + "/" + encounter.getId())
+              .setFullUrl(
+                  BundleResourceIdentifier.ENCOUNTER + MapperConstants.SLASH + encounter.getId())
               .setResource(encounter));
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(BundleResourceIdentifier.ORGANISATION + "/" + organization.getId())
+              .setFullUrl(
+                  BundleResourceIdentifier.ORGANISATION
+                      + MapperConstants.SLASH
+                      + organization.getId())
               .setResource(organization));
 
       for (Observation observation : vitalSignsList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.VITAL_SIGNS + "/" + observation.getId())
+                .setFullUrl(
+                    BundleResourceIdentifier.VITAL_SIGNS
+                        + MapperConstants.SLASH
+                        + observation.getId())
                 .setResource(observation));
       }
       for (Observation observation : bodyMeasurementList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.BODY_MEASUREMENT + "/" + observation.getId())
+                .setFullUrl(
+                    BundleResourceIdentifier.BODY_MEASUREMENT
+                        + MapperConstants.SLASH
+                        + observation.getId())
                 .setResource(observation));
       }
       for (Observation observation : physicalActivityList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.PHYSICAL_ACTIVITY + "/" + observation.getId())
+                .setFullUrl(
+                    BundleResourceIdentifier.PHYSICAL_ACTIVITY
+                        + MapperConstants.SLASH
+                        + observation.getId())
                 .setResource(observation));
       }
       for (Observation observation : generalAssessmentList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.GENERAL_ASSESSMENT + "/" + observation.getId())
+                .setFullUrl(
+                    BundleResourceIdentifier.GENERAL_ASSESSMENT
+                        + MapperConstants.SLASH
+                        + observation.getId())
                 .setResource(observation));
       }
       for (Observation observation : womanHealthList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.WOMAN_HEALTH + "/" + observation.getId())
+                .setFullUrl(
+                    BundleResourceIdentifier.WOMAN_HEALTH
+                        + MapperConstants.SLASH
+                        + observation.getId())
                 .setResource(observation));
       }
       for (Observation observation : lifeStyleList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.LIFE_STYLE + "/" + observation.getId())
+                .setFullUrl(
+                    BundleResourceIdentifier.LIFE_STYLE
+                        + MapperConstants.SLASH
+                        + observation.getId())
                 .setResource(observation));
       }
       for (Observation observation : otherObservationList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.OTHER_OBSERVATIONS + "/" + observation.getId())
+                .setFullUrl(
+                    BundleResourceIdentifier.OTHER_OBSERVATIONS
+                        + MapperConstants.SLASH
+                        + observation.getId())
                 .setResource(observation));
       }
       for (DocumentReference documentReference : documentReferenceList) {
         entries.add(
             new Bundle.BundleEntryComponent()
                 .setFullUrl(
-                    BundleResourceIdentifier.DOCUMENT_REFERENCE + "/" + documentReference.getId())
+                    BundleResourceIdentifier.DOCUMENT_REFERENCE
+                        + MapperConstants.SLASH
+                        + documentReference.getId())
                 .setResource(documentReference));
       }
       bundle.setEntry(entries);
@@ -291,13 +325,12 @@ public class WellnessRecordConverter {
         log.error(e.getMessage());
         return BundleResponse.builder()
             .error(
-                new ErrorResponse(
-                    ErrorCode.DB_ERROR,
-                    " JDBCException Generic SQL Related Error, kindly check logs."))
+                new ErrorResponse(ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE))
             .build();
       }
       return BundleResponse.builder()
-          .error(ErrorResponse.builder().code("1000").message(e.getMessage()).build())
+          .error(
+              ErrorResponse.builder().code(ErrorCode.UNKNOWN_ERROR).message(e.getMessage()).build())
           .build();
     }
   }
