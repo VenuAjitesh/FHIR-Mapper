@@ -1,6 +1,7 @@
 /* (C) 2024 */
 package com.nha.abdm.fhir.mapper.rest.requests;
 
+import com.nha.abdm.fhir.mapper.rest.common.constants.ValidationConstants;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.DocumentResource;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.OrganisationResource;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.PatientResource;
@@ -21,30 +22,31 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class ImmunizationRequest {
-  @Pattern(regexp = "ImmunizationRecord")
-  @NotBlank(message = "BundleType is mandatory and must not be empty : 'ImmunizationRecord'")
+  @Pattern(regexp = ValidationConstants.IMMUNIZATION_RECORD)
+  @NotBlank(
+      message = ValidationConstants.BUNDLE_TYPE_MESSAGE + ValidationConstants.IMMUNIZATION_RECORD)
   private String bundleType;
 
-  @NotBlank(message = "careContextReference is mandatory and must not be empty")
+  @NotBlank(message = ValidationConstants.CARE_CONTEXT_MANDATORY)
   private String careContextReference;
 
   @Valid
-  @NotNull(message = "Patient demographic details are mandatory and must not be empty") private PatientResource patient;
+  @NotNull(message = ValidationConstants.PATIENT_MANDATORY) private PatientResource patient;
 
   @Valid
-  @NotNull(message = "practitioners are mandatory and must not be empty") private List<PractitionerResource> practitioners;
+  @NotNull(message = ValidationConstants.PRACTITIONER_MANDATORY) private List<PractitionerResource> practitioners;
 
   private OrganisationResource organisation;
   private String encounter;
 
   @Pattern(
-      regexp = "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z)?$",
-      message = "Value must match either yyyy-MM-dd or yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-  @NotBlank(message = "authoredOn is mandatory timestamp")
+      regexp = ValidationConstants.DATE_TIME_PATTERN,
+      message = ValidationConstants.DATE_TIME_FORMAT_MESSAGE)
+  @NotBlank(message = ValidationConstants.AUTHORED_ON_MANDATORY)
   private String authoredOn;
 
   @Valid
-  @NotNull(message = "Immunizations are mandatory") private List<ImmunizationResource> immunizations;
+  @NotNull(message = "Immunizations" + ValidationConstants.MANDATORY_MESSAGE) private List<ImmunizationResource> immunizations;
 
   @Valid private List<DocumentResource> documents;
 }

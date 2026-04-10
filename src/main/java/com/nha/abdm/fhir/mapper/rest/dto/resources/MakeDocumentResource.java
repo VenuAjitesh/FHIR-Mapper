@@ -2,9 +2,7 @@
 package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import com.nha.abdm.fhir.mapper.Utils;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.DocumentResource;
 import java.text.ParseException;
@@ -24,9 +22,9 @@ public class MakeDocumentResource {
       throws ParseException {
     HumanName patientName = patient.getName().get(0);
     Coding coding = new Coding();
-    coding.setCode(docCode);
-    coding.setSystem(BundleUrlIdentifier.SNOMED_URL);
-    coding.setDisplay(docName);
+    coding.setCode("MR");
+    coding.setSystem(ResourceProfileIdentifier.PROFILE_PROVIDER);
+    coding.setDisplay("Medical record number");
     CodeableConcept codeableConcept = new CodeableConcept();
     codeableConcept.addCoding(coding);
     codeableConcept.setText(documentResource.getType());
@@ -56,12 +54,8 @@ public class MakeDocumentResource {
     documentReference.addContent(documentReferenceContentComponent);
     documentReference.setStatus(Enumerations.DocumentReferenceStatus.CURRENT);
     documentReference.setDocStatus(DocumentReference.ReferredDocumentStatus.FINAL);
-    Reference documentSubject = new Reference();
     documentReference.setSubject(
-        documentSubject
-            .setReference(
-                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
-            .setDisplay(patientName.getText()));
+        Utils.buildReference(patient.getId()).setDisplay(patientName.getText()));
     return documentReference;
   }
 }

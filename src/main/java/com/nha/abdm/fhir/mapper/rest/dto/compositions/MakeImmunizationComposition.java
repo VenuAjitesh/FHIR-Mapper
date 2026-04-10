@@ -18,6 +18,7 @@ public class MakeImmunizationComposition {
       Patient patient,
       List<Practitioner> practitionerList,
       Organization organization,
+      Encounter encounter,
       String authoredOn,
       List<Immunization> immunizationList,
       List<DocumentReference> documentList)
@@ -26,7 +27,7 @@ public class MakeImmunizationComposition {
     Meta meta = new Meta();
     meta.setVersionId("1");
     meta.setLastUpdatedElement(Utils.getCurrentTimeStamp());
-    meta.addProfile(ResourceProfileIdentifier.PROFILE_IMMUNIZATION);
+    meta.addProfile(ResourceProfileIdentifier.PROFILE_IMMUNIZATION_RECORD);
     composition.setMeta(meta);
     CodeableConcept typeCode = new CodeableConcept();
     Coding typeCoding = new Coding();
@@ -37,29 +38,19 @@ public class MakeImmunizationComposition {
     composition.setType(typeCode);
     composition.setTitle(BundleCompositionIdentifier.IMMUNIZATION_RECORD);
     if (Objects.nonNull(organization))
-      composition.setCustodian(
-          new Reference()
-              .setReference(
-                  BundleResourceIdentifier.ORGANISATION
-                      + MapperConstants.SLASH
-                      + organization.getId()));
+      composition.setCustodian(Utils.buildReference(organization.getId()));
     List<Reference> authorList = new ArrayList<>();
     HumanName practitionerName = null;
     for (Practitioner author : practitionerList) {
       practitionerName = author.getName().get(0);
-      authorList.add(
-          new Reference()
-              .setReference(
-                  BundleResourceIdentifier.PRACTITIONER + MapperConstants.SLASH + author.getId())
-              .setDisplay(practitionerName.getText()));
+      authorList.add(Utils.buildReference(author.getId()).setDisplay(practitionerName.getText()));
     }
     composition.setAuthor(authorList);
     HumanName patientName = patient.getName().get(0);
-    composition.setSubject(
-        new Reference()
-            .setReference(
-                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
-            .setDisplay(patientName.getText()));
+    composition.setSubject(Utils.buildReference(patient.getId()).setDisplay(patientName.getText()));
+    if (Objects.nonNull(encounter)) {
+      composition.setEncounter(Utils.buildReference(encounter.getId()));
+    }
     composition.setDateElement(Utils.getFormattedDateTime(authoredOn));
     Composition.SectionComponent immunizationSection = new Composition.SectionComponent();
     immunizationSection.setTitle(BundleResourceIdentifier.IMMUNIZATION);
@@ -73,22 +64,13 @@ public class MakeImmunizationComposition {
                     .setSystem(BundleUrlIdentifier.SNOMED_URL)));
     for (Immunization immunization : immunizationList) {
       Reference entryReference =
-          new Reference()
-              .setReference(
-                  BundleResourceIdentifier.IMMUNIZATION
-                      + MapperConstants.SLASH
-                      + immunization.getId())
-              .setType(BundleResourceIdentifier.IMMUNIZATION);
+          Utils.buildReference(immunization.getId()).setType(BundleResourceIdentifier.IMMUNIZATION);
       immunizationSection.addEntry(entryReference);
     }
     composition.addSection(immunizationSection);
     for (DocumentReference documentReference : documentList)
       immunizationSection.addEntry(
-          new Reference()
-              .setReference(
-                  BundleResourceIdentifier.DOCUMENT_REFERENCE
-                      + MapperConstants.SLASH
-                      + documentReference.getId())
+          Utils.buildReference(documentReference.getId())
               .setType(BundleResourceIdentifier.DOCUMENT_REFERENCE));
     composition.setStatus(Composition.CompositionStatus.FINAL);
     Identifier identifier = new Identifier();

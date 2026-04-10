@@ -24,8 +24,12 @@ public class ResourceProfileIdentifier {
       "https://nrces.in/ndhm/fhir/r4/StructureDefinition/FamilyMemberHistory";
   public static final String PROFILE_IMMUNIZATION =
       "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Immunization";
+  public static final String PROFILE_IMMUNIZATION_RECORD =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ImmunizationRecord";
   public static final String PROFILE_VACCINE_BRAND_NAME =
       "https://nrces.in/ndhm/fhir/r4/StructureDefinition/BrandName";
+  public static final String ENCOUNTER_CLASS_SYSTEM =
+      "http://terminology.hl7.org/CodeSystem/v3-ActCode";
   public static final String PROFILE_MEDICATION_REQUEST =
       "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest";
   public static final String PROFILE_OBSERVATION =

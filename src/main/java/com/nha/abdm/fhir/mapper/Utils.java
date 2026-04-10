@@ -1,11 +1,13 @@
 /* (C) 2024 */
 package com.nha.abdm.fhir.mapper;
 
+import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.hl7.fhir.r4.model.DateTimeType;
 import org.hl7.fhir.r4.model.InstantType;
+import org.hl7.fhir.r4.model.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -44,5 +46,9 @@ public class Utils {
     }
     dateTimeString = dateTimeString.trim();
     return new DateTimeType(dateTimeString).getValue();
+  }
+
+  public static Reference buildReference(String id) {
+    return new Reference(MapperConstants.URN_UUID + id);
   }
 }

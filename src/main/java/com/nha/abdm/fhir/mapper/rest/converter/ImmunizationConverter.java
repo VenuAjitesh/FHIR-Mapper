@@ -110,6 +110,7 @@ public class ImmunizationConverter {
               patient,
               practitionerList,
               organization,
+              encounter,
               immunizationRequest.getAuthoredOn(),
               immunizationList,
               documentList);
@@ -125,66 +126,46 @@ public class ImmunizationConverter {
               .setValue(immunizationRequest.getCareContextReference()));
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(
-                  BundleResourceIdentifier.COMPOSITION
-                      + MapperConstants.SLASH
-                      + composition.getId())
+              .setFullUrl(MapperConstants.URN_UUID + composition.getId())
               .setResource(composition));
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(
-                  BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
+              .setFullUrl(MapperConstants.URN_UUID + patient.getId())
               .setResource(patient));
       for (Practitioner practitioner : practitionerList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.PRACTITIONER
-                        + MapperConstants.SLASH
-                        + practitioner.getId())
+                .setFullUrl(MapperConstants.URN_UUID + practitioner.getId())
                 .setResource(practitioner));
       }
       if (Objects.nonNull(organization)) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.ORGANISATION
-                        + MapperConstants.SLASH
-                        + organization.getId())
+                .setFullUrl(MapperConstants.URN_UUID + organization.getId())
                 .setResource(organization));
       }
       if (Objects.nonNull(encounter)) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.ENCOUNTER + MapperConstants.SLASH + encounter.getId())
+                .setFullUrl(MapperConstants.URN_UUID + encounter.getId())
                 .setResource(encounter));
       }
       for (Organization manufacturer : manufactureList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.MANUFACTURER
-                        + MapperConstants.SLASH
-                        + manufacturer.getId())
+                .setFullUrl(MapperConstants.URN_UUID + manufacturer.getId())
                 .setResource(manufacturer));
       }
       for (Immunization immunization : immunizationList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.IMMUNIZATION
-                        + MapperConstants.SLASH
-                        + immunization.getId())
+                .setFullUrl(MapperConstants.URN_UUID + immunization.getId())
                 .setResource(immunization));
       }
       for (DocumentReference documentReference : documentList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.DOCUMENT_REFERENCE
-                        + MapperConstants.SLASH
-                        + documentReference.getId())
+                .setFullUrl(MapperConstants.URN_UUID + documentReference.getId())
                 .setResource(documentReference));
       }
       bundle.setEntry(entries);

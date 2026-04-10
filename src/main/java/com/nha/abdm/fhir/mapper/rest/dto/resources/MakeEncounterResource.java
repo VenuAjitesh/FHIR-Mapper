@@ -3,8 +3,6 @@ package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleFieldIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import com.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedEncounter;
@@ -31,17 +29,13 @@ public class MakeEncounterResource {
     SnomedEncounter snomedEncounter = snomedService.getSnomedEncounterCode(encounterName);
     encounter.setClass_(
         new Coding()
-            .setSystem(ResourceProfileIdentifier.PROFILE_BUNDLE_META)
+            .setSystem(ResourceProfileIdentifier.ENCOUNTER_CLASS_SYSTEM)
             .setCode(snomedEncounter.getCode())
             .setDisplay(
                 (encounterName != null && !encounterName.isEmpty())
                     ? encounterName
                     : BundleFieldIdentifier.AMBULATORY));
-    encounter.setSubject(
-        new Reference()
-            .setReference(
-                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
-            .setDisplay(patientName.getText()));
+    encounter.setSubject(Utils.buildReference(patient.getId()).setDisplay(patientName.getText()));
     encounter.setPeriod(new Period().setStartElement(Utils.getFormattedDateTime(visitDate)));
     return encounter;
   }
