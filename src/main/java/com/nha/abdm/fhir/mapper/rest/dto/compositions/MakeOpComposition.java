@@ -137,7 +137,7 @@ public class MakeOpComposition {
               .addCoding(
                   new Coding()
                       .setSystem(BundleUrlIdentifier.SNOMED_URL)
-                      .setCode(BundleCompositionIdentifier.ALLERGY_RECORD)
+                      .setCode(BundleCompositionIdentifier.ALLERGY_RECORD_CODE)
                       .setDisplay(BundleCompositionIdentifier.ALLERGY_RECORD)));
       for (AllergyIntolerance allergyIntolerance : allergieList) {
         sectionComponent.addEntry(Utils.buildReference(allergyIntolerance.getId()));
