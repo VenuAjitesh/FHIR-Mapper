@@ -3,11 +3,10 @@ package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.*;
-import com.nha.abdm.fhir.mapper.rest.common.helpers.BundleResponse;
-import com.nha.abdm.fhir.mapper.rest.common.helpers.ErrorResponse;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.OrganisationResource;
 import com.nha.abdm.fhir.mapper.rest.dto.compositions.MakeImmunizationComposition;
 import com.nha.abdm.fhir.mapper.rest.dto.resources.*;
+import com.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.ImmunizationRequest;
 import java.text.ParseException;
@@ -49,7 +48,7 @@ public class ImmunizationConverter {
     this.makeImmunizationComposition = makeImmunizationComposition;
   }
 
-  public BundleResponse makeImmunizationBundle(ImmunizationRequest immunizationRequest)
+  public Bundle makeImmunizationBundle(ImmunizationRequest immunizationRequest)
       throws ParseException {
     try {
       Bundle bundle = new Bundle();
@@ -189,19 +188,17 @@ public class ImmunizationConverter {
                 .setResource(documentReference));
       }
       bundle.setEntry(entries);
-      return BundleResponse.builder().bundle(bundle).build();
+      return bundle;
     } catch (Exception e) {
       if (e instanceof InvalidDataAccessResourceUsageException) {
         log.error(e.getMessage());
-        return BundleResponse.builder()
-            .error(
-                new ErrorResponse(ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE))
-            .build();
+        throw new FhirMapperException(
+            ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE);
       }
-      return BundleResponse.builder()
-          .error(
-              ErrorResponse.builder().code(ErrorCode.UNKNOWN_ERROR).message(e.getMessage()).build())
-          .build();
+      if (e instanceof FhirMapperException) {
+        throw e;
+      }
+      throw new FhirMapperException(ErrorCode.UNKNOWN_ERROR, e.getMessage());
     }
   }
 }

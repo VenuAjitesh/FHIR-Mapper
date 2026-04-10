@@ -3,10 +3,9 @@ package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.*;
-import com.nha.abdm.fhir.mapper.rest.common.helpers.BundleResponse;
-import com.nha.abdm.fhir.mapper.rest.common.helpers.ErrorResponse;
 import com.nha.abdm.fhir.mapper.rest.dto.compositions.MakeHealthDocumentComposition;
 import com.nha.abdm.fhir.mapper.rest.dto.resources.*;
+import com.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.HealthDocumentRecord;
 import java.text.ParseException;
@@ -47,7 +46,7 @@ public class HealthDocumentConverter {
     this.makeHealthDocumentComposition = makeHealthDocumentComposition;
   }
 
-  public BundleResponse convertToHealthDocumentBundle(HealthDocumentRecord healthDocumentRecord)
+  public Bundle convertToHealthDocumentBundle(HealthDocumentRecord healthDocumentRecord)
       throws ParseException {
     try {
       Organization organization =
@@ -149,19 +148,17 @@ public class HealthDocumentConverter {
                 .setResource(documentReference));
       }
       bundle.setEntry(entries);
-      return BundleResponse.builder().bundle(bundle).build();
+      return bundle;
     } catch (Exception e) {
       if (e instanceof InvalidDataAccessResourceUsageException) {
         log.error(e.getMessage());
-        return BundleResponse.builder()
-            .error(
-                new ErrorResponse(ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE))
-            .build();
+        throw new FhirMapperException(
+            ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE);
       }
-      return BundleResponse.builder()
-          .error(
-              ErrorResponse.builder().code(ErrorCode.UNKNOWN_ERROR).message(e.getMessage()).build())
-          .build();
+      if (e instanceof FhirMapperException) {
+        throw e;
+      }
+      throw new FhirMapperException(ErrorCode.UNKNOWN_ERROR, e.getMessage());
     }
   }
 }

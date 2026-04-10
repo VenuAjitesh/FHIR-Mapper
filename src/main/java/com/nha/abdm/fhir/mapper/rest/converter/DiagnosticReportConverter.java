@@ -3,10 +3,9 @@ package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.*;
-import com.nha.abdm.fhir.mapper.rest.common.helpers.BundleResponse;
-import com.nha.abdm.fhir.mapper.rest.common.helpers.ErrorResponse;
 import com.nha.abdm.fhir.mapper.rest.dto.compositions.MakeDiagnosticComposition;
 import com.nha.abdm.fhir.mapper.rest.dto.resources.*;
+import com.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.DiagnosticReportRequest;
 import java.text.ParseException;
@@ -53,13 +52,11 @@ public class DiagnosticReportConverter {
     this.makeDiagnosticComposition = makeDiagnosticComposition;
   }
 
-  public BundleResponse convertToDiagnosticBundle(DiagnosticReportRequest diagnosticReportRequest)
+  public Bundle convertToDiagnosticBundle(DiagnosticReportRequest diagnosticReportRequest)
       throws ParseException {
     try {
       if (diagnosticReportRequest == null) {
-        return BundleResponse.builder()
-            .error(ErrorResponse.builder().code("1001").message("Request is null").build())
-            .build();
+        throw new FhirMapperException(ErrorCode.VALIDATION_ERROR, "Request is null");
       }
 
       // Initialize bundle entries
@@ -178,20 +175,18 @@ public class DiagnosticReportConverter {
 
       bundle.setEntry(entries);
 
-      return BundleResponse.builder().bundle(bundle).build();
+      return bundle;
 
     } catch (Exception e) {
       if (e instanceof InvalidDataAccessResourceUsageException) {
         log.error(e.getMessage());
-        return BundleResponse.builder()
-            .error(
-                new ErrorResponse(ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE))
-            .build();
+        throw new FhirMapperException(
+            ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE);
       }
-      return BundleResponse.builder()
-          .error(
-              ErrorResponse.builder().code(ErrorCode.UNKNOWN_ERROR).message(e.getMessage()).build())
-          .build();
+      if (e instanceof FhirMapperException) {
+        throw e;
+      }
+      throw new FhirMapperException(ErrorCode.UNKNOWN_ERROR, e.getMessage());
     }
   }
 

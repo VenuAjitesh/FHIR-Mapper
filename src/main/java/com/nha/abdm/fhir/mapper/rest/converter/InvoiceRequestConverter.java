@@ -3,12 +3,11 @@ package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.*;
-import com.nha.abdm.fhir.mapper.rest.common.helpers.BundleResponse;
-import com.nha.abdm.fhir.mapper.rest.common.helpers.ErrorResponse;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.OrganisationResource;
 import com.nha.abdm.fhir.mapper.rest.dto.compositions.MakeInvoiceComposition;
 import com.nha.abdm.fhir.mapper.rest.dto.resources.*;
 import com.nha.abdm.fhir.mapper.rest.dto.resources.invoice.*;
+import com.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.InvoiceBundleRequest;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.ChargeItemResource;
@@ -17,7 +16,6 @@ import java.util.*;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +35,6 @@ public class InvoiceRequestConverter {
   private final MakeInvoiceMedicationResource makeInvoiceMedicationResource;
   private final MakeInvoicePaymentResource makeInvoicePaymentResource;
 
-  @Autowired
   public InvoiceRequestConverter(
       MakePatientResource makePatientResource,
       MakePractitionerResource makePractitionerResource,
@@ -65,7 +62,7 @@ public class InvoiceRequestConverter {
     this.makeInvoicePaymentResource = makeInvoicePaymentResource;
   }
 
-  public BundleResponse makeInvoiceBundle(InvoiceBundleRequest invoiceBundleRequest) {
+  public Bundle makeInvoiceBundle(InvoiceBundleRequest invoiceBundleRequest) throws ParseException {
     try {
       Bundle bundle = new Bundle();
       bundle.setId(UUID.randomUUID().toString());
@@ -173,20 +170,18 @@ public class InvoiceRequestConverter {
 
       bundle.setEntry(entries);
 
-      return BundleResponse.builder().bundle(bundle).build();
+      return bundle;
 
     } catch (Exception e) {
       if (e instanceof InvalidDataAccessResourceUsageException) {
         log.error(e.getMessage());
-        return BundleResponse.builder()
-            .error(
-                new ErrorResponse(ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE))
-            .build();
+        throw new FhirMapperException(
+            ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE);
       }
-      return BundleResponse.builder()
-          .error(
-              ErrorResponse.builder().code(ErrorCode.UNKNOWN_ERROR).message(e.getMessage()).build())
-          .build();
+      if (e instanceof FhirMapperException) {
+        throw e;
+      }
+      throw new FhirMapperException(ErrorCode.UNKNOWN_ERROR, e.getMessage());
     }
   }
 

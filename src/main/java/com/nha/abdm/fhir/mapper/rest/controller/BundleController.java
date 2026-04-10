@@ -1,20 +1,13 @@
 /* (C) 2024 */
 package com.nha.abdm.fhir.mapper.rest.controller;
 
-import ca.uhn.fhir.context.FhirContext;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ControllerMappingConstants;
-import com.nha.abdm.fhir.mapper.rest.common.helpers.BundleResponse;
-import com.nha.abdm.fhir.mapper.rest.common.helpers.FacadeError;
 import com.nha.abdm.fhir.mapper.rest.converter.*;
-import com.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import com.nha.abdm.fhir.mapper.rest.requests.*;
 import jakarta.validation.Valid;
 import java.text.ParseException;
-import java.util.Objects;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.hl7.fhir.r4.model.Bundle;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,16 +15,34 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = ControllerMappingConstants.BUNDLE_BASE_PATH)
 @Validated
 public class BundleController {
-  @Autowired ImmunizationConverter immunizationConverter;
-  @Autowired PrescriptionConverter prescriptionConverter;
-  @Autowired HealthDocumentConverter healthDocumentConverter;
-  @Autowired OPConsultationConverter opConsultationConverter;
-  @Autowired DiagnosticReportConverter diagnosticReportConverter;
-  @Autowired DischargeSummaryConverter dischargeSummaryConverter;
-  @Autowired WellnessRecordConverter wellnessRecordConverter;
-  @Autowired InvoiceRequestConverter invoiceRequestConverter;
-  @Autowired SnomedService snomedService;
-  @Autowired FhirContext ctx;
+
+  private final ImmunizationConverter immunizationConverter;
+  private final PrescriptionConverter prescriptionConverter;
+  private final HealthDocumentConverter healthDocumentConverter;
+  private final OPConsultationConverter opConsultationConverter;
+  private final DiagnosticReportConverter diagnosticReportConverter;
+  private final DischargeSummaryConverter dischargeSummaryConverter;
+  private final WellnessRecordConverter wellnessRecordConverter;
+  private final InvoiceRequestConverter invoiceRequestConverter;
+
+  public BundleController(
+      ImmunizationConverter immunizationConverter,
+      PrescriptionConverter prescriptionConverter,
+      HealthDocumentConverter healthDocumentConverter,
+      OPConsultationConverter opConsultationConverter,
+      DiagnosticReportConverter diagnosticReportConverter,
+      DischargeSummaryConverter dischargeSummaryConverter,
+      WellnessRecordConverter wellnessRecordConverter,
+      InvoiceRequestConverter invoiceRequestConverter) {
+    this.immunizationConverter = immunizationConverter;
+    this.prescriptionConverter = prescriptionConverter;
+    this.healthDocumentConverter = healthDocumentConverter;
+    this.opConsultationConverter = opConsultationConverter;
+    this.diagnosticReportConverter = diagnosticReportConverter;
+    this.dischargeSummaryConverter = dischargeSummaryConverter;
+    this.wellnessRecordConverter = wellnessRecordConverter;
+    this.invoiceRequestConverter = invoiceRequestConverter;
+  }
 
   /**
    * @param immunizationRequest which has immunization details like vaccine and type of vaccine
@@ -39,19 +50,10 @@ public class BundleController {
    * @throws ParseException while parsing the string into date
    */
   @PostMapping(ControllerMappingConstants.IMMUNIZATION_PATH)
-  public Object createImmunizationBundle(
+  @ResponseStatus(HttpStatus.CREATED)
+  public Bundle createImmunizationBundle(
       @Valid @RequestBody ImmunizationRequest immunizationRequest) throws ParseException {
-
-    BundleResponse bundleResponse =
-        immunizationConverter.makeImmunizationBundle(immunizationRequest);
-
-    if (Objects.nonNull(bundleResponse.getError()))
-      return ResponseEntity.badRequest()
-          .contentType(MediaType.APPLICATION_JSON)
-          .body(FacadeError.builder().error(bundleResponse.getError()).build());
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .contentType(MediaType.APPLICATION_JSON)
-        .body(ctx.newJsonParser().encodeResourceToString(bundleResponse.getBundle()));
+    return immunizationConverter.makeImmunizationBundle(immunizationRequest);
   }
 
   /**
@@ -60,19 +62,10 @@ public class BundleController {
    * @throws ParseException while parsing the string into date
    */
   @PostMapping(ControllerMappingConstants.PRESCRIPTION_PATH)
-  public ResponseEntity<Object> createPrescriptionBundle(
+  @ResponseStatus(HttpStatus.CREATED)
+  public Bundle createPrescriptionBundle(
       @Valid @RequestBody PrescriptionRequest prescriptionRequest) throws ParseException {
-
-    BundleResponse bundleResponse =
-        prescriptionConverter.convertToPrescriptionBundle(prescriptionRequest);
-
-    if (Objects.nonNull(bundleResponse.getError()))
-      return ResponseEntity.badRequest()
-          .contentType(MediaType.APPLICATION_JSON)
-          .body(FacadeError.builder().error(bundleResponse.getError()).build());
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .contentType(MediaType.APPLICATION_JSON)
-        .body(ctx.newJsonParser().encodeResourceToString(bundleResponse.getBundle()));
+    return prescriptionConverter.convertToPrescriptionBundle(prescriptionRequest);
   }
 
   /**
@@ -81,19 +74,10 @@ public class BundleController {
    * @throws ParseException while parsing the string into date
    */
   @PostMapping(ControllerMappingConstants.OP_CONSULTATION_PATH)
-  public ResponseEntity<Object> createOPConsultationBundle(
+  @ResponseStatus(HttpStatus.CREATED)
+  public Bundle createOPConsultationBundle(
       @Valid @RequestBody OPConsultationRequest opConsultationRequest) throws ParseException {
-
-    BundleResponse bundleResponse =
-        opConsultationConverter.convertToOPConsultationBundle(opConsultationRequest);
-
-    if (Objects.nonNull(bundleResponse.getError()))
-      return ResponseEntity.badRequest()
-          .contentType(MediaType.APPLICATION_JSON)
-          .body(FacadeError.builder().error(bundleResponse.getError()).build());
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .contentType(MediaType.APPLICATION_JSON)
-        .body(ctx.newJsonParser().encodeResourceToString(bundleResponse.getBundle()));
+    return opConsultationConverter.convertToOPConsultationBundle(opConsultationRequest);
   }
 
   /**
@@ -102,19 +86,10 @@ public class BundleController {
    * @throws ParseException while parsing the string into date
    */
   @PostMapping(ControllerMappingConstants.HEALTH_DOCUMENT_PATH)
-  public ResponseEntity<Object> createHealthDocumentBundle(
+  @ResponseStatus(HttpStatus.CREATED)
+  public Bundle createHealthDocumentBundle(
       @Valid @RequestBody HealthDocumentRecord healthDocumentRecord) throws ParseException {
-
-    BundleResponse bundleResponse =
-        healthDocumentConverter.convertToHealthDocumentBundle(healthDocumentRecord);
-
-    if (Objects.nonNull(bundleResponse.getError()))
-      return ResponseEntity.badRequest()
-          .contentType(MediaType.APPLICATION_JSON)
-          .body(FacadeError.builder().error(bundleResponse.getError()).build());
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .contentType(MediaType.APPLICATION_JSON)
-        .body(ctx.newJsonParser().encodeResourceToString(bundleResponse.getBundle()));
+    return healthDocumentConverter.convertToHealthDocumentBundle(healthDocumentRecord);
   }
 
   /**
@@ -124,19 +99,10 @@ public class BundleController {
    * @throws ParseException while parsing the string into date
    */
   @PostMapping(value = ControllerMappingConstants.DIAGNOSTIC_REPORT_PATH)
-  public ResponseEntity<Object> createDiagnosticReportBundle(
+  @ResponseStatus(HttpStatus.CREATED)
+  public Bundle createDiagnosticReportBundle(
       @Valid @RequestBody DiagnosticReportRequest diagnosticReportRequest) throws ParseException {
-
-    BundleResponse bundleResponse =
-        diagnosticReportConverter.convertToDiagnosticBundle(diagnosticReportRequest);
-
-    if (Objects.nonNull(bundleResponse.getError()))
-      return ResponseEntity.badRequest()
-          .contentType(MediaType.APPLICATION_JSON)
-          .body(FacadeError.builder().error(bundleResponse.getError()).build());
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .contentType(MediaType.APPLICATION_JSON)
-        .body(ctx.newJsonParser().encodeResourceToString(bundleResponse.getBundle()));
+    return diagnosticReportConverter.convertToDiagnosticBundle(diagnosticReportRequest);
   }
 
   /**
@@ -145,60 +111,32 @@ public class BundleController {
    * @throws ParseException while parsing the string into date
    */
   @PostMapping(ControllerMappingConstants.DISCHARGE_SUMMARY_PATH)
-  public ResponseEntity<Object> createDischargeSummaryBundle(
+  @ResponseStatus(HttpStatus.CREATED)
+  public Bundle createDischargeSummaryBundle(
       @Valid @RequestBody DischargeSummaryRequest dischargeSummaryRequest) throws ParseException {
-
-    BundleResponse bundleResponse =
-        dischargeSummaryConverter.convertToDischargeSummary(dischargeSummaryRequest);
-
-    if (Objects.nonNull(bundleResponse.getError()))
-      return ResponseEntity.badRequest()
-          .contentType(MediaType.APPLICATION_JSON)
-          .body(FacadeError.builder().error(bundleResponse.getError()).build());
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .contentType(MediaType.APPLICATION_JSON)
-        .body(ctx.newJsonParser().encodeResourceToString(bundleResponse.getBundle()));
+    return dischargeSummaryConverter.convertToDischargeSummary(dischargeSummaryRequest);
   }
 
   /**
    * @param wellnessRecordRequest which has all the physical observations
    * @return FHIR bundle if no error found
-   * @throws ParseException while parsing the string into date
    */
   @PostMapping(ControllerMappingConstants.WELLNESS_RECORD_PATH)
-  public ResponseEntity<Object> createWellnessBundle(
-      @Valid @RequestBody WellnessRecordRequest wellnessRecordRequest) {
-
-    BundleResponse bundleResponse =
-        wellnessRecordConverter.getWellnessBundle(wellnessRecordRequest);
-
-    if (Objects.nonNull(bundleResponse.getError()))
-      return ResponseEntity.badRequest()
-          .contentType(MediaType.APPLICATION_JSON)
-          .body(FacadeError.builder().error(bundleResponse.getError()).build());
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .contentType(MediaType.APPLICATION_JSON)
-        .body(ctx.newJsonParser().encodeResourceToString(bundleResponse.getBundle()));
+  @ResponseStatus(HttpStatus.CREATED)
+  public Bundle createWellnessBundle(
+      @Valid @RequestBody WellnessRecordRequest wellnessRecordRequest) throws ParseException {
+    return wellnessRecordConverter.getWellnessBundle(wellnessRecordRequest);
   }
 
   /**
    * @param invoiceBundleRequest which has all the invoice details like charge items, total amount,
    *     tax, etc.
    * @return FHIR bundle if no error found
-   * @throws ParseException while parsing the string into date
    */
   @PostMapping(ControllerMappingConstants.INVOICE_PATH)
-  public ResponseEntity<Object> createInvoiceBundle(
-      @Valid @RequestBody InvoiceBundleRequest invoiceBundleRequest) {
-
-    BundleResponse bundleResponse = invoiceRequestConverter.makeInvoiceBundle(invoiceBundleRequest);
-
-    if (Objects.nonNull(bundleResponse.getError()))
-      return ResponseEntity.badRequest()
-          .contentType(MediaType.APPLICATION_JSON)
-          .body(FacadeError.builder().error(bundleResponse.getError()).build());
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .contentType(MediaType.APPLICATION_JSON)
-        .body(ctx.newJsonParser().encodeResourceToString(bundleResponse.getBundle()));
+  @ResponseStatus(HttpStatus.CREATED)
+  public Bundle createInvoiceBundle(@Valid @RequestBody InvoiceBundleRequest invoiceBundleRequest)
+      throws ParseException {
+    return invoiceRequestConverter.makeInvoiceBundle(invoiceBundleRequest);
   }
 }
