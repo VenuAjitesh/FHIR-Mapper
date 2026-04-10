@@ -16,9 +16,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import com.nha.abdm.fhir.mapper.rest.common.constants.ControllerMappingConstants;
 
 @RestController
-@RequestMapping(path = "/v1/bundle")
+@RequestMapping(path = ControllerMappingConstants.BUNDLE_BASE_PATH)
 @Validated
 public class BundleController {
   @Autowired ImmunizationConverter immunizationConverter;
@@ -30,14 +31,14 @@ public class BundleController {
   @Autowired WellnessRecordConverter wellnessRecordConverter;
   @Autowired InvoiceRequestConverter invoiceRequestConverter;
   @Autowired SnomedService snomedService;
-  FhirContext ctx = FhirContext.forR4();
+  @Autowired FhirContext ctx;
 
   /**
    * @param immunizationRequest which has immunization details like vaccine and type of vaccine
    * @return FHIR bundle if no error found
    * @throws ParseException while parsing the string into date
    */
-  @PostMapping("/immunization")
+  @PostMapping(ControllerMappingConstants.IMMUNIZATION_PATH)
   public Object createImmunizationBundle(
       @Valid @RequestBody ImmunizationRequest immunizationRequest) throws ParseException {
 
@@ -58,7 +59,7 @@ public class BundleController {
    * @return FHIR bundle if no error found
    * @throws ParseException while parsing the string into date
    */
-  @PostMapping("/prescription")
+  @PostMapping(ControllerMappingConstants.PRESCRIPTION_PATH)
   public ResponseEntity<Object> createPrescriptionBundle(
       @Valid @RequestBody PrescriptionRequest prescriptionRequest) throws ParseException {
 
@@ -79,7 +80,7 @@ public class BundleController {
    * @return FHIR bundle if no error found
    * @throws ParseException while parsing the string into date
    */
-  @PostMapping("/op-consultation")
+  @PostMapping(ControllerMappingConstants.OP_CONSULTATION_PATH)
   public ResponseEntity<Object> createOPConsultationBundle(
       @Valid @RequestBody OPConsultationRequest opConsultationRequest) throws ParseException {
 
@@ -100,7 +101,7 @@ public class BundleController {
    * @return FHIR bundle if no error found
    * @throws ParseException while parsing the string into date
    */
-  @PostMapping("/health-document")
+  @PostMapping(ControllerMappingConstants.HEALTH_DOCUMENT_PATH)
   public ResponseEntity<Object> createHealthDocumentBundle(
       @Valid @RequestBody HealthDocumentRecord healthDocumentRecord) throws ParseException {
 
@@ -122,7 +123,7 @@ public class BundleController {
    * @return FHIR bundle if no error found
    * @throws ParseException while parsing the string into date
    */
-  @PostMapping(value = "/diagnostic-report")
+  @PostMapping(value = ControllerMappingConstants.DIAGNOSTIC_REPORT_PATH)
   public ResponseEntity<Object> createDiagnosticReportBundle(
       @Valid @RequestBody DiagnosticReportRequest diagnosticReportRequest) throws ParseException {
 
@@ -143,7 +144,7 @@ public class BundleController {
    * @return FHIR bundle if no error found
    * @throws ParseException while parsing the string into date
    */
-  @PostMapping("/discharge-summary")
+  @PostMapping(ControllerMappingConstants.DISCHARGE_SUMMARY_PATH)
   public ResponseEntity<Object> createDischargeSummaryBundle(
       @Valid @RequestBody DischargeSummaryRequest dischargeSummaryRequest) throws ParseException {
 
@@ -164,7 +165,7 @@ public class BundleController {
    * @return FHIR bundle if no error found
    * @throws ParseException while parsing the string into date
    */
-  @PostMapping("/wellness-record")
+  @PostMapping(ControllerMappingConstants.WELLNESS_RECORD_PATH)
   public ResponseEntity<Object> createWellnessBundle(
       @Valid @RequestBody WellnessRecordRequest wellnessRecordRequest) {
 
@@ -186,7 +187,7 @@ public class BundleController {
    * @return FHIR bundle if no error found
    * @throws ParseException while parsing the string into date
    */
-  @PostMapping("/invoice")
+  @PostMapping(ControllerMappingConstants.INVOICE_PATH)
   public ResponseEntity<Object> createInvoiceBundle(
       @Valid @RequestBody InvoiceBundleRequest invoiceBundleRequest) {
 

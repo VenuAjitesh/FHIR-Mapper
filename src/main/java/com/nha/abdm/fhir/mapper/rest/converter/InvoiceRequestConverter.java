@@ -14,6 +14,7 @@ import com.nha.abdm.fhir.mapper.rest.dto.resources.invoice.*;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.InvoiceBundleRequest;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.ChargeItemResource;
+import com.nha.abdm.fhir.mapper.rest.common.constants.LogMessageConstants;
 import java.text.ParseException;
 import java.util.*;
 import org.hl7.fhir.r4.model.*;
@@ -184,7 +185,7 @@ public class InvoiceRequestConverter {
             .error(
                 new ErrorResponse(
                     ErrorCode.DB_ERROR,
-                    " JDBCException Generic SQL Related Error, kindly check logs."))
+                    LogMessageConstants.JDBC_EXCEPTION_MESSAGE))
             .build();
       }
       return BundleResponse.builder()
@@ -236,7 +237,7 @@ public class InvoiceRequestConverter {
       medicationList.add(medication);
       return makeChargeItemResource.getChargeItems(item, medication.getId());
     } else {
-      throw new IllegalArgumentException("Unknown product type: " + item.getProductType());
+      throw new IllegalArgumentException(LogMessageConstants.UNKNOWN_PRODUCT_TYPE + item.getProductType());
     }
   }
 }
