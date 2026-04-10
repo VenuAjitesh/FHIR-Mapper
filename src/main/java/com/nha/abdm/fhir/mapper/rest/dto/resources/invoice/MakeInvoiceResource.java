@@ -2,8 +2,6 @@
 package com.nha.abdm.fhir.mapper.rest.dto.resources.invoice;
 
 import com.nha.abdm.fhir.mapper.Utils;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import com.nha.abdm.fhir.mapper.rest.database.h2.repositories.TypeInvoiceRepo;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.TypeInvoice;
@@ -55,22 +53,13 @@ public class MakeInvoiceResource {
     }
 
     if (patient != null && patient.hasId()) {
-      Reference patientRef =
-          new Reference(BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId());
-      if (patient.hasName() && patient.getNameFirstRep().hasText()) {
-        patientRef.setDisplay(patient.getNameFirstRep().getText());
-      }
-      invoice.setSubject(patientRef);
+      invoice.setSubject(
+          Utils.buildReference(patient.getId()).setDisplay(patient.getNameFirstRep().getText()));
     }
 
     if (organisation != null && organisation.hasId()) {
-      Reference orgRef =
-          new Reference(
-              BundleResourceIdentifier.ORGANISATION + MapperConstants.SLASH + organisation.getId());
-      if (StringUtils.isNotBlank(organisation.getName())) {
-        orgRef.setDisplay(organisation.getName());
-      }
-      invoice.setIssuer(orgRef);
+      invoice.setIssuer(
+          Utils.buildReference(organisation.getId()).setDisplay(organisation.getName()));
     }
 
     if (invoiceBundleRequest.getInvoice() != null
@@ -124,11 +113,7 @@ public class MakeInvoiceResource {
                     item -> {
                       Invoice.InvoiceLineItemComponent lineItem =
                           new Invoice.InvoiceLineItemComponent();
-                      lineItem.setChargeItem(
-                          new Reference(
-                              BundleResourceIdentifier.CHARGE_ITEM
-                                  + MapperConstants.SLASH
-                                  + item.getId()));
+                      lineItem.setChargeItem(Utils.buildReference(item.getId()));
                       makeInvoicePriceComponent
                           .makeInvoicePriceComponents(item, invoiceBundleRequest)
                           .forEach(lineItem::addPriceComponent);

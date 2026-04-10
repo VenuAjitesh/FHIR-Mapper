@@ -27,7 +27,10 @@ public class MakeObservationResource {
   private final SnomedService snomedService;
 
   public Observation getObservation(
-      Patient patient, List<Practitioner> practitionerList, ObservationResource observationResource)
+      Patient patient,
+      List<Practitioner> practitionerList,
+      ObservationResource observationResource,
+      String date)
       throws ParseException {
 
     Observation observation = new Observation();
@@ -38,6 +41,10 @@ public class MakeObservationResource {
         new Meta()
             .setLastUpdatedElement(Utils.getCurrentTimeStamp())
             .addProfile(ResourceProfileIdentifier.PROFILE_OBSERVATION));
+
+    if (date != null) {
+      observation.setEffective(Utils.getFormattedDateTime(date));
+    }
 
     setObservationCode(observation, observationResource);
 

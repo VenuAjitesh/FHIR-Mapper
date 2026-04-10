@@ -1,8 +1,7 @@
 /* (C) 2025 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources.invoice;
 
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
+import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import com.nha.abdm.fhir.mapper.rest.database.h2.repositories.TypeChargeItemRepo;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.TypeChargeItem;
@@ -73,14 +72,11 @@ public class MakeChargeItemResource {
     }
 
     if (Objects.nonNull(resource.getMedication())) {
-      chargeItem.setProduct(
-          new Reference(BundleResourceIdentifier.MEDICATION + MapperConstants.SLASH + baseUrl));
+      chargeItem.setProduct(Utils.buildReference(baseUrl));
     } else if (Objects.nonNull(resource.getDevice())) {
-      chargeItem.setProduct(
-          new Reference(BundleResourceIdentifier.DEVICE + MapperConstants.SLASH + baseUrl));
+      chargeItem.setProduct(Utils.buildReference(baseUrl));
     } else if (Objects.nonNull(resource.getSubstance())) {
-      chargeItem.setProduct(
-          new Reference(BundleResourceIdentifier.SUBSTANCE + MapperConstants.SLASH + baseUrl));
+      chargeItem.setProduct(Utils.buildReference(baseUrl));
     }
 
     return chargeItem;

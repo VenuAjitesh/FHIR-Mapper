@@ -36,7 +36,7 @@ public class MakeFamilyMemberResource {
                   new Coding()
                       .setSystem(BundleUrlIdentifier.SNOMED_URL)
                       .setCode(SnomedCodeIdentifier.SNOMED_UNKNOWN)
-                      .setDisplay("Unknown"))
+                      .setDisplay(familyObservationResource.getRelationship()))
               .setText(familyObservationResource.getRelationship()));
     }
     if (Objects.nonNull(familyObservationResource.getObservation())) {

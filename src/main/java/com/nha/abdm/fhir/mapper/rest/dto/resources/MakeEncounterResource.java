@@ -45,9 +45,11 @@ public class MakeEncounterResource {
             .setSystem(ResourceProfileIdentifier.ENCOUNTER_CLASS_SYSTEM)
             .setCode(snomedEncounter.getCode())
             .setDisplay(
-                (encounterName != null && !encounterName.trim().isEmpty())
-                    ? encounterName
-                    : BundleFieldIdentifier.AMBULATORY));
+                (snomedEncounter.getCode().equals(SnomedCodeIdentifier.SNOMED_ENCOUNTER_AMBULATORY))
+                    ? BundleFieldIdentifier.AMBULATORY
+                    : (encounterName != null && !encounterName.trim().isEmpty())
+                        ? encounterName
+                        : BundleFieldIdentifier.AMBULATORY));
 
     encounter.setSubject(
         Utils.buildReference(patient.getId()).setDisplay(patient.getName().get(0).getText()));
@@ -57,7 +59,7 @@ public class MakeEncounterResource {
     }
 
     Utils.setNarrative(
-        encounter, "Encounter: " + (encounterName != null ? encounterName : "Ambulatory"));
+        encounter, "Encounter: " + (encounterName != null ? encounterName : "ambulatory"));
     return encounter;
   }
 }
