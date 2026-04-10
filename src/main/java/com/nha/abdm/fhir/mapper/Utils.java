@@ -52,6 +52,10 @@ public class Utils {
     return new Reference(MapperConstants.URN_UUID + id);
   }
 
+  public static Reference buildReference(String id, String type) {
+    return new Reference(MapperConstants.URN_UUID + id).setType(type);
+  }
+
   public static void setNarrative(DomainResource resource, String text) {
     Narrative narrative = new Narrative();
     narrative.setStatus(Narrative.NarrativeStatus.GENERATED);

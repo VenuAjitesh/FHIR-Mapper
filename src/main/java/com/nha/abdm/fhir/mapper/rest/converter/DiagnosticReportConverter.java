@@ -99,7 +99,12 @@ public class DiagnosticReportConverter {
                             StreamUtils.wrapException(
                                 observationResource -> {
                                   return makeObservationResource.getObservation(
-                                      patient, practitionerList, observationResource);
+                                      patient,
+                                      practitionerList,
+                                      observationResource,
+                                      diagnosticResource.getAuthoredOn() != null
+                                          ? diagnosticResource.getAuthoredOn()
+                                          : diagnosticReportRequest.getVisitDate());
                                 }))
                         .peek(diagnosticObservationList::add)
                         .toList();
@@ -195,7 +200,7 @@ public class DiagnosticReportConverter {
     if (resource != null && resource.getId() != null) {
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(resourceIdentifier + MapperConstants.SLASH + resource.getId())
+              .setFullUrl(MapperConstants.URN_UUID + resource.getId())
               .setResource(resource));
     }
   }

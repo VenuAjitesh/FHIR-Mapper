@@ -40,45 +40,24 @@ public class MakeHealthDocumentComposition {
     sectionComponent.setCode(typeCode);
     for (DocumentReference documentReference : documentReferenceList) {
       sectionComponent.addEntry(
-          new Reference()
-              .setReference(
-                  BundleResourceIdentifier.DOCUMENT_REFERENCE
-                      + MapperConstants.SLASH
-                      + documentReference.getId()));
+          Utils.buildReference(documentReference.getId(), "DocumentReference"));
     }
     composition.addSection(sectionComponent);
     composition.setTitle(BundleCompositionIdentifier.HEALTH_DOCUMENT);
-    composition.setEncounter(
-        new Reference()
-            .setReference(
-                BundleResourceIdentifier.ENCOUNTER + MapperConstants.SLASH + encounter.getId()));
+    composition.setEncounter(Utils.buildReference(encounter.getId(), "Encounter"));
     List<Reference> authorList = new ArrayList<>();
     for (Practitioner practitioner : practitionerList) {
       HumanName practionerName = practitioner.getName().get(0);
       authorList.add(
-          new Reference()
-              .setDisplay(practionerName.getText())
-              .setReference(
-                  BundleResourceIdentifier.PRACTITIONER
-                      + MapperConstants.SLASH
-                      + practitioner.getId()));
+          Utils.buildReference(practitioner.getId()).setDisplay(practionerName.getText()));
     }
     if (Objects.nonNull(organization)) {
       composition.setCustodian(
-          new Reference()
-              .setDisplay(organization.getName())
-              .setReference(
-                  BundleResourceIdentifier.ORGANISATION
-                      + MapperConstants.SLASH
-                      + organization.getId()));
+          Utils.buildReference(organization.getId()).setDisplay(organization.getName()));
     }
     composition.setAuthor(authorList);
     HumanName patientName = patient.getName().get(0);
-    composition.setSubject(
-        new Reference()
-            .setDisplay(patientName.getText())
-            .setReference(
-                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId()));
+    composition.setSubject(Utils.buildReference(patient.getId()).setDisplay(patientName.getText()));
     composition.setDateElement(Utils.getFormattedDateTime(authoredOn));
     composition.setStatus(Composition.CompositionStatus.FINAL);
     Identifier identifier = new Identifier();
@@ -86,6 +65,7 @@ public class MakeHealthDocumentComposition {
     identifier.setValue(UUID.randomUUID().toString());
     composition.setIdentifier(identifier);
     composition.setId(UUID.randomUUID().toString());
+    Utils.setNarrative(composition, "Health Document Record for " + patientName.getText());
     return composition;
   }
 }

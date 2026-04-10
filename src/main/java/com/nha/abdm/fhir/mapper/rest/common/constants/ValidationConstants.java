@@ -21,6 +21,10 @@ public class ValidationConstants {
 
   public static final String CLINICAL_STATUS_MESSAGE =
       "clinicalStatus must be active | inactive | resolved";
+  public static final String DIAGNOSTIC_REPORT_STATUS_PATTERN =
+      "registered|partial|preliminary|final|amended|corrected|appended|cancelled|entered-in-error|unknown";
+  public static final String DIAGNOSTIC_REPORT_STATUS_MESSAGE =
+      "status must be registered | partial | preliminary | final | amended | corrected | appended | cancelled | entered-in-error | unknown";
   public static final String ALLERGY_TYPE_MESSAGE = "type must be allergy | intolerance";
   public static final String ALLERGY_CATEGORY_MESSAGE =
       "category must be food | medication | environment | biologic";

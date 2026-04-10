@@ -5,7 +5,6 @@ import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleCompositionIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import java.text.ParseException;
 import java.util.List;
 import java.util.UUID;
@@ -43,27 +42,19 @@ public class MakeInvoiceComposition {
         .setTitle(BundleCompositionIdentifier.INVOICE_RECORD);
 
     if (organization != null) {
-      composition.setCustodian(ref(BundleResourceIdentifier.ORGANISATION, organization.getId()));
+      composition.setCustodian(Utils.buildReference(organization.getId()));
     }
 
     if (practitionerList != null && !practitionerList.isEmpty()) {
       composition.setAuthor(
           practitionerList.stream()
-              .map(
-                  p ->
-                      ref(
-                          BundleResourceIdentifier.PRACTITIONER,
-                          p.getId(),
-                          p.getName().get(0).getText()))
+              .map(p -> Utils.buildReference(p.getId()).setDisplay(p.getName().get(0).getText()))
               .toList());
     }
 
     if (patient != null) {
       composition.setSubject(
-          ref(
-              BundleResourceIdentifier.PATIENT,
-              patient.getId(),
-              patient.getName().get(0).getText()));
+          Utils.buildReference(patient.getId()).setDisplay(patient.getName().get(0).getText()));
     }
 
     if (invoice != null) {
@@ -83,37 +74,34 @@ public class MakeInvoiceComposition {
                             .setSystem(BundleUrlIdentifier.SNOMED_URL)));
 
     if (invoice != null) {
-      invoiceSection.addEntry(ref(BundleResourceIdentifier.INVOICE, invoice.getId()));
+      invoiceSection.addEntry(Utils.buildReference(invoice.getId(), "Invoice"));
     }
 
     if (chargeItemList != null && !chargeItemList.isEmpty()) {
       chargeItemList.forEach(
-          item -> invoiceSection.addEntry(ref(BundleResourceIdentifier.CHARGE_ITEM, item.getId())));
+          item -> invoiceSection.addEntry(Utils.buildReference(item.getId(), "ChargeItem")));
     }
 
     if (deviceList != null && !deviceList.isEmpty()) {
       deviceList.forEach(
-          device -> invoiceSection.addEntry(ref(BundleResourceIdentifier.DEVICE, device.getId())));
+          device -> invoiceSection.addEntry(Utils.buildReference(device.getId(), "Device")));
     }
 
     if (substanceList != null && !substanceList.isEmpty()) {
       substanceList.forEach(
           substance ->
-              invoiceSection.addEntry(ref(BundleResourceIdentifier.SUBSTANCE, substance.getId())));
+              invoiceSection.addEntry(Utils.buildReference(substance.getId(), "Substance")));
     }
 
     if (medicationList != null && !medicationList.isEmpty()) {
       medicationList.forEach(
           medication ->
-              invoiceSection.addEntry(
-                  ref(BundleResourceIdentifier.MEDICATION, medication.getId())));
+              invoiceSection.addEntry(Utils.buildReference(medication.getId(), "Medication")));
     }
 
     if (paymentReconciliation != null) {
       invoiceSection.addEntry(
-          ref(
-              BundleResourceIdentifier.INVOICE_PAYMENT_RECONCILIATION,
-              paymentReconciliation.getId()));
+          Utils.buildReference(paymentReconciliation.getId(), "PaymentReconciliation"));
     }
 
     composition.addSection(invoiceSection);
@@ -123,17 +111,8 @@ public class MakeInvoiceComposition {
     composition.setIdentifier(
         new Identifier().setSystem(BundleUrlIdentifier.WRAPPER_URL).setValue(compositionId));
     composition.setId(compositionId);
+    Utils.setNarrative(composition, "Invoice Record for " + patient.getName().get(0).getText());
 
     return composition;
-  }
-
-  private Reference ref(String resourceType, String id) {
-    return new Reference()
-        .setReference(resourceType + MapperConstants.SLASH + id)
-        .setType(resourceType);
-  }
-
-  private Reference ref(String resourceType, String id, String display) {
-    return ref(resourceType, id).setDisplay(display);
   }
 }

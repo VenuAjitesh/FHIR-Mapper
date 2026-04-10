@@ -86,7 +86,8 @@ public class WellnessRecordConverter {
                               patient,
                               practitionerList,
                               vitalSign,
-                              BundleFieldIdentifier.VITAL_SIGNS)))
+                              BundleFieldIdentifier.VITAL_SIGNS,
+                              wellnessRecordRequest.getAuthoredOn())))
               .toList();
 
       List<Observation> bodyMeasurementList =
@@ -101,7 +102,8 @@ public class WellnessRecordConverter {
                               patient,
                               practitionerList,
                               bodyMeasurement,
-                              BundleFieldIdentifier.BODY_MEASUREMENT)))
+                              BundleFieldIdentifier.BODY_MEASUREMENT,
+                              wellnessRecordRequest.getAuthoredOn())))
               .toList();
 
       List<Observation> physicalActivityList =
@@ -115,7 +117,8 @@ public class WellnessRecordConverter {
                               patient,
                               practitionerList,
                               physicalActivity,
-                              BundleFieldIdentifier.PHYSICAL_ACTIVITY)))
+                              BundleFieldIdentifier.PHYSICAL_ACTIVITY,
+                              wellnessRecordRequest.getAuthoredOn())))
               .toList();
 
       List<Observation> generalAssessmentList =
@@ -129,7 +132,8 @@ public class WellnessRecordConverter {
                               patient,
                               practitionerList,
                               generalAssessment,
-                              BundleFieldIdentifier.GENERAL_ASSESSMENT)))
+                              BundleFieldIdentifier.GENERAL_ASSESSMENT,
+                              wellnessRecordRequest.getAuthoredOn())))
               .toList();
 
       List<Observation> womanHealthList =
@@ -143,7 +147,8 @@ public class WellnessRecordConverter {
                               patient,
                               practitionerList,
                               womanHealth,
-                              BundleFieldIdentifier.WOMAN_HEALTH)))
+                              BundleFieldIdentifier.WOMAN_HEALTH,
+                              wellnessRecordRequest.getAuthoredOn())))
               .toList();
 
       List<Observation> lifeStyleList =
@@ -157,7 +162,8 @@ public class WellnessRecordConverter {
                               patient,
                               practitionerList,
                               lifeStyle,
-                              BundleFieldIdentifier.LIFE_STYLE)))
+                              BundleFieldIdentifier.LIFE_STYLE,
+                              wellnessRecordRequest.getAuthoredOn())))
               .toList();
 
       List<Observation> otherObservationList =
@@ -168,7 +174,10 @@ public class WellnessRecordConverter {
                   StreamUtils.wrapException(
                       otherObservation ->
                           makeObservationResource.getObservation(
-                              patient, practitionerList, otherObservation)))
+                              patient,
+                              practitionerList,
+                              otherObservation,
+                              wellnessRecordRequest.getAuthoredOn())))
               .toList();
 
       List<DocumentReference> documentReferenceList =
@@ -215,108 +224,73 @@ public class WellnessRecordConverter {
       List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(
-                  BundleResourceIdentifier.COMPOSITION
-                      + MapperConstants.SLASH
-                      + composition.getId())
+              .setFullUrl(MapperConstants.URN_UUID + composition.getId())
               .setResource(composition));
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(
-                  BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
+              .setFullUrl(MapperConstants.URN_UUID + patient.getId())
               .setResource(patient));
       for (Practitioner practitioner : practitionerList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.PRACTITIONER
-                        + MapperConstants.SLASH
-                        + practitioner.getId())
+                .setFullUrl(MapperConstants.URN_UUID + practitioner.getId())
                 .setResource(practitioner));
       }
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(
-                  BundleResourceIdentifier.ENCOUNTER + MapperConstants.SLASH + encounter.getId())
+              .setFullUrl(MapperConstants.URN_UUID + encounter.getId())
               .setResource(encounter));
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(
-                  BundleResourceIdentifier.ORGANISATION
-                      + MapperConstants.SLASH
-                      + organization.getId())
+              .setFullUrl(MapperConstants.URN_UUID + organization.getId())
               .setResource(organization));
 
       for (Observation observation : vitalSignsList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.VITAL_SIGNS
-                        + MapperConstants.SLASH
-                        + observation.getId())
+                .setFullUrl(MapperConstants.URN_UUID + observation.getId())
                 .setResource(observation));
       }
       for (Observation observation : bodyMeasurementList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.BODY_MEASUREMENT
-                        + MapperConstants.SLASH
-                        + observation.getId())
+                .setFullUrl(MapperConstants.URN_UUID + observation.getId())
                 .setResource(observation));
       }
       for (Observation observation : physicalActivityList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.PHYSICAL_ACTIVITY
-                        + MapperConstants.SLASH
-                        + observation.getId())
+                .setFullUrl(MapperConstants.URN_UUID + observation.getId())
                 .setResource(observation));
       }
       for (Observation observation : generalAssessmentList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.GENERAL_ASSESSMENT
-                        + MapperConstants.SLASH
-                        + observation.getId())
+                .setFullUrl(MapperConstants.URN_UUID + observation.getId())
                 .setResource(observation));
       }
       for (Observation observation : womanHealthList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.WOMAN_HEALTH
-                        + MapperConstants.SLASH
-                        + observation.getId())
+                .setFullUrl(MapperConstants.URN_UUID + observation.getId())
                 .setResource(observation));
       }
       for (Observation observation : lifeStyleList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.LIFE_STYLE
-                        + MapperConstants.SLASH
-                        + observation.getId())
+                .setFullUrl(MapperConstants.URN_UUID + observation.getId())
                 .setResource(observation));
       }
       for (Observation observation : otherObservationList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.OTHER_OBSERVATIONS
-                        + MapperConstants.SLASH
-                        + observation.getId())
+                .setFullUrl(MapperConstants.URN_UUID + observation.getId())
                 .setResource(observation));
       }
       for (DocumentReference documentReference : documentReferenceList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.DOCUMENT_REFERENCE
-                        + MapperConstants.SLASH
-                        + documentReference.getId())
+                .setFullUrl(MapperConstants.URN_UUID + documentReference.getId())
                 .setResource(documentReference));
       }
       bundle.setEntry(entries);

@@ -189,7 +189,7 @@ public class InvoiceRequestConverter {
       List<Bundle.BundleEntryComponent> entries, String resourceType, Resource resource) {
     entries.add(
         new Bundle.BundleEntryComponent()
-            .setFullUrl(resourceType + MapperConstants.SLASH + resource.getId())
+            .setFullUrl(MapperConstants.URN_UUID + resource.getId())
             .setResource(resource));
   }
 

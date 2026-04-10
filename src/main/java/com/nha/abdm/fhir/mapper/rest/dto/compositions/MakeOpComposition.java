@@ -110,7 +110,7 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.CHIEF_COMPLAINTS_CODE)
                       .setDisplay(BundleCompositionIdentifier.CHIEF_COMPLAINTS)));
       for (Condition chiefComplaint : chiefComplaintList) {
-        sectionComponent.addEntry(Utils.buildReference(chiefComplaint.getId()));
+        sectionComponent.addEntry(Utils.buildReference(chiefComplaint.getId(), "Condition"));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -125,7 +125,7 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.PHYSICAL_EXAMINATION_CODE)
                       .setDisplay(BundleCompositionIdentifier.PHYSICAL_EXAMINATION)));
       for (Observation physicalObservation : physicalObservationList) {
-        sectionComponent.addEntry(Utils.buildReference(physicalObservation.getId()));
+        sectionComponent.addEntry(Utils.buildReference(physicalObservation.getId(), "Observation"));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -140,7 +140,8 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.ALLERGY_RECORD_CODE)
                       .setDisplay(BundleCompositionIdentifier.ALLERGY_RECORD)));
       for (AllergyIntolerance allergyIntolerance : allergieList) {
-        sectionComponent.addEntry(Utils.buildReference(allergyIntolerance.getId()));
+        sectionComponent.addEntry(
+            Utils.buildReference(allergyIntolerance.getId(), "AllergyIntolerance"));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -152,10 +153,10 @@ public class MakeOpComposition {
               .addCoding(
                   new Coding()
                       .setSystem(BundleUrlIdentifier.SNOMED_URL)
-                      .setCode(BundleCompositionIdentifier.MEDICAL_HISTORY_SECTION)
+                      .setCode(BundleCompositionIdentifier.MEDICAL_HISTORY_SECTION_CODE)
                       .setDisplay(BundleCompositionIdentifier.MEDICAL_HISTORY_SECTION)));
       for (Condition medicalHistory : medicalHistoryList) {
-        sectionComponent.addEntry(Utils.buildReference(medicalHistory.getId()));
+        sectionComponent.addEntry(Utils.buildReference(medicalHistory.getId(), "Condition"));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -170,7 +171,8 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.FAMILY_HISTORY_SECTION_CODE)
                       .setDisplay(BundleCompositionIdentifier.FAMILY_HISTORY_SECTION)));
       for (FamilyMemberHistory familyMemberHistory : familyMemberHistoryList) {
-        sectionComponent.addEntry(Utils.buildReference(familyMemberHistory.getId()));
+        sectionComponent.addEntry(
+            Utils.buildReference(familyMemberHistory.getId(), "FamilyMemberHistory"));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -185,7 +187,7 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.ORDER_DOCUMENT_CODE)
                       .setDisplay(BundleCompositionIdentifier.ORDER_DOCUMENT)));
       for (ServiceRequest investigation : investigationAdviceList) {
-        sectionComponent.addEntry(Utils.buildReference(investigation.getId()));
+        sectionComponent.addEntry(Utils.buildReference(investigation.getId(), "ServiceRequest"));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -200,7 +202,7 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.MEDICATION_SUMMARY_CODE)
                       .setDisplay(BundleCompositionIdentifier.MEDICATION_SUMMARY)));
       for (MedicationRequest medication : medicationList) {
-        sectionComponent.addEntry(Utils.buildReference(medication.getId()));
+        sectionComponent.addEntry(Utils.buildReference(medication.getId(), "MedicationRequest"));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -215,7 +217,7 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.FOLLOW_UP_CODE)
                       .setDisplay(BundleCompositionIdentifier.FOLLOW_UP)));
       for (Appointment followUp : followupList) {
-        sectionComponent.addEntry(Utils.buildReference(followUp.getId()));
+        sectionComponent.addEntry(Utils.buildReference(followUp.getId(), "Appointment"));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -230,7 +232,7 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.CLINICAL_PROCEDURE_CODE)
                       .setDisplay(BundleCompositionIdentifier.CLINICAL_PROCEDURE)));
       for (Procedure procedure : procedureList) {
-        sectionComponent.addEntry(Utils.buildReference(procedure.getId()));
+        sectionComponent.addEntry(Utils.buildReference(procedure.getId(), "Procedure"));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -245,7 +247,7 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.REFERRAL_TO_SERVICE_CODE)
                       .setDisplay(BundleCompositionIdentifier.REFERRAL_TO_SERVICE)));
       for (ServiceRequest referral : referralList) {
-        sectionComponent.addEntry(Utils.buildReference(referral.getId()));
+        sectionComponent.addEntry(Utils.buildReference(referral.getId(), "ServiceRequest"));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -260,7 +262,7 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.CLINICAL_FINDING_CODE)
                       .setDisplay(BundleCompositionIdentifier.CLINICAL_FINDING)));
       for (Observation otherObservation : otherObservationList) {
-        sectionComponent.addEntry(Utils.buildReference(otherObservation.getId()));
+        sectionComponent.addEntry(Utils.buildReference(otherObservation.getId(), "Observation"));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -275,7 +277,8 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.CLINICAL_CONSULTATION_REPORT_CODE)
                       .setDisplay(BundleCompositionIdentifier.CLINICAL_CONSULTATION_REPORT)));
       for (DocumentReference documentReferenceItem : documentReferenceList) {
-        sectionComponent.addEntry(Utils.buildReference(documentReferenceItem.getId()));
+        sectionComponent.addEntry(
+            Utils.buildReference(documentReferenceItem.getId(), "DocumentReference"));
       }
       sectionComponentList.add(sectionComponent);
     }

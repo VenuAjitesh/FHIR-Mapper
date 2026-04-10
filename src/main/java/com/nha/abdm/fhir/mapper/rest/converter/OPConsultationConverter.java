@@ -297,7 +297,11 @@ public class OPConsultationConverter {
         .map(
             StreamUtils.wrapException(
                 observation ->
-                    makeObservationResource.getObservation(patient, practitionerList, observation)))
+                    makeObservationResource.getObservation(
+                        patient,
+                        practitionerList,
+                        observation,
+                        opConsultationRequest.getVisitDate())))
         .toList();
   }
 
@@ -430,7 +434,10 @@ public class OPConsultationConverter {
             StreamUtils.wrapException(
                 physicalObservation ->
                     makeObservationResource.getObservation(
-                        patient, practitionerList, physicalObservation)))
+                        patient,
+                        practitionerList,
+                        physicalObservation,
+                        opConsultationRequest.getVisitDate())))
         .toList();
   }
 

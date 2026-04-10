@@ -157,7 +157,10 @@ public class DischargeSummaryConverter {
                             StreamUtils.wrapException(
                                 observationResource -> {
                                   return makeObservationResource.getObservation(
-                                      patient, practitionerList, observationResource);
+                                      patient,
+                                      practitionerList,
+                                      observationResource,
+                                      dischargeSummaryRequest.getAuthoredOn());
                                 }))
                         .peek(diagnosticObservationList::add)
                         .toList();
@@ -223,142 +226,99 @@ public class DischargeSummaryConverter {
               .setValue(dischargeSummaryRequest.getCareContextReference()));
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(
-                  BundleResourceIdentifier.COMPOSITION
-                      + MapperConstants.SLASH
-                      + composition.getId())
+              .setFullUrl(MapperConstants.URN_UUID + composition.getId())
               .setResource(composition));
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(
-                  BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
+              .setFullUrl(MapperConstants.URN_UUID + patient.getId())
               .setResource(patient));
       for (Practitioner practitioner : practitionerList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.PRACTITIONER
-                        + MapperConstants.SLASH
-                        + practitioner.getId())
+                .setFullUrl(MapperConstants.URN_UUID + practitioner.getId())
                 .setResource(practitioner));
       }
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(
-                  BundleResourceIdentifier.ENCOUNTER + MapperConstants.SLASH + encounter.getId())
+              .setFullUrl(MapperConstants.URN_UUID + encounter.getId())
               .setResource(encounter));
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(
-                  BundleResourceIdentifier.ORGANISATION
-                      + MapperConstants.SLASH
-                      + organization.getId())
+              .setFullUrl(MapperConstants.URN_UUID + organization.getId())
               .setResource(organization));
 
       for (Condition complaint : chiefComplaintList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.CHIEF_COMPLAINTS
-                        + MapperConstants.SLASH
-                        + complaint.getId())
+                .setFullUrl(MapperConstants.URN_UUID + complaint.getId())
                 .setResource(complaint));
       }
       for (Observation physicalObservation : physicalObservationList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.PHYSICAL_EXAMINATION
-                        + MapperConstants.SLASH
-                        + physicalObservation.getId())
+                .setFullUrl(MapperConstants.URN_UUID + physicalObservation.getId())
                 .setResource(physicalObservation));
       }
       for (AllergyIntolerance allergyIntolerance : allergieList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.ALLERGY_INTOLERANCE
-                        + MapperConstants.SLASH
-                        + allergyIntolerance.getId())
+                .setFullUrl(MapperConstants.URN_UUID + allergyIntolerance.getId())
                 .setResource(allergyIntolerance));
       }
       for (Condition medicalHistory : medicalHistoryList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.MEDICAL_HISTORY
-                        + MapperConstants.SLASH
-                        + medicalHistory.getId())
+                .setFullUrl(MapperConstants.URN_UUID + medicalHistory.getId())
                 .setResource(medicalHistory));
       }
       for (Condition medicationCondition : medicationConditionList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.CONDITION
-                        + MapperConstants.SLASH
-                        + medicationCondition.getId())
+                .setFullUrl(MapperConstants.URN_UUID + medicationCondition.getId())
                 .setResource(medicationCondition));
       }
       for (FamilyMemberHistory familyMemberHistory : familyMemberHistoryList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.FAMILY_HISTORY
-                        + MapperConstants.SLASH
-                        + familyMemberHistory.getId())
+                .setFullUrl(MapperConstants.URN_UUID + familyMemberHistory.getId())
                 .setResource(familyMemberHistory));
       }
       if (Objects.nonNull(carePlan)) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.CARE_PLAN + MapperConstants.SLASH + carePlan.getId())
+                .setFullUrl(MapperConstants.URN_UUID + carePlan.getId())
                 .setResource(carePlan));
       }
       for (MedicationRequest medicationRequest : medicationList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.FAMILY_HISTORY
-                        + MapperConstants.SLASH
-                        + medicationRequest.getId())
+                .setFullUrl(MapperConstants.URN_UUID + medicationRequest.getId())
                 .setResource(medicationRequest));
       }
 
       for (DiagnosticReport diagnosticReport : diagnosticReportList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.DIAGNOSTIC_REPORT
-                        + MapperConstants.SLASH
-                        + diagnosticReport.getId())
+                .setFullUrl(MapperConstants.URN_UUID + diagnosticReport.getId())
                 .setResource(diagnosticReport));
       }
 
       for (Procedure procedure : procedureList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.PROCEDURE + MapperConstants.SLASH + procedure.getId())
+                .setFullUrl(MapperConstants.URN_UUID + procedure.getId())
                 .setResource(procedure));
       }
       for (Observation observation : diagnosticObservationList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.OBSERVATION
-                        + MapperConstants.SLASH
-                        + observation.getId())
+                .setFullUrl(MapperConstants.URN_UUID + observation.getId())
                 .setResource(observation));
       }
       for (DocumentReference documentReference : documentReferenceList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.DOCUMENT_REFERENCE
-                        + MapperConstants.SLASH
-                        + documentReference.getId())
+                .setFullUrl(MapperConstants.URN_UUID + documentReference.getId())
                 .setResource(documentReference));
       }
       bundle.setEntry(entries);
@@ -457,7 +417,10 @@ public class DischargeSummaryConverter {
             StreamUtils.wrapException(
                 observationResource ->
                     makeObservationResource.getObservation(
-                        patient, practitionerList, observationResource)))
+                        patient,
+                        practitionerList,
+                        observationResource,
+                        dischargeSummaryRequest.getAuthoredOn())))
         .toList();
   }
 

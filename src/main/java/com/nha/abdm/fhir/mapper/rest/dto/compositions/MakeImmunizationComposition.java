@@ -49,7 +49,7 @@ public class MakeImmunizationComposition {
     HumanName patientName = patient.getName().get(0);
     composition.setSubject(Utils.buildReference(patient.getId()).setDisplay(patientName.getText()));
     if (Objects.nonNull(encounter)) {
-      composition.setEncounter(Utils.buildReference(encounter.getId()));
+      composition.setEncounter(Utils.buildReference(encounter.getId(), "Encounter"));
     }
     composition.setDateElement(Utils.getFormattedDateTime(authoredOn));
     Composition.SectionComponent immunizationSection = new Composition.SectionComponent();
@@ -63,21 +63,19 @@ public class MakeImmunizationComposition {
                     .setDisplay(BundleCompositionIdentifier.IMMUNIZATION_RECORD)
                     .setSystem(BundleUrlIdentifier.SNOMED_URL)));
     for (Immunization immunization : immunizationList) {
-      Reference entryReference =
-          Utils.buildReference(immunization.getId()).setType(BundleResourceIdentifier.IMMUNIZATION);
-      immunizationSection.addEntry(entryReference);
+      immunizationSection.addEntry(Utils.buildReference(immunization.getId(), "Immunization"));
     }
     composition.addSection(immunizationSection);
     for (DocumentReference documentReference : documentList)
       immunizationSection.addEntry(
-          Utils.buildReference(documentReference.getId())
-              .setType(BundleResourceIdentifier.DOCUMENT_REFERENCE));
+          Utils.buildReference(documentReference.getId(), "DocumentReference"));
     composition.setStatus(Composition.CompositionStatus.FINAL);
     Identifier identifier = new Identifier();
     identifier.setSystem(BundleUrlIdentifier.WRAPPER_URL);
     identifier.setValue(UUID.randomUUID().toString());
     composition.setIdentifier(identifier);
     composition.setId(UUID.randomUUID().toString());
+    Utils.setNarrative(composition, "Immunization Record for " + patientName.getText());
     return composition;
   }
 }

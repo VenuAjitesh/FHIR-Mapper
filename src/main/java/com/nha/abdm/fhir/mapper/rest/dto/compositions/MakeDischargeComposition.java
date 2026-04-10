@@ -5,7 +5,6 @@ import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleCompositionIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +34,6 @@ public class MakeDischargeComposition {
       String docCode,
       String docName)
       throws ParseException {
-    HumanName patientName = patient.getName().get(0);
-    HumanName practitionerName = null;
     Composition composition = new Composition();
     CodeableConcept typeCode = new CodeableConcept();
     Coding typeCoding = new Coding();
@@ -48,32 +45,16 @@ public class MakeDischargeComposition {
     composition.setTitle(BundleCompositionIdentifier.DISCHARGE_SUMMARY);
     List<Reference> authorList = new ArrayList<>();
     for (Practitioner practitioner : practitionerList) {
-      practitionerName = practitioner.getName().get(0);
       authorList.add(
-          new Reference()
-              .setReference(
-                  BundleResourceIdentifier.PRACTITIONER
-                      + MapperConstants.SLASH
-                      + practitioner.getId())
-              .setDisplay(practitionerName != null ? practitionerName.getText() : null));
+          Utils.buildReference(practitioner.getId())
+              .setDisplay(practitioner.getName().get(0).getText()));
     }
-    composition.setEncounter(
-        new Reference()
-            .setReference(
-                BundleResourceIdentifier.ENCOUNTER + MapperConstants.SLASH + encounter.getId()));
+    composition.setEncounter(Utils.buildReference(encounter.getId()));
     composition.setCustodian(
-        new Reference()
-            .setReference(
-                BundleResourceIdentifier.ORGANISATION
-                    + MapperConstants.SLASH
-                    + organization.getId())
-            .setDisplay(organization.getName()));
+        Utils.buildReference(organization.getId()).setDisplay(organization.getName()));
     composition.setAuthor(authorList);
     composition.setSubject(
-        new Reference()
-            .setReference(
-                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
-            .setDisplay(patientName.getText()));
+        Utils.buildReference(patient.getId()).setDisplay(patient.getName().get(0).getText()));
     composition.setDateElement(Utils.getFormattedDateTime(authoredOn));
     composition.setStatus(Composition.CompositionStatus.FINAL);
     List<Composition.SectionComponent> sectionComponentList =
@@ -93,14 +74,17 @@ public class MakeDischargeComposition {
             documentReferenceList,
             docCode,
             docName);
-    if (Objects.nonNull(sectionComponentList))
-      for (Composition.SectionComponent sectionComponent : sectionComponentList)
+    if (Objects.nonNull(sectionComponentList)) {
+      for (Composition.SectionComponent sectionComponent : sectionComponentList) {
         composition.addSection(sectionComponent);
+      }
+    }
     Identifier identifier = new Identifier();
     identifier.setSystem(BundleUrlIdentifier.WRAPPER_URL);
     identifier.setValue(UUID.randomUUID().toString());
     composition.setIdentifier(identifier);
     composition.setId(UUID.randomUUID().toString());
+    Utils.setNarrative(composition, "Discharge Summary for " + patient.getName().get(0).getText());
     return composition;
   }
 
@@ -132,12 +116,7 @@ public class MakeDischargeComposition {
                       .setCode(BundleCompositionIdentifier.CHIEF_COMPLAINTS_CODE)
                       .setDisplay(BundleCompositionIdentifier.CHIEF_COMPLAINTS)));
       for (Condition chiefComplaint : chiefComplaintList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.CHIEF_COMPLAINTS
-                        + MapperConstants.SLASH
-                        + chiefComplaint.getId()));
+        sectionComponent.addEntry(Utils.buildReference(chiefComplaint.getId(), "Condition"));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -152,12 +131,7 @@ public class MakeDischargeComposition {
                       .setCode(BundleCompositionIdentifier.PHYSICAL_EXAMINATION_CODE)
                       .setDisplay(BundleCompositionIdentifier.PHYSICAL_EXAMINATION)));
       for (Observation physicalObservation : physicalObservationList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.PHYSICAL_EXAMINATION
-                        + MapperConstants.SLASH
-                        + physicalObservation.getId()));
+        sectionComponent.addEntry(Utils.buildReference(physicalObservation.getId(), "Observation"));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -173,11 +147,7 @@ public class MakeDischargeComposition {
                       .setDisplay(BundleCompositionIdentifier.ALLERGY_RECORD)));
       for (AllergyIntolerance allergyIntolerance : allergieList) {
         sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.ALLERGY_INTOLERANCE
-                        + MapperConstants.SLASH
-                        + allergyIntolerance.getId()));
+            Utils.buildReference(allergyIntolerance.getId(), "AllergyIntolerance"));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -192,12 +162,7 @@ public class MakeDischargeComposition {
                       .setCode(BundleCompositionIdentifier.PAST_MEDICAL_CODE)
                       .setDisplay(BundleCompositionIdentifier.PAST_MEDICAL_HISTORY)));
       for (Condition medicalHistory : medicalHistoryList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.MEDICAL_HISTORY
-                        + MapperConstants.SLASH
-                        + medicalHistory.getId()));
+        sectionComponent.addEntry(Utils.buildReference(medicalHistory.getId(), "Condition"));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -213,11 +178,7 @@ public class MakeDischargeComposition {
                       .setDisplay(BundleCompositionIdentifier.FAMILY_HISTORY_SECTION)));
       for (FamilyMemberHistory familyMemberHistory : familyMemberHistoryList) {
         sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.FAMILY_HISTORY
-                        + MapperConstants.SLASH
-                        + familyMemberHistory.getId()));
+            Utils.buildReference(familyMemberHistory.getId(), "FamilyMemberHistory"));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -231,10 +192,7 @@ public class MakeDischargeComposition {
                       .setSystem(BundleUrlIdentifier.SNOMED_URL)
                       .setCode(BundleCompositionIdentifier.CARE_PLAN_CODE)
                       .setDisplay(BundleCompositionIdentifier.CARE_PLAN)));
-      sectionComponent.addEntry(
-          new Reference()
-              .setReference(
-                  BundleResourceIdentifier.CARE_PLAN + MapperConstants.SLASH + carePlan.getId()));
+      sectionComponent.addEntry(Utils.buildReference(carePlan.getId(), "CarePlan"));
       sectionComponentList.add(sectionComponent);
     }
     if (!(medicationRequestList.isEmpty())) {
@@ -249,12 +207,7 @@ public class MakeDischargeComposition {
                       .setDisplay(BundleCompositionIdentifier.MEDICAL_HISTORY_SECTION)));
       for (MedicationRequest medicationRequest : medicationRequestList) {
         sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.MEDICATION_REQUEST
-                        + BundleResourceIdentifier.FAMILY_HISTORY
-                        + MapperConstants.SLASH
-                        + medicationRequest.getId()));
+            Utils.buildReference(medicationRequest.getId(), "MedicationRequest"));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -270,11 +223,7 @@ public class MakeDischargeComposition {
                       .setDisplay(BundleCompositionIdentifier.DIAGNOSTIC_STUDIES_REPORT)));
       for (DiagnosticReport diagnosticReport : diagnosticReportList) {
         sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.DIAGNOSTIC_REPORT
-                        + MapperConstants.SLASH
-                        + diagnosticReport.getId()));
+            Utils.buildReference(diagnosticReport.getId(), "DiagnosticReport"));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -289,12 +238,7 @@ public class MakeDischargeComposition {
                       .setCode(BundleCompositionIdentifier.HISTORY_PAST_PROCEDURE_CODE)
                       .setDisplay(BundleCompositionIdentifier.HISTORY_PAST_PROCEDURE)));
       for (Procedure procedure : procedureList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.PROCEDURE
-                        + MapperConstants.SLASH
-                        + procedure.getId()));
+        sectionComponent.addEntry(Utils.buildReference(procedure.getId(), "Procedure"));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -310,11 +254,7 @@ public class MakeDischargeComposition {
                       .setDisplay(docName)));
       for (DocumentReference documentReferenceItem : documentReferenceList) {
         sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.DOCUMENT_REFERENCE
-                        + MapperConstants.SLASH
-                        + documentReferenceItem.getId()));
+            Utils.buildReference(documentReferenceItem.getId(), "DocumentReference"));
       }
       sectionComponentList.add(sectionComponent);
     }

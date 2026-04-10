@@ -5,7 +5,7 @@ public class BundleFieldIdentifier {
   public static final String ALLERGY = "Allergy";
   public static final String ACTIVE = "Active";
   public static final String VERY_RESTRICTED = "very restricted";
-  public static final String AMBULATORY = "Ambulatory";
+  public static final String AMBULATORY = "ambulatory";
   public static final String MEDICAL_RECORD_NUMBER = "Medical record number";
   public static final String LIFE_STYLE = "lifeStyle";
   public static final String WOMAN_HEALTH = "womanHealth";
