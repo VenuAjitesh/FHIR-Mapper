@@ -9,6 +9,7 @@ import com.nha.abdm.fhir.mapper.rest.database.h2.tables.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.text.similarity.CosineSimilarity;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -41,6 +42,7 @@ public class SnomedService {
     this.snomedMedicineRouteRepo = snomedMedicineRouteRepo;
   }
 
+  @Cacheable(value = "snomed_condition_procedure", key = "#display")
   public SnomedConditionProcedure getConditionProcedureCode(String display) {
     SnomedConditionProcedure snomedCode =
         (SnomedConditionProcedure)
@@ -60,6 +62,7 @@ public class SnomedService {
     return snomedConditionProcedureRepo.findAll();
   }
 
+  @Cacheable(value = "snomed_diagnostic", key = "#display")
   public SnomedDiagnostic getSnomedDiagnosticCode(String display) {
     SnomedDiagnostic snomedCode =
         (SnomedDiagnostic)
@@ -79,6 +82,7 @@ public class SnomedService {
     return snomedDiagnosticRepo.findAll();
   }
 
+  @Cacheable(value = "snomed_encounter", key = "#display")
   public SnomedEncounter getSnomedEncounterCode(String display) {
     if (display == null) {
       return SnomedEncounter.builder()
@@ -104,6 +108,7 @@ public class SnomedService {
     return snomedEncounterRepo.findAll();
   }
 
+  @Cacheable(value = "snomed_medicine", key = "#display")
   public SnomedMedicine getSnomedMedicineCode(String display) {
     SnomedMedicine snomedCode =
         (SnomedMedicine)
@@ -123,6 +128,7 @@ public class SnomedService {
     return snomedMedicineRepo.findAll();
   }
 
+  @Cacheable(value = "snomed_observation", key = "#display")
   public SnomedObservation getSnomedObservationCode(String display) {
     SnomedObservation snomedObservation =
         (SnomedObservation)
@@ -142,6 +148,7 @@ public class SnomedService {
     return snomedObservationRepo.findAll();
   }
 
+  @Cacheable(value = "snomed_specimen", key = "#display")
   public SnomedSpecimen getSnomedSpecimenCode(String display) {
     SnomedSpecimen snomedCode =
         (SnomedSpecimen)
@@ -161,6 +168,7 @@ public class SnomedService {
     return snomedSpecimenRepo.findAll();
   }
 
+  @Cacheable(value = "snomed_vaccine", key = "#display")
   public SnomedVaccine getSnomedVaccineCode(String display) {
     SnomedVaccine snomedCode =
         (SnomedVaccine)
@@ -180,6 +188,7 @@ public class SnomedService {
     return snomedVaccineRepo.findAll();
   }
 
+  @Cacheable(value = "snomed_route", key = "#display")
   public SnomedMedicineRoute getSnomedMedicineRouteCode(String display) {
     SnomedMedicineRoute snomedCode =
         (SnomedMedicineRoute)
