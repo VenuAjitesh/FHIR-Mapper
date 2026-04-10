@@ -1,4 +1,4 @@
-/* (C) 2024 */
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import com.nha.abdm.fhir.mapper.Utils;
@@ -20,7 +20,6 @@ public class MakeDocumentResource {
       String docCode,
       String docName)
       throws ParseException {
-    HumanName patientName = patient.getName().get(0);
     Coding coding = new Coding();
     coding.setCode("MR");
     coding.setSystem(ResourceProfileIdentifier.PROFILE_PROVIDER);
@@ -55,7 +54,8 @@ public class MakeDocumentResource {
     documentReference.setStatus(Enumerations.DocumentReferenceStatus.CURRENT);
     documentReference.setDocStatus(DocumentReference.ReferredDocumentStatus.FINAL);
     documentReference.setSubject(
-        Utils.buildReference(patient.getId()).setDisplay(patientName.getText()));
+        Utils.buildReference(patient.getId()).setDisplay(patient.getName().get(0).getText()));
+    Utils.setNarrative(documentReference, "Document: " + documentResource.getType());
     return documentReference;
   }
 }

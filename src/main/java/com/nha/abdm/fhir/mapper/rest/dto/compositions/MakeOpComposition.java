@@ -1,11 +1,9 @@
-/* (C) 2024 */
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.dto.compositions;
 
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleCompositionIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +33,6 @@ public class MakeOpComposition {
       List<Observation> otherObservationList,
       List<DocumentReference> documentReferenceList)
       throws ParseException {
-    HumanName patientName = patient.getName().get(0);
-    HumanName practitionerName = null;
     Composition composition = new Composition();
     CodeableConcept typeCode = new CodeableConcept();
     Coding typeCoding = new Coding();
@@ -48,39 +44,20 @@ public class MakeOpComposition {
     composition.setTitle(BundleCompositionIdentifier.CLINICAL_CONSULTATION_REPORT);
     List<Reference> authorList = new ArrayList<>();
     for (Practitioner practitioner : practitionerList) {
-      practitionerName = practitioner.getName().get(0);
       authorList.add(
-          new Reference()
-              .setReference(
-                  BundleResourceIdentifier.PRACTITIONER
-                      + MapperConstants.SLASH
-                      + practitioner.getId())
-              .setDisplay(practitionerName != null ? practitionerName.getText() : null));
+          Utils.buildReference(practitioner.getId())
+              .setDisplay(practitioner.getName().get(0).getText()));
     }
-    composition.setEncounter(
-        new Reference()
-            .setReference(
-                BundleResourceIdentifier.ENCOUNTER + MapperConstants.SLASH + encounter.getId()));
+    composition.setEncounter(Utils.buildReference(encounter.getId()));
     composition.setCustodian(
-        new Reference()
-            .setReference(
-                BundleResourceIdentifier.ORGANISATION
-                    + MapperConstants.SLASH
-                    + organization.getId())
-            .setDisplay(organization.getName()));
+        Utils.buildReference(organization.getId()).setDisplay(organization.getName()));
     composition.setAuthor(authorList);
     composition.setSubject(
-        new Reference()
-            .setReference(
-                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
-            .setDisplay(patientName.getText()));
+        Utils.buildReference(patient.getId()).setDisplay(patient.getName().get(0).getText()));
     composition.setDateElement(Utils.getFormattedDateTime(visitDate));
     composition.setStatus(Composition.CompositionStatus.FINAL);
     List<Composition.SectionComponent> sectionComponentList =
         makeCompositionSection(
-            patient,
-            practitionerList,
-            organization,
             chiefComplaintList,
             physicalObservationList,
             allergieList,
@@ -93,21 +70,22 @@ public class MakeOpComposition {
             referralList,
             otherObservationList,
             documentReferenceList);
-    if (Objects.nonNull(sectionComponentList))
-      for (Composition.SectionComponent sectionComponent : sectionComponentList)
+    if (Objects.nonNull(sectionComponentList)) {
+      for (Composition.SectionComponent sectionComponent : sectionComponentList) {
         composition.addSection(sectionComponent);
+      }
+    }
     Identifier identifier = new Identifier();
     identifier.setSystem(BundleUrlIdentifier.WRAPPER_URL);
     identifier.setValue(UUID.randomUUID().toString());
     composition.setIdentifier(identifier);
     composition.setId(UUID.randomUUID().toString());
+    Utils.setNarrative(
+        composition, "OP Consultation Record for " + patient.getName().get(0).getText());
     return composition;
   }
 
   private List<Composition.SectionComponent> makeCompositionSection(
-      Patient patient,
-      List<Practitioner> practitionerList,
-      Organization organization,
       List<Condition> chiefComplaintList,
       List<Observation> physicalObservationList,
       List<AllergyIntolerance> allergieList,
@@ -132,12 +110,7 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.CHIEF_COMPLAINTS_CODE)
                       .setDisplay(BundleCompositionIdentifier.CHIEF_COMPLAINTS)));
       for (Condition chiefComplaint : chiefComplaintList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.CHIEF_COMPLAINTS
-                        + MapperConstants.SLASH
-                        + chiefComplaint.getId()));
+        sectionComponent.addEntry(Utils.buildReference(chiefComplaint.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -152,12 +125,7 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.PHYSICAL_EXAMINATION_CODE)
                       .setDisplay(BundleCompositionIdentifier.PHYSICAL_EXAMINATION)));
       for (Observation physicalObservation : physicalObservationList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.PHYSICAL_EXAMINATION
-                        + MapperConstants.SLASH
-                        + physicalObservation.getId()));
+        sectionComponent.addEntry(Utils.buildReference(physicalObservation.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -172,12 +140,7 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.ALLERGY_RECORD)
                       .setDisplay(BundleCompositionIdentifier.ALLERGY_RECORD)));
       for (AllergyIntolerance allergyIntolerance : allergieList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.ALLERGY_INTOLERANCE
-                        + MapperConstants.SLASH
-                        + allergyIntolerance.getId()));
+        sectionComponent.addEntry(Utils.buildReference(allergyIntolerance.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -192,12 +155,7 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.MEDICAL_HISTORY_SECTION)
                       .setDisplay(BundleCompositionIdentifier.MEDICAL_HISTORY_SECTION)));
       for (Condition medicalHistory : medicalHistoryList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.MEDICAL_HISTORY
-                        + MapperConstants.SLASH
-                        + medicalHistory.getId()));
+        sectionComponent.addEntry(Utils.buildReference(medicalHistory.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -212,12 +170,7 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.FAMILY_HISTORY_SECTION_CODE)
                       .setDisplay(BundleCompositionIdentifier.FAMILY_HISTORY_SECTION)));
       for (FamilyMemberHistory familyMemberHistory : familyMemberHistoryList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.FAMILY_HISTORY
-                        + MapperConstants.SLASH
-                        + familyMemberHistory.getId()));
+        sectionComponent.addEntry(Utils.buildReference(familyMemberHistory.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -232,12 +185,7 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.ORDER_DOCUMENT_CODE)
                       .setDisplay(BundleCompositionIdentifier.ORDER_DOCUMENT)));
       for (ServiceRequest investigation : investigationAdviceList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.INVESTIGATION_ADVICE
-                        + MapperConstants.SLASH
-                        + investigation.getId()));
+        sectionComponent.addEntry(Utils.buildReference(investigation.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -252,12 +200,7 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.MEDICATION_SUMMARY_CODE)
                       .setDisplay(BundleCompositionIdentifier.MEDICATION_SUMMARY)));
       for (MedicationRequest medication : medicationList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.MEDICATION_REQUEST
-                        + MapperConstants.SLASH
-                        + medication.getId()));
+        sectionComponent.addEntry(Utils.buildReference(medication.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -272,10 +215,7 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.FOLLOW_UP_CODE)
                       .setDisplay(BundleCompositionIdentifier.FOLLOW_UP)));
       for (Appointment followUp : followupList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.FOLLOW_UP + MapperConstants.SLASH + followUp.getId()));
+        sectionComponent.addEntry(Utils.buildReference(followUp.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -290,12 +230,7 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.CLINICAL_PROCEDURE_CODE)
                       .setDisplay(BundleCompositionIdentifier.CLINICAL_PROCEDURE)));
       for (Procedure procedure : procedureList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.PROCEDURE
-                        + MapperConstants.SLASH
-                        + procedure.getId()));
+        sectionComponent.addEntry(Utils.buildReference(procedure.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -310,10 +245,7 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.REFERRAL_TO_SERVICE_CODE)
                       .setDisplay(BundleCompositionIdentifier.REFERRAL_TO_SERVICE)));
       for (ServiceRequest referral : referralList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.REFERRAL + MapperConstants.SLASH + referral.getId()));
+        sectionComponent.addEntry(Utils.buildReference(referral.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -328,12 +260,7 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.CLINICAL_FINDING_CODE)
                       .setDisplay(BundleCompositionIdentifier.CLINICAL_FINDING)));
       for (Observation otherObservation : otherObservationList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.OTHER_OBSERVATIONS
-                        + MapperConstants.SLASH
-                        + otherObservation.getId()));
+        sectionComponent.addEntry(Utils.buildReference(otherObservation.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
@@ -348,16 +275,10 @@ public class MakeOpComposition {
                       .setCode(BundleCompositionIdentifier.CLINICAL_CONSULTATION_REPORT_CODE)
                       .setDisplay(BundleCompositionIdentifier.CLINICAL_CONSULTATION_REPORT)));
       for (DocumentReference documentReferenceItem : documentReferenceList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.DOCUMENT_REFERENCE
-                        + MapperConstants.SLASH
-                        + documentReferenceItem.getId()));
+        sectionComponent.addEntry(Utils.buildReference(documentReferenceItem.getId()));
       }
       sectionComponentList.add(sectionComponent);
     }
-
     return sectionComponentList;
   }
 }

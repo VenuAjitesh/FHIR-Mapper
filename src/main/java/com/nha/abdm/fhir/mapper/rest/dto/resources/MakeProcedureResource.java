@@ -1,23 +1,22 @@
-/* (C) 2024 */
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import com.nha.abdm.fhir.mapper.Utils;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import com.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedConditionProcedure;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.ProcedureResource;
 import java.text.ParseException;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.r4.model.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class MakeProcedureResource {
-  @Autowired SnomedService snomedService;
+  private final SnomedService snomedService;
 
   public Procedure getProcedure(Patient patient, ProcedureResource procedureResource)
       throws ParseException {
@@ -29,12 +28,10 @@ public class MakeProcedureResource {
     } else {
       procedure.setStatus(Procedure.ProcedureStatus.COMPLETED);
     }
-    procedure.setSubject(
-        new Reference()
-            .setReference(
-                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId()));
+    procedure.setSubject(Utils.buildReference(patient.getId()));
     SnomedConditionProcedure snomedProcedure =
         snomedService.getConditionProcedureCode(procedureResource.getProcedureName());
+
     procedure.setCode(
         new CodeableConcept()
             .setText(procedureResource.getProcedureName())
@@ -66,6 +63,7 @@ public class MakeProcedureResource {
                     .setCode(snomedCondition.getCode())
                     .setDisplay(snomedCondition.getDisplay())));
     procedure.setPerformed((Utils.getFormattedDateTime(procedureResource.getDate())));
+    Utils.setNarrative(procedure, "Procedure: " + procedureResource.getProcedureName());
     return procedure;
   }
 }

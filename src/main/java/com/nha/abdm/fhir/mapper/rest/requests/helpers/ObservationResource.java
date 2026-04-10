@@ -19,4 +19,5 @@ public class ObservationResource {
   private String result;
 
   private ValueQuantityResource valueQuantity;
+  private ObservationReferenceRange referenceRange;
 }

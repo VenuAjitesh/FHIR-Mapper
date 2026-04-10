@@ -1,4 +1,4 @@
-/* (C) 2024 */
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
@@ -12,6 +12,7 @@ import com.nha.abdm.fhir.mapper.rest.requests.OPConsultationRequest;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.*;
 import java.text.ParseException;
 import java.util.*;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,13 +20,12 @@ import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class OPConsultationConverter {
   private static final Logger log = LoggerFactory.getLogger(OPConsultationConverter.class);
   private final MakeOrganisationResource makeOrganisationResource;
   private final MakeBundleMetaResource makeBundleMetaResource;
-
   private final MakePatientResource makePatientResource;
-
   private final MakePractitionerResource makePractitionerResource;
   private final MakeConditionResource makeConditionResource;
   private final MakeObservationResource makeObservationResource;
@@ -37,37 +37,6 @@ public class OPConsultationConverter {
   private final MakeMedicationRequestResource makeMedicationRequestResource;
   private final MakeProcedureResource makeProcedureResource;
   private final MakeOpComposition makeOpComposition;
-
-  public OPConsultationConverter(
-      MakeOrganisationResource makeOrganisationResource,
-      MakeBundleMetaResource makeBundleMetaResource,
-      MakePatientResource makePatientResource,
-      MakePractitionerResource makePractitionerResource,
-      MakeConditionResource makeConditionResource,
-      MakeObservationResource makeObservationResource,
-      MakeServiceRequestResource makeServiceRequestResource,
-      MakeAllergyToleranceResource makeAllergyToleranceResource,
-      MakeFamilyMemberResource makeFamilyMemberResource,
-      MakeDocumentResource makeDocumentResource,
-      MakeEncounterResource makeEncounterResource,
-      MakeMedicationRequestResource makeMedicationRequestResource,
-      MakeProcedureResource makeProcedureResource,
-      MakeOpComposition makeOpComposition) {
-    this.makeOrganisationResource = makeOrganisationResource;
-    this.makeBundleMetaResource = makeBundleMetaResource;
-    this.makePatientResource = makePatientResource;
-    this.makePractitionerResource = makePractitionerResource;
-    this.makeConditionResource = makeConditionResource;
-    this.makeObservationResource = makeObservationResource;
-    this.makeServiceRequestResource = makeServiceRequestResource;
-    this.makeAllergyToleranceResource = makeAllergyToleranceResource;
-    this.makeFamilyMemberResource = makeFamilyMemberResource;
-    this.makeDocumentResource = makeDocumentResource;
-    this.makeEncounterResource = makeEncounterResource;
-    this.makeMedicationRequestResource = makeMedicationRequestResource;
-    this.makeProcedureResource = makeProcedureResource;
-    this.makeOpComposition = makeOpComposition;
-  }
 
   public Bundle convertToOPConsultationBundle(OPConsultationRequest opConsultationRequest)
       throws ParseException {
@@ -112,7 +81,6 @@ public class OPConsultationConverter {
           opConsultationRequest.getServiceRequests() != null
               ? makeInvestigationAdviceList(opConsultationRequest, patient, practitionerList)
               : new ArrayList<>();
-      HashMap<Medication, MedicationRequest> medicationRequestMap = new HashMap<>();
       List<MedicationRequest> medicationList = new ArrayList<>();
       List<Condition> medicationConditionList = new ArrayList<>();
       if (Objects.nonNull(opConsultationRequest.getMedications())) {
@@ -136,7 +104,7 @@ public class OPConsultationConverter {
           if (medicationCondition != null) {
             medicationConditionList.add(medicationCondition);
           }
-        } // TODO
+        }
       }
       List<Appointment> followupList =
           opConsultationRequest.getFollowups() != null
@@ -193,147 +161,103 @@ public class OPConsultationConverter {
       List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(
-                  BundleResourceIdentifier.COMPOSITION
-                      + MapperConstants.SLASH
-                      + composition.getId())
+              .setFullUrl(MapperConstants.URN_UUID + composition.getId())
               .setResource(composition));
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(
-                  BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
+              .setFullUrl(MapperConstants.URN_UUID + patient.getId())
               .setResource(patient));
       for (Practitioner practitioner : practitionerList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.PRACTITIONER
-                        + MapperConstants.SLASH
-                        + practitioner.getId())
+                .setFullUrl(MapperConstants.URN_UUID + practitioner.getId())
                 .setResource(practitioner));
       }
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(
-                  BundleResourceIdentifier.ENCOUNTER + MapperConstants.SLASH + encounter.getId())
+              .setFullUrl(MapperConstants.URN_UUID + encounter.getId())
               .setResource(encounter));
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(
-                  BundleResourceIdentifier.ORGANISATION
-                      + MapperConstants.SLASH
-                      + organization.getId())
+              .setFullUrl(MapperConstants.URN_UUID + organization.getId())
               .setResource(organization));
 
       for (Condition complaint : chiefComplaintList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.CHIEF_COMPLAINTS
-                        + MapperConstants.SLASH
-                        + complaint.getId())
+                .setFullUrl(MapperConstants.URN_UUID + complaint.getId())
                 .setResource(complaint));
       }
       for (Observation physicalObservation : physicalObservationList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.PHYSICAL_EXAMINATION
-                        + MapperConstants.SLASH
-                        + physicalObservation.getId())
+                .setFullUrl(MapperConstants.URN_UUID + physicalObservation.getId())
                 .setResource(physicalObservation));
       }
       for (AllergyIntolerance allergyIntolerance : allergieList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.ALLERGY_INTOLERANCE
-                        + MapperConstants.SLASH
-                        + allergyIntolerance.getId())
+                .setFullUrl(MapperConstants.URN_UUID + allergyIntolerance.getId())
                 .setResource(allergyIntolerance));
       }
       for (Condition medicalHistory : medicalHistoryList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.MEDICAL_HISTORY
-                        + MapperConstants.SLASH
-                        + medicalHistory.getId())
+                .setFullUrl(MapperConstants.URN_UUID + medicalHistory.getId())
                 .setResource(medicalHistory));
       }
       for (FamilyMemberHistory familyMemberHistory : familyMemberHistoryList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.FAMILY_HISTORY
-                        + MapperConstants.SLASH
-                        + familyMemberHistory.getId())
+                .setFullUrl(MapperConstants.URN_UUID + familyMemberHistory.getId())
                 .setResource(familyMemberHistory));
       }
       for (ServiceRequest investigation : investigationAdviceList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.INVESTIGATION_ADVICE
-                        + MapperConstants.SLASH
-                        + investigation.getId())
+                .setFullUrl(MapperConstants.URN_UUID + investigation.getId())
                 .setResource(investigation));
       }
       for (MedicationRequest medicationRequest : medicationList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.MEDICATION_REQUEST
-                        + MapperConstants.SLASH
-                        + medicationRequest.getId())
+                .setFullUrl(MapperConstants.URN_UUID + medicationRequest.getId())
                 .setResource(medicationRequest));
       }
       for (Condition medicationCondition : medicationConditionList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.CONDITION
-                        + MapperConstants.SLASH
-                        + medicationCondition.getId())
+                .setFullUrl(MapperConstants.URN_UUID + medicationCondition.getId())
                 .setResource(medicationCondition));
       }
       for (Appointment followUp : followupList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.FOLLOW_UP + MapperConstants.SLASH + followUp.getId())
+                .setFullUrl(MapperConstants.URN_UUID + followUp.getId())
                 .setResource(followUp));
       }
       for (Procedure procedure : procedureList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.PROCEDURE + MapperConstants.SLASH + procedure.getId())
+                .setFullUrl(MapperConstants.URN_UUID + procedure.getId())
                 .setResource(procedure));
       }
       for (ServiceRequest referral : referralList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.REFERRAL + MapperConstants.SLASH + referral.getId())
+                .setFullUrl(MapperConstants.URN_UUID + referral.getId())
                 .setResource(referral));
       }
       for (Observation observation : otherObservationList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.OTHER_OBSERVATIONS
-                        + MapperConstants.SLASH
-                        + observation.getId())
+                .setFullUrl(MapperConstants.URN_UUID + observation.getId())
                 .setResource(observation));
       }
       for (DocumentReference documentReference : documentReferenceList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.DOCUMENT_REFERENCE
-                        + MapperConstants.SLASH
-                        + documentReference.getId())
+                .setFullUrl(MapperConstants.URN_UUID + documentReference.getId())
                 .setResource(documentReference));
       }
       bundle.setEntry(entries);
@@ -418,20 +342,16 @@ public class OPConsultationConverter {
                   appointment.setParticipant(
                       Collections.singletonList(
                           new Appointment.AppointmentParticipantComponent()
-                              .setActor(
-                                  new Reference()
-                                      .setReference(
-                                          BundleResourceIdentifier.PATIENT
-                                              + MapperConstants.SLASH
-                                              + patient.getId()))
+                              .setActor(Utils.buildReference(patient.getId()))
                               .setStatus(Appointment.ParticipationStatus.ACCEPTED)));
                   appointment.setStart(
-                      Utils.getFormattedDateTime(item.getAppointmentTime())
-                          .getValue()); // TODO in UTC format
+                      Utils.getFormattedDateTime(item.getAppointmentTime()).getValue());
                   appointment.addReasonCode(new CodeableConcept().setText(item.getReason()));
                   appointment.setServiceType(
                       Collections.singletonList(
                           new CodeableConcept().setText(item.getServiceType())));
+                  Utils.setNarrative(
+                      appointment, "Follow-up Appointment on " + item.getAppointmentTime());
                   return appointment;
                 }))
         .toList();
@@ -489,7 +409,7 @@ public class OPConsultationConverter {
       OPConsultationRequest opConsultationRequest) {
 
     return Optional.ofNullable(opConsultationRequest.getAllergies()).orElse(List.of()).stream()
-        .filter(allergy -> allergy != null && !allergy.isBlank())
+        .filter(allergy -> allergy != null && allergy.getAllergy() != null)
         .map(
             StreamUtils.wrapException(
                 allergy ->

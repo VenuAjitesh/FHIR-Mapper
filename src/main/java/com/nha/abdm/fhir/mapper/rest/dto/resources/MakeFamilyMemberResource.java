@@ -1,4 +1,4 @@
-/* (C) 2024 */
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import com.nha.abdm.fhir.mapper.Utils;
@@ -9,18 +9,17 @@ import com.nha.abdm.fhir.mapper.rest.requests.helpers.FamilyObservationResource;
 import java.text.ParseException;
 import java.util.Objects;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.r4.model.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class MakeFamilyMemberResource {
-
-  @Autowired SnomedService snomedService;
+  private final SnomedService snomedService;
 
   public FamilyMemberHistory getFamilyHistory(
       Patient patient, FamilyObservationResource familyObservationResource) throws ParseException {
-    HumanName patientName = patient.getName().get(0);
     FamilyMemberHistory familyMemberHistory = new FamilyMemberHistory();
     familyMemberHistory.setId(UUID.randomUUID().toString());
     familyMemberHistory.setStatus(FamilyMemberHistory.FamilyHistoryStatus.COMPLETED);
@@ -29,10 +28,7 @@ public class MakeFamilyMemberResource {
             .setLastUpdatedElement(Utils.getCurrentTimeStamp())
             .addProfile(ResourceProfileIdentifier.PROFILE_FAMILY_MEMBER_HISTORY));
     familyMemberHistory.setPatient(
-        new Reference()
-            .setReference(
-                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
-            .setDisplay(patientName.getText()));
+        Utils.buildReference(patient.getId()).setDisplay(patient.getName().get(0).getText()));
     if (Objects.nonNull(familyObservationResource.getRelationship())) {
       familyMemberHistory.setRelationship(
           new CodeableConcept()
@@ -40,12 +36,13 @@ public class MakeFamilyMemberResource {
                   new Coding()
                       .setSystem(BundleUrlIdentifier.SNOMED_URL)
                       .setCode(SnomedCodeIdentifier.SNOMED_UNKNOWN)
-                      .setDisplay(familyObservationResource.getRelationship()))
+                      .setDisplay("Unknown"))
               .setText(familyObservationResource.getRelationship()));
     }
     if (Objects.nonNull(familyObservationResource.getObservation())) {
       SnomedObservation snomedCondition =
           snomedService.getSnomedObservationCode(familyObservationResource.getObservation());
+
       familyMemberHistory.addCondition(
           new FamilyMemberHistory.FamilyMemberHistoryConditionComponent()
               .setCode(
@@ -57,6 +54,9 @@ public class MakeFamilyMemberResource {
                               .setDisplay(snomedCondition.getDisplay()))
                       .setText(snomedCondition.getDisplay())));
     }
+    Utils.setNarrative(
+        familyMemberHistory,
+        "Family Member History: " + familyObservationResource.getObservation());
     return familyMemberHistory;
   }
 }

@@ -431,11 +431,10 @@ public class DischargeSummaryConverter {
   private List<AllergyIntolerance> makeAllergiesList(
       Patient patient,
       List<Practitioner> practitionerList,
-      DischargeSummaryRequest dischargeSummaryRequest)
-      throws ParseException {
-    return Optional.ofNullable(dischargeSummaryRequest.getAllergies())
-        .orElse(Collections.emptyList())
-        .stream()
+      DischargeSummaryRequest dischargeSummaryRequest) {
+
+    return Optional.ofNullable(dischargeSummaryRequest.getAllergies()).orElse(List.of()).stream()
+        .filter(allergy -> allergy != null && allergy.getAllergy() != null)
         .map(
             StreamUtils.wrapException(
                 allergy ->
@@ -450,8 +449,7 @@ public class DischargeSummaryConverter {
   private List<Observation> makePhysicalObservations(
       DischargeSummaryRequest dischargeSummaryRequest,
       Patient patient,
-      List<Practitioner> practitionerList)
-      throws ParseException {
+      List<Practitioner> practitionerList) {
     return Optional.ofNullable(dischargeSummaryRequest.getPhysicalExaminations())
         .orElse(Collections.emptyList())
         .stream()
@@ -464,7 +462,7 @@ public class DischargeSummaryConverter {
   }
 
   private List<Condition> makeCheifComplaintsList(
-      DischargeSummaryRequest dischargeSummaryRequest, Patient patient) throws ParseException {
+      DischargeSummaryRequest dischargeSummaryRequest, Patient patient) {
     return Optional.ofNullable(dischargeSummaryRequest.getChiefComplaints())
         .orElse(Collections.emptyList())
         .stream()
