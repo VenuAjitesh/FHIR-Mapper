@@ -36,6 +36,7 @@ public class MakePractitionerResource {
     practitioner.setMeta(meta);
     practitioner.addIdentifier(identifier);
     practitioner.setId(UUID.randomUUID().toString());
+    Utils.setNarrative(practitioner, "Practitioner: " + practitionerResource.getName());
     return practitioner;
   }
 }

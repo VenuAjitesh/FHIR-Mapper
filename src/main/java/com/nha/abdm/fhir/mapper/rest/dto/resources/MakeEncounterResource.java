@@ -37,6 +37,8 @@ public class MakeEncounterResource {
                     : BundleFieldIdentifier.AMBULATORY));
     encounter.setSubject(Utils.buildReference(patient.getId()).setDisplay(patientName.getText()));
     encounter.setPeriod(new Period().setStartElement(Utils.getFormattedDateTime(visitDate)));
+    Utils.setNarrative(
+        encounter, "Encounter: " + (encounterName != null ? encounterName : "Ambulatory"));
     return encounter;
   }
 }

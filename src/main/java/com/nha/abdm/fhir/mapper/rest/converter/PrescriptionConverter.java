@@ -130,64 +130,46 @@ public class PrescriptionConverter {
       List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(
-                  BundleResourceIdentifier.COMPOSITION
-                      + MapperConstants.SLASH
-                      + composition.getId())
+              .setFullUrl(MapperConstants.URN_UUID + composition.getId())
               .setResource(composition));
       entries.add(
           new Bundle.BundleEntryComponent()
-              .setFullUrl(
-                  BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
+              .setFullUrl(MapperConstants.URN_UUID + patient.getId())
               .setResource(patient));
       for (Practitioner practitioner : practitionerList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.PRACTITIONER
-                        + MapperConstants.SLASH
-                        + practitioner.getId())
+                .setFullUrl(MapperConstants.URN_UUID + practitioner.getId())
                 .setResource(practitioner));
       }
       if (Objects.nonNull(organization)) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.ORGANISATION
-                        + MapperConstants.SLASH
-                        + organization.getId())
+                .setFullUrl(MapperConstants.URN_UUID + organization.getId())
                 .setResource(organization));
       }
       if (Objects.nonNull(encounter)) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.ENCOUNTER + MapperConstants.SLASH + encounter.getId())
+                .setFullUrl(MapperConstants.URN_UUID + encounter.getId())
                 .setResource(encounter));
       }
       for (MedicationRequest medicationRequest : medicationRequestList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.MEDICATION_REQUEST
-                        + MapperConstants.SLASH
-                        + medicationRequest.getId())
+                .setFullUrl(MapperConstants.URN_UUID + medicationRequest.getId())
                 .setResource(medicationRequest));
       }
       for (Condition medicationCondition : medicationConditionList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.CONDITION
-                        + MapperConstants.SLASH
-                        + medicationCondition.getId())
+                .setFullUrl(MapperConstants.URN_UUID + medicationCondition.getId())
                 .setResource(medicationCondition));
       }
       for (Binary binary : documentList) {
         entries.add(
             new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.BINARY + MapperConstants.SLASH + binary.getId())
+                .setFullUrl(MapperConstants.URN_UUID + binary.getId())
                 .setResource(binary));
       }
       bundle.setEntry(entries);

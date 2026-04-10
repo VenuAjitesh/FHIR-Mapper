@@ -2,9 +2,7 @@
 package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import com.nha.abdm.fhir.mapper.Utils;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.DateRange;
 import com.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
@@ -22,7 +20,6 @@ public class MakeConditionResource {
   public Condition getCondition(
       String conditionDetails, Patient patient, String recordedDate, DateRange dateRange)
       throws ParseException {
-    HumanName patientName = patient.getName().get(0);
     Condition condition = new Condition();
     condition.setId(UUID.randomUUID().toString());
 
@@ -40,18 +37,17 @@ public class MakeConditionResource {
             .setLastUpdatedElement(Utils.getCurrentTimeStamp())
             .addProfile(ResourceProfileIdentifier.PROFILE_CONDITION));
     condition.setSubject(
-        new Reference()
-            .setReference(
-                BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
-            .setDisplay(patientName.getText()));
-    if (recordedDate != null)
+        Utils.buildReference(patient.getId()).setDisplay(patient.getName().get(0).getText()));
+    if (recordedDate != null) {
       condition.setRecordedDateElement(Utils.getFormattedDateTime(recordedDate));
+    }
     if (dateRange != null) {
       condition.setOnset(
           new Period()
               .setStartElement(Utils.getFormattedDateTime(dateRange.getFrom()))
               .setEndElement(Utils.getFormattedDateTime(dateRange.getTo())));
     }
+    Utils.setNarrative(condition, "Condition: " + conditionDetails);
     return condition;
   }
 }
