@@ -1,4 +1,4 @@
-/* (C) 2024 */
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.dto.compositions;
 
 import com.nha.abdm.fhir.mapper.Utils;
@@ -24,34 +24,65 @@ public class MakeImmunizationComposition {
       List<DocumentReference> documentList)
       throws ParseException {
     Composition composition = new Composition();
+    composition.setMeta(createMeta());
+    composition.setType(createType());
+    composition.setTitle(BundleCompositionIdentifier.IMMUNIZATION_RECORD);
+    if (Objects.nonNull(organization)) {
+      composition.setCustodian(createCustodian(organization));
+    }
+    composition.setAuthor(createAuthors(practitionerList));
+    composition.setSubject(createSubject(patient));
+    if (Objects.nonNull(encounter)) {
+      composition.setEncounter(Utils.buildReference(encounter.getId(), "Encounter"));
+    }
+    composition.setDateElement(Utils.getFormattedDateTime(authoredOn));
+    composition.addSection(createSection(immunizationList, documentList));
+    composition.setStatus(Composition.CompositionStatus.FINAL);
+    composition.setIdentifier(createIdentifier());
+    composition.setId(UUID.randomUUID().toString());
+    HumanName patientName = patient.getName().get(0);
+    Utils.setNarrative(composition, "Immunization Record for " + patientName.getText());
+    return composition;
+  }
+
+  private Meta createMeta() throws ParseException {
     Meta meta = new Meta();
     meta.setVersionId("1");
     meta.setLastUpdatedElement(Utils.getCurrentTimeStamp());
     meta.addProfile(ResourceProfileIdentifier.PROFILE_IMMUNIZATION_RECORD);
-    composition.setMeta(meta);
+    return meta;
+  }
+
+  private CodeableConcept createType() {
     CodeableConcept typeCode = new CodeableConcept();
     Coding typeCoding = new Coding();
     typeCoding.setSystem(BundleUrlIdentifier.SNOMED_URL);
     typeCoding.setCode(BundleCompositionIdentifier.IMMUNIZATION_RECORD_CODE);
     typeCoding.setDisplay(BundleCompositionIdentifier.IMMUNIZATION_RECORD);
     typeCode.addCoding(typeCoding);
-    composition.setType(typeCode);
-    composition.setTitle(BundleCompositionIdentifier.IMMUNIZATION_RECORD);
-    if (Objects.nonNull(organization))
-      composition.setCustodian(Utils.buildReference(organization.getId()));
+    return typeCode;
+  }
+
+  private Reference createCustodian(Organization organization) {
+    return Utils.buildReference(organization.getId());
+  }
+
+  private List<Reference> createAuthors(List<Practitioner> practitionerList) {
     List<Reference> authorList = new ArrayList<>();
-    HumanName practitionerName = null;
     for (Practitioner author : practitionerList) {
-      practitionerName = author.getName().get(0);
+      HumanName practitionerName = author.getName().get(0);
       authorList.add(Utils.buildReference(author.getId()).setDisplay(practitionerName.getText()));
     }
-    composition.setAuthor(authorList);
+    return authorList;
+  }
+
+  private Reference createSubject(Patient patient) {
     HumanName patientName = patient.getName().get(0);
-    composition.setSubject(Utils.buildReference(patient.getId()).setDisplay(patientName.getText()));
-    if (Objects.nonNull(encounter)) {
-      composition.setEncounter(Utils.buildReference(encounter.getId(), "Encounter"));
-    }
-    composition.setDateElement(Utils.getFormattedDateTime(authoredOn));
+    return Utils.buildReference(patient.getId()).setDisplay(patientName.getText());
+  }
+
+  private Composition.SectionComponent createSection(
+      List<Immunization> immunizationList, List<DocumentReference> documentList) {
     Composition.SectionComponent immunizationSection = new Composition.SectionComponent();
     immunizationSection.setTitle(BundleResourceIdentifier.IMMUNIZATION);
     immunizationSection.setCode(
@@ -65,17 +96,17 @@ public class MakeImmunizationComposition {
     for (Immunization immunization : immunizationList) {
       immunizationSection.addEntry(Utils.buildReference(immunization.getId(), "Immunization"));
     }
-    composition.addSection(immunizationSection);
-    for (DocumentReference documentReference : documentList)
+    for (DocumentReference documentReference : documentList) {
       immunizationSection.addEntry(
           Utils.buildReference(documentReference.getId(), "DocumentReference"));
-    composition.setStatus(Composition.CompositionStatus.FINAL);
+    }
+    return immunizationSection;
+  }
+
+  private Identifier createIdentifier() {
     Identifier identifier = new Identifier();
     identifier.setSystem(BundleUrlIdentifier.WRAPPER_URL);
     identifier.setValue(UUID.randomUUID().toString());
-    composition.setIdentifier(identifier);
-    composition.setId(UUID.randomUUID().toString());
-    Utils.setNarrative(composition, "Immunization Record for " + patientName.getText());
-    return composition;
+    return identifier;
   }
 }

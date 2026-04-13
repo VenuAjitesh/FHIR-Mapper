@@ -34,30 +34,16 @@ public class MakeOpComposition {
       List<DocumentReference> documentReferenceList)
       throws ParseException {
     Composition composition = new Composition();
-    CodeableConcept typeCode = new CodeableConcept();
-    Coding typeCoding = new Coding();
-    typeCoding.setSystem(BundleUrlIdentifier.SNOMED_URL);
-    typeCoding.setCode(BundleCompositionIdentifier.CLINICAL_CONSULTATION_REPORT_CODE);
-    typeCoding.setDisplay(BundleCompositionIdentifier.CLINICAL_CONSULTATION_REPORT);
-    typeCode.addCoding(typeCoding);
-    composition.setType(typeCode);
+    composition.setType(createType());
     composition.setTitle(BundleCompositionIdentifier.CLINICAL_CONSULTATION_REPORT);
-    List<Reference> authorList = new ArrayList<>();
-    for (Practitioner practitioner : practitionerList) {
-      authorList.add(
-          Utils.buildReference(practitioner.getId())
-              .setDisplay(practitioner.getName().get(0).getText()));
-    }
+    composition.setAuthor(createAuthors(practitionerList));
     composition.setEncounter(Utils.buildReference(encounter.getId()));
-    composition.setCustodian(
-        Utils.buildReference(organization.getId()).setDisplay(organization.getName()));
-    composition.setAuthor(authorList);
-    composition.setSubject(
-        Utils.buildReference(patient.getId()).setDisplay(patient.getName().get(0).getText()));
+    composition.setCustodian(createCustodian(organization));
+    composition.setSubject(createSubject(patient));
     composition.setDateElement(Utils.getFormattedDateTime(visitDate));
     composition.setStatus(Composition.CompositionStatus.FINAL);
     List<Composition.SectionComponent> sectionComponentList =
-        makeCompositionSection(
+        createSections(
             chiefComplaintList,
             physicalObservationList,
             allergieList,
@@ -75,17 +61,48 @@ public class MakeOpComposition {
         composition.addSection(sectionComponent);
       }
     }
-    Identifier identifier = new Identifier();
-    identifier.setSystem(BundleUrlIdentifier.WRAPPER_URL);
-    identifier.setValue(UUID.randomUUID().toString());
-    composition.setIdentifier(identifier);
+    composition.setIdentifier(createIdentifier());
     composition.setId(UUID.randomUUID().toString());
-    Utils.setNarrative(
-        composition, "OP Consultation Record for " + patient.getName().get(0).getText());
+    Utils.setNarrative(composition, "OP Consultation for " + patient.getName().get(0).getText());
     return composition;
   }
 
-  private List<Composition.SectionComponent> makeCompositionSection(
+  private CodeableConcept createType() {
+    CodeableConcept typeCode = new CodeableConcept();
+    Coding typeCoding = new Coding();
+    typeCoding.setSystem(BundleUrlIdentifier.SNOMED_URL);
+    typeCoding.setCode(BundleCompositionIdentifier.CLINICAL_CONSULTATION_REPORT_CODE);
+    typeCoding.setDisplay(BundleCompositionIdentifier.CLINICAL_CONSULTATION_REPORT);
+    typeCode.addCoding(typeCoding);
+    return typeCode;
+  }
+
+  private List<Reference> createAuthors(List<Practitioner> practitionerList) {
+    List<Reference> authorList = new ArrayList<>();
+    for (Practitioner practitioner : practitionerList) {
+      authorList.add(
+          Utils.buildReference(practitioner.getId())
+              .setDisplay(practitioner.getName().get(0).getText()));
+    }
+    return authorList;
+  }
+
+  private Reference createCustodian(Organization organization) {
+    return Utils.buildReference(organization.getId()).setDisplay(organization.getName());
+  }
+
+  private Reference createSubject(Patient patient) {
+    return Utils.buildReference(patient.getId()).setDisplay(patient.getName().get(0).getText());
+  }
+
+  private Identifier createIdentifier() {
+    Identifier identifier = new Identifier();
+    identifier.setSystem(BundleUrlIdentifier.WRAPPER_URL);
+    identifier.setValue(UUID.randomUUID().toString());
+    return identifier;
+  }
+
+  private List<Composition.SectionComponent> createSections(
       List<Condition> chiefComplaintList,
       List<Observation> physicalObservationList,
       List<AllergyIntolerance> allergieList,
@@ -99,7 +116,24 @@ public class MakeOpComposition {
       List<Observation> otherObservationList,
       List<DocumentReference> documentReferenceList) {
     List<Composition.SectionComponent> sectionComponentList = new ArrayList<>();
-    if (chiefComplaintList != null && !chiefComplaintList.isEmpty()) {
+    addChiefComplaintsSection(sectionComponentList, chiefComplaintList);
+    addPhysicalExaminationSection(sectionComponentList, physicalObservationList);
+    addAllergiesSection(sectionComponentList, allergieList);
+    addMedicationsSection(sectionComponentList, medicationList);
+    addMedicalHistorySection(sectionComponentList, medicalHistoryList);
+    addFamilyHistorySection(sectionComponentList, familyMemberHistoryList);
+    addInvestigationAdviceSection(sectionComponentList, investigationAdviceList);
+    addFollowupSection(sectionComponentList, followupList);
+    addProceduresSection(sectionComponentList, procedureList);
+    addReferralsSection(sectionComponentList, referralList);
+    addOtherObservationsSection(sectionComponentList, otherObservationList);
+    addDocumentsSection(sectionComponentList, documentReferenceList);
+    return sectionComponentList;
+  }
+
+  private void addChiefComplaintsSection(
+      List<Composition.SectionComponent> sections, List<Condition> chiefComplaintList) {
+    if (!chiefComplaintList.isEmpty()) {
       Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
       sectionComponent.setCode(
           new CodeableConcept()
@@ -112,9 +146,13 @@ public class MakeOpComposition {
       for (Condition chiefComplaint : chiefComplaintList) {
         sectionComponent.addEntry(Utils.buildReference(chiefComplaint.getId(), "Condition"));
       }
-      sectionComponentList.add(sectionComponent);
+      sections.add(sectionComponent);
     }
-    if (Objects.nonNull(physicalObservationList) && !physicalObservationList.isEmpty()) {
+  }
+
+  private void addPhysicalExaminationSection(
+      List<Composition.SectionComponent> sections, List<Observation> physicalObservationList) {
+    if (!physicalObservationList.isEmpty()) {
       Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
       sectionComponent.setCode(
           new CodeableConcept()
@@ -127,9 +165,13 @@ public class MakeOpComposition {
       for (Observation physicalObservation : physicalObservationList) {
         sectionComponent.addEntry(Utils.buildReference(physicalObservation.getId(), "Observation"));
       }
-      sectionComponentList.add(sectionComponent);
+      sections.add(sectionComponent);
     }
-    if (Objects.nonNull(allergieList) && !allergieList.isEmpty()) {
+  }
+
+  private void addAllergiesSection(
+      List<Composition.SectionComponent> sections, List<AllergyIntolerance> allergieList) {
+    if (!allergieList.isEmpty()) {
       Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
       sectionComponent.setCode(
           new CodeableConcept()
@@ -143,9 +185,33 @@ public class MakeOpComposition {
         sectionComponent.addEntry(
             Utils.buildReference(allergyIntolerance.getId(), "AllergyIntolerance"));
       }
-      sectionComponentList.add(sectionComponent);
+      sections.add(sectionComponent);
     }
-    if (Objects.nonNull(medicalHistoryList) && !medicalHistoryList.isEmpty()) {
+  }
+
+  private void addMedicationsSection(
+      List<Composition.SectionComponent> sections, List<MedicationRequest> medicationList) {
+    if (!medicationList.isEmpty()) {
+      Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
+      sectionComponent.setCode(
+          new CodeableConcept()
+              .setText("Medications")
+              .addCoding(
+                  new Coding()
+                      .setSystem(BundleUrlIdentifier.SNOMED_URL)
+                      .setCode("721912009")
+                      .setDisplay("Medication summary document")));
+      for (MedicationRequest medicationRequest : medicationList) {
+        sectionComponent.addEntry(
+            Utils.buildReference(medicationRequest.getId(), "MedicationRequest"));
+      }
+      sections.add(sectionComponent);
+    }
+  }
+
+  private void addMedicalHistorySection(
+      List<Composition.SectionComponent> sections, List<Condition> medicalHistoryList) {
+    if (!medicalHistoryList.isEmpty()) {
       Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
       sectionComponent.setCode(
           new CodeableConcept()
@@ -158,9 +224,14 @@ public class MakeOpComposition {
       for (Condition medicalHistory : medicalHistoryList) {
         sectionComponent.addEntry(Utils.buildReference(medicalHistory.getId(), "Condition"));
       }
-      sectionComponentList.add(sectionComponent);
+      sections.add(sectionComponent);
     }
-    if (Objects.nonNull(familyMemberHistoryList) && !familyMemberHistoryList.isEmpty()) {
+  }
+
+  private void addFamilyHistorySection(
+      List<Composition.SectionComponent> sections,
+      List<FamilyMemberHistory> familyMemberHistoryList) {
+    if (!familyMemberHistoryList.isEmpty()) {
       Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
       sectionComponent.setCode(
           new CodeableConcept()
@@ -174,9 +245,13 @@ public class MakeOpComposition {
         sectionComponent.addEntry(
             Utils.buildReference(familyMemberHistory.getId(), "FamilyMemberHistory"));
       }
-      sectionComponentList.add(sectionComponent);
+      sections.add(sectionComponent);
     }
-    if (Objects.nonNull(investigationAdviceList) && !investigationAdviceList.isEmpty()) {
+  }
+
+  private void addInvestigationAdviceSection(
+      List<Composition.SectionComponent> sections, List<ServiceRequest> investigationAdviceList) {
+    if (!investigationAdviceList.isEmpty()) {
       Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
       sectionComponent.setCode(
           new CodeableConcept()
@@ -189,24 +264,13 @@ public class MakeOpComposition {
       for (ServiceRequest investigation : investigationAdviceList) {
         sectionComponent.addEntry(Utils.buildReference(investigation.getId(), "ServiceRequest"));
       }
-      sectionComponentList.add(sectionComponent);
+      sections.add(sectionComponent);
     }
-    if (Objects.nonNull(medicationList) && !medicationList.isEmpty()) {
-      Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
-      sectionComponent.setCode(
-          new CodeableConcept()
-              .setText(BundleCompositionIdentifier.MEDICATION_SUMMARY)
-              .addCoding(
-                  new Coding()
-                      .setSystem(BundleUrlIdentifier.SNOMED_URL)
-                      .setCode(BundleCompositionIdentifier.MEDICATION_SUMMARY_CODE)
-                      .setDisplay(BundleCompositionIdentifier.MEDICATION_SUMMARY)));
-      for (MedicationRequest medication : medicationList) {
-        sectionComponent.addEntry(Utils.buildReference(medication.getId(), "MedicationRequest"));
-      }
-      sectionComponentList.add(sectionComponent);
-    }
-    if (Objects.nonNull(followupList) && !followupList.isEmpty()) {
+  }
+
+  private void addFollowupSection(
+      List<Composition.SectionComponent> sections, List<Appointment> followupList) {
+    if (!followupList.isEmpty()) {
       Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
       sectionComponent.setCode(
           new CodeableConcept()
@@ -219,9 +283,13 @@ public class MakeOpComposition {
       for (Appointment followUp : followupList) {
         sectionComponent.addEntry(Utils.buildReference(followUp.getId(), "Appointment"));
       }
-      sectionComponentList.add(sectionComponent);
+      sections.add(sectionComponent);
     }
-    if (Objects.nonNull(procedureList) && !procedureList.isEmpty()) {
+  }
+
+  private void addProceduresSection(
+      List<Composition.SectionComponent> sections, List<Procedure> procedureList) {
+    if (!procedureList.isEmpty()) {
       Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
       sectionComponent.setCode(
           new CodeableConcept()
@@ -234,9 +302,13 @@ public class MakeOpComposition {
       for (Procedure procedure : procedureList) {
         sectionComponent.addEntry(Utils.buildReference(procedure.getId(), "Procedure"));
       }
-      sectionComponentList.add(sectionComponent);
+      sections.add(sectionComponent);
     }
-    if (Objects.nonNull(referralList) && !referralList.isEmpty()) {
+  }
+
+  private void addReferralsSection(
+      List<Composition.SectionComponent> sections, List<ServiceRequest> referralList) {
+    if (!referralList.isEmpty()) {
       Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
       sectionComponent.setCode(
           new CodeableConcept()
@@ -249,9 +321,13 @@ public class MakeOpComposition {
       for (ServiceRequest referral : referralList) {
         sectionComponent.addEntry(Utils.buildReference(referral.getId(), "ServiceRequest"));
       }
-      sectionComponentList.add(sectionComponent);
+      sections.add(sectionComponent);
     }
-    if (Objects.nonNull(otherObservationList) && !otherObservationList.isEmpty()) {
+  }
+
+  private void addOtherObservationsSection(
+      List<Composition.SectionComponent> sections, List<Observation> otherObservationList) {
+    if (!otherObservationList.isEmpty()) {
       Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
       sectionComponent.setCode(
           new CodeableConcept()
@@ -264,9 +340,13 @@ public class MakeOpComposition {
       for (Observation otherObservation : otherObservationList) {
         sectionComponent.addEntry(Utils.buildReference(otherObservation.getId(), "Observation"));
       }
-      sectionComponentList.add(sectionComponent);
+      sections.add(sectionComponent);
     }
-    if (Objects.nonNull(documentReferenceList) && !documentReferenceList.isEmpty()) {
+  }
+
+  private void addDocumentsSection(
+      List<Composition.SectionComponent> sections, List<DocumentReference> documentReferenceList) {
+    if (!documentReferenceList.isEmpty()) {
       Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
       sectionComponent.setCode(
           new CodeableConcept()
@@ -276,12 +356,11 @@ public class MakeOpComposition {
                       .setSystem(BundleUrlIdentifier.SNOMED_URL)
                       .setCode(BundleCompositionIdentifier.CLINICAL_CONSULTATION_REPORT_CODE)
                       .setDisplay(BundleCompositionIdentifier.CLINICAL_CONSULTATION_REPORT)));
-      for (DocumentReference documentReferenceItem : documentReferenceList) {
+      for (DocumentReference documentReference : documentReferenceList) {
         sectionComponent.addEntry(
-            Utils.buildReference(documentReferenceItem.getId(), "DocumentReference"));
+            Utils.buildReference(documentReference.getId(), "DocumentReference"));
       }
-      sectionComponentList.add(sectionComponent);
+      sections.add(sectionComponent);
     }
-    return sectionComponentList;
   }
 }
