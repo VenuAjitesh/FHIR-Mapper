@@ -6,6 +6,7 @@ import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import com.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedObservation;
+import com.nha.abdm.fhir.mapper.rest.requests.helpers.ObservationComponentResource;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.ObservationReferenceRange;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.ObservationResource;
 import java.text.ParseException;
@@ -55,6 +56,8 @@ public class MakeObservationResource {
     setValue(observation, observationResource);
 
     setReferenceRange(observation, observationResource);
+
+    setComponents(observation, observationResource);
 
     Utils.setNarrative(observation, "Observation: " + observationResource.getObservation());
 
@@ -111,70 +114,173 @@ public class MakeObservationResource {
     }
 
     try {
-      ObservationReferenceRange inputObservations = observationResource.getReferenceRange();
       Observation.ObservationReferenceRangeComponent component =
-          new Observation.ObservationReferenceRangeComponent();
-
-      if (inputObservations.getAge() != null) {
-        try {
-          String highValue = inputObservations.getAge().getHigh();
-          String lowValue = inputObservations.getAge().getLow();
-
-          if (highValue != null && lowValue != null) {
-            component.setAge(
-                new Range()
-                    .setHigh(new Quantity(Double.parseDouble(highValue)))
-                    .setLow(new Quantity(Double.parseDouble(lowValue))));
-          }
-        } catch (NumberFormatException e) {
-          log.error("Error parsing age reference range values: {}", e.getMessage());
-        } catch (Exception e) {
-          log.error("Error setting age reference range: {}", e.getMessage());
-        }
-      }
-
-      if (inputObservations.getHigh() != null) {
-        try {
-          String value = inputObservations.getHigh().getValue();
-          if (value != null) {
-            component.setHigh(
-                new Quantity(
-                    null,
-                    Double.parseDouble(value),
-                    inputObservations.getHigh().getSystem(),
-                    inputObservations.getHigh().getCode(),
-                    inputObservations.getHigh().getUnit()));
-          }
-        } catch (NumberFormatException e) {
-          log.error("Error parsing high reference range value: {}", e.getMessage());
-        } catch (Exception e) {
-          log.error("Error setting high reference range: {}", e.getMessage());
-        }
-      }
-
-      if (inputObservations.getLow() != null) {
-        try {
-          String value = inputObservations.getLow().getValue();
-          if (value != null) {
-            component.setLow(
-                new Quantity(
-                    null,
-                    Double.parseDouble(value),
-                    inputObservations.getLow().getSystem(),
-                    inputObservations.getLow().getCode(),
-                    inputObservations.getLow().getUnit()));
-          }
-        } catch (NumberFormatException e) {
-          log.error("Error parsing low reference range value: {}", e.getMessage());
-        } catch (Exception e) {
-          log.error("Error setting low reference range: {}", e.getMessage());
-        }
-      }
-
+          createReferenceRangeComponent(observationResource.getReferenceRange());
       observation.setReferenceRange(List.of(component));
-
     } catch (Exception e) {
       log.error("Error setting reference range for observation: {}", e.getMessage(), e);
+    }
+  }
+
+  private Observation.ObservationReferenceRangeComponent createReferenceRangeComponent(
+      ObservationReferenceRange inputRange) {
+    Observation.ObservationReferenceRangeComponent component =
+        new Observation.ObservationReferenceRangeComponent();
+
+    setAgeReferenceRange(component, inputRange);
+    setHighReferenceRange(component, inputRange);
+    setLowReferenceRange(component, inputRange);
+
+    return component;
+  }
+
+  private void setAgeReferenceRange(
+      Observation.ObservationReferenceRangeComponent component,
+      ObservationReferenceRange inputRange) {
+    if (inputRange.getAge() == null) {
+      return;
+    }
+
+    try {
+      String highValue = inputRange.getAge().getHigh();
+      String lowValue = inputRange.getAge().getLow();
+      if (highValue != null && lowValue != null) {
+        component.setAge(
+            new Range()
+                .setHigh(new Quantity(Double.parseDouble(highValue)))
+                .setLow(new Quantity(Double.parseDouble(lowValue))));
+      }
+    } catch (NumberFormatException e) {
+      log.error("Error parsing age reference range values: {}", e.getMessage());
+    } catch (Exception e) {
+      log.error("Error setting age reference range: {}", e.getMessage());
+    }
+  }
+
+  private void setHighReferenceRange(
+      Observation.ObservationReferenceRangeComponent component,
+      ObservationReferenceRange inputRange) {
+    if (inputRange.getHigh() == null) {
+      return;
+    }
+
+    try {
+      String value = inputRange.getHigh().getValue();
+      if (value != null) {
+        component.setHigh(
+            new Quantity(
+                null,
+                Double.parseDouble(value),
+                inputRange.getHigh().getSystem(),
+                inputRange.getHigh().getCode(),
+                inputRange.getHigh().getUnit()));
+      }
+    } catch (NumberFormatException e) {
+      log.error("Error parsing high reference range value: {}", e.getMessage());
+    } catch (Exception e) {
+      log.error("Error setting high reference range: {}", e.getMessage());
+    }
+  }
+
+  private void setLowReferenceRange(
+      Observation.ObservationReferenceRangeComponent component,
+      ObservationReferenceRange inputRange) {
+    if (inputRange.getLow() == null) {
+      return;
+    }
+
+    try {
+      String value = inputRange.getLow().getValue();
+      if (value != null) {
+        component.setLow(
+            new Quantity(
+                null,
+                Double.parseDouble(value),
+                inputRange.getLow().getSystem(),
+                inputRange.getLow().getCode(),
+                inputRange.getLow().getUnit()));
+      }
+    } catch (NumberFormatException e) {
+      log.error("Error parsing low reference range value: {}", e.getMessage());
+    } catch (Exception e) {
+      log.error("Error setting low reference range: {}", e.getMessage());
+    }
+  }
+
+  private void setComponents(Observation observation, ObservationResource observationResource) {
+    if (observationResource.getComponents() == null) {
+      return;
+    }
+
+    List<Observation.ObservationComponentComponent> components = new ArrayList<>();
+
+    for (ObservationComponentResource componentResource : observationResource.getComponents()) {
+      Observation.ObservationComponentComponent component = createComponent(componentResource);
+      components.add(component);
+    }
+
+    observation.setComponent(components);
+  }
+
+  private Observation.ObservationComponentComponent createComponent(
+      ObservationComponentResource componentResource) {
+    Observation.ObservationComponentComponent component =
+        new Observation.ObservationComponentComponent();
+
+    setComponentCode(component, componentResource);
+    setComponentValue(component, componentResource);
+    setComponentReferenceRange(component, componentResource);
+
+    return component;
+  }
+
+  private void setComponentCode(
+      Observation.ObservationComponentComponent component,
+      ObservationComponentResource componentResource) {
+    if (componentResource.getObservation() == null) {
+      return;
+    }
+
+    SnomedObservation snomed =
+        snomedService.getSnomedObservationCode(componentResource.getObservation());
+
+    component.setCode(
+        new CodeableConcept()
+            .setText(componentResource.getObservation())
+            .addCoding(
+                new Coding()
+                    .setSystem(BundleUrlIdentifier.SNOMED_URL)
+                    .setCode(snomed.getCode())
+                    .setDisplay(snomed.getDisplay())));
+  }
+
+  private void setComponentValue(
+      Observation.ObservationComponentComponent component,
+      ObservationComponentResource componentResource) {
+    if (Objects.nonNull(componentResource.getValueQuantity())) {
+      component.setValue(
+          new Quantity()
+              .setValue(componentResource.getValueQuantity().getValue())
+              .setUnit(componentResource.getValueQuantity().getUnit()));
+    } else if (Objects.nonNull(componentResource.getResult())
+        && !componentResource.getResult().trim().isEmpty()) {
+      component.setValue(new CodeableConcept().setText(componentResource.getResult()));
+    }
+  }
+
+  private void setComponentReferenceRange(
+      Observation.ObservationComponentComponent component,
+      ObservationComponentResource componentResource) {
+    if (componentResource.getReferenceRange() == null) {
+      return;
+    }
+
+    try {
+      Observation.ObservationReferenceRangeComponent rangeComponent =
+          createReferenceRangeComponent(componentResource.getReferenceRange());
+      component.setReferenceRange(List.of(rangeComponent));
+    } catch (Exception e) {
+      log.error("Error setting reference range for component: {}", e.getMessage(), e);
     }
   }
 }

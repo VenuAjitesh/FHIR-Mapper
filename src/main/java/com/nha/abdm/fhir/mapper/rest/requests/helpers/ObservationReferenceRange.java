@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ObservationReferenceRange {
-  private ReferenceRange low; //
+  private ReferenceRange low;
   private ReferenceRange high;
-  private Range age; // ignore
+  private Range age;
 }
