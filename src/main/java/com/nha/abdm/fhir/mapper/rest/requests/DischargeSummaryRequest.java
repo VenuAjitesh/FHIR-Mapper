@@ -41,7 +41,7 @@ public class DischargeSummaryRequest {
 
   @Valid private List<ChiefComplaintResource> chiefComplaints;
   @Valid private List<ObservationResource> physicalExaminations;
-  private List<String> allergies;
+  @Valid private List<AllergyResource> allergies;
   @Valid private List<ChiefComplaintResource> medicalHistories;
   @Valid private List<FamilyObservationResource> familyHistories;
   @Valid private List<DiagnosticResource> diagnostics;

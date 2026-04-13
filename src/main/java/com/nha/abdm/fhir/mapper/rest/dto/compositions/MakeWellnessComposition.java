@@ -1,9 +1,8 @@
-/* (C) 2024 */
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.dto.compositions;
 
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleCompositionIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -31,37 +30,17 @@ public class MakeWellnessComposition {
       List<DocumentReference> documentReferenceList)
       throws ParseException {
     HumanName patientName = patient.getName().get(0);
-    HumanName practitionerName = null;
     Composition composition = new Composition();
     composition.setStatus(Composition.CompositionStatus.FINAL);
     composition.setType(new CodeableConcept().setText(BundleCompositionIdentifier.WELLNESS_RECORD));
     composition.setTitle(BundleCompositionIdentifier.WELLNESS_RECORD);
-    List<Reference> authorList = new ArrayList<>();
-    for (Practitioner practitioner : practitionerList) {
-      practitionerName = practitioner.getName().get(0);
-      authorList.add(
-          new Reference()
-              .setReference(BundleResourceIdentifier.PRACTITIONER + "/" + practitioner.getId())
-              .setDisplay(practitionerName != null ? practitionerName.getText() : null));
-    }
-    composition.setEncounter(
-        new Reference().setReference(BundleResourceIdentifier.ENCOUNTER + "/" + encounter.getId()));
-    composition.setCustodian(
-        new Reference()
-            .setReference(BundleResourceIdentifier.ORGANISATION + "/" + organization.getId())
-            .setDisplay(organization.getName()));
-    composition.setAuthor(authorList);
-    composition.setSubject(
-        new Reference()
-            .setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
-            .setDisplay(patientName.getText()));
+    composition.setAuthor(createAuthors(practitionerList));
+    composition.setEncounter(Utils.buildReference(encounter.getId()));
+    composition.setCustodian(createCustodian(organization));
+    composition.setSubject(createSubject(patient));
     composition.setDateElement(Utils.getFormattedDateTime(authoredOn));
     List<Composition.SectionComponent> sectionComponentList =
-        makeCompositionSection(
-            patient,
-            encounter,
-            practitionerList,
-            organization,
+        createSections(
             vitalSignsList,
             bodyMeasurementList,
             physicalActivityList,
@@ -73,19 +52,40 @@ public class MakeWellnessComposition {
     if (Objects.nonNull(sectionComponentList))
       for (Composition.SectionComponent sectionComponent : sectionComponentList)
         composition.addSection(sectionComponent);
-    Identifier identifier = new Identifier();
-    identifier.setSystem(BundleUrlIdentifier.WRAPPER_URL);
-    identifier.setValue(UUID.randomUUID().toString());
-    composition.setIdentifier(identifier);
+    composition.setIdentifier(createIdentifier());
     composition.setId(UUID.randomUUID().toString());
+    Utils.setNarrative(composition, "Wellness Record for " + patientName.getText());
     return composition;
   }
 
-  private List<Composition.SectionComponent> makeCompositionSection(
-      Patient patient,
-      Encounter encounter,
-      List<Practitioner> practitionerList,
-      Organization organization,
+  private List<Reference> createAuthors(List<Practitioner> practitionerList) {
+    List<Reference> authorList = new ArrayList<>();
+    for (Practitioner practitioner : practitionerList) {
+      HumanName practitionerName = practitioner.getName().get(0);
+      authorList.add(
+          Utils.buildReference(practitioner.getId())
+              .setDisplay(practitionerName != null ? practitionerName.getText() : null));
+    }
+    return authorList;
+  }
+
+  private Reference createCustodian(Organization organization) {
+    return Utils.buildReference(organization.getId()).setDisplay(organization.getName());
+  }
+
+  private Reference createSubject(Patient patient) {
+    HumanName patientName = patient.getName().get(0);
+    return Utils.buildReference(patient.getId()).setDisplay(patientName.getText());
+  }
+
+  private Identifier createIdentifier() {
+    Identifier identifier = new Identifier();
+    identifier.setSystem(BundleUrlIdentifier.WRAPPER_URL);
+    identifier.setValue(UUID.randomUUID().toString());
+    return identifier;
+  }
+
+  private List<Composition.SectionComponent> createSections(
       List<Observation> vitalSignsList,
       List<Observation> bodyMeasurementList,
       List<Observation> physicalActivityList,
@@ -95,91 +95,111 @@ public class MakeWellnessComposition {
       List<Observation> otherObservationList,
       List<DocumentReference> documentReferenceList) {
     List<Composition.SectionComponent> sectionComponentList = new ArrayList<>();
+    addVitalSignsSection(sectionComponentList, vitalSignsList);
+    addBodyMeasurementSection(sectionComponentList, bodyMeasurementList);
+    addPhysicalActivitySection(sectionComponentList, physicalActivityList);
+    addGeneralAssessmentSection(sectionComponentList, generalAssessmentList);
+    addWomanHealthSection(sectionComponentList, womanHealthList);
+    addLifeStyleSection(sectionComponentList, lifeStyleList);
+    addOtherObservationsSection(sectionComponentList, otherObservationList);
+    addDocumentsSection(sectionComponentList, documentReferenceList);
+    return sectionComponentList;
+  }
+
+  private void addVitalSignsSection(
+      List<Composition.SectionComponent> sections, List<Observation> vitalSignsList) {
     if (Objects.nonNull(vitalSignsList)) {
       Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
       sectionComponent.setTitle(BundleCompositionIdentifier.VITAL_SIGNS);
       for (Observation observation : vitalSignsList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(BundleResourceIdentifier.VITAL_SIGNS + "/" + observation.getId()));
+        sectionComponent.addEntry(Utils.buildReference(observation.getId()));
       }
-      sectionComponentList.add(sectionComponent);
+      sections.add(sectionComponent);
     }
+  }
+
+  private void addBodyMeasurementSection(
+      List<Composition.SectionComponent> sections, List<Observation> bodyMeasurementList) {
     if (Objects.nonNull(bodyMeasurementList)) {
       Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
       sectionComponent.setTitle(BundleCompositionIdentifier.BODY_MEASUREMENT);
       for (Observation observation : bodyMeasurementList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.BODY_MEASUREMENT + "/" + observation.getId()));
+        sectionComponent.addEntry(Utils.buildReference(observation.getId(), "Observation"));
       }
-      sectionComponentList.add(sectionComponent);
+      sections.add(sectionComponent);
     }
+  }
+
+  private void addPhysicalActivitySection(
+      List<Composition.SectionComponent> sections, List<Observation> physicalActivityList) {
     if (Objects.nonNull(physicalActivityList)) {
       Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
       sectionComponent.setTitle(BundleCompositionIdentifier.PHYSICAL_ACTIVITY);
       for (Observation observation : physicalActivityList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.PHYSICAL_ACTIVITY + "/" + observation.getId()));
+        sectionComponent.addEntry(Utils.buildReference(observation.getId(), "Observation"));
       }
-      sectionComponentList.add(sectionComponent);
+      sections.add(sectionComponent);
     }
+  }
+
+  private void addGeneralAssessmentSection(
+      List<Composition.SectionComponent> sections, List<Observation> generalAssessmentList) {
     if (Objects.nonNull(generalAssessmentList)) {
       Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
       sectionComponent.setTitle(BundleCompositionIdentifier.GENERAL_ASSESSMENT);
       for (Observation observation : generalAssessmentList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.GENERAL_ASSESSMENT + "/" + observation.getId()));
+        sectionComponent.addEntry(Utils.buildReference(observation.getId(), "Observation"));
       }
-      sectionComponentList.add(sectionComponent);
+      sections.add(sectionComponent);
     }
+  }
+
+  private void addWomanHealthSection(
+      List<Composition.SectionComponent> sections, List<Observation> womanHealthList) {
     if (Objects.nonNull(womanHealthList)) {
       Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
       sectionComponent.setTitle(BundleCompositionIdentifier.WOMEN_HEALTH);
       for (Observation observation : womanHealthList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(BundleResourceIdentifier.WOMAN_HEALTH + "/" + observation.getId()));
+        sectionComponent.addEntry(Utils.buildReference(observation.getId(), "Observation"));
       }
-      sectionComponentList.add(sectionComponent);
+      sections.add(sectionComponent);
     }
+  }
+
+  private void addLifeStyleSection(
+      List<Composition.SectionComponent> sections, List<Observation> lifeStyleList) {
     if (Objects.nonNull(lifeStyleList)) {
       Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
       sectionComponent.setTitle(BundleCompositionIdentifier.LIFE_STYLE);
       for (Observation observation : lifeStyleList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(BundleResourceIdentifier.LIFE_STYLE + "/" + observation.getId()));
+        sectionComponent.addEntry(Utils.buildReference(observation.getId(), "Observation"));
       }
-      sectionComponentList.add(sectionComponent);
+      sections.add(sectionComponent);
     }
+  }
+
+  private void addOtherObservationsSection(
+      List<Composition.SectionComponent> sections, List<Observation> otherObservationList) {
     if (Objects.nonNull(otherObservationList)) {
       Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
       sectionComponent.setTitle(BundleCompositionIdentifier.OTHER_OBSERVATIONS);
       for (Observation observation : otherObservationList) {
-        sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.OTHER_OBSERVATIONS + "/" + observation.getId()));
+        sectionComponent.addEntry(Utils.buildReference(observation.getId(), "Observation"));
       }
-      sectionComponentList.add(sectionComponent);
+      sections.add(sectionComponent);
     }
+  }
+
+  private void addDocumentsSection(
+      List<Composition.SectionComponent> sections, List<DocumentReference> documentReferenceList) {
     if (Objects.nonNull(documentReferenceList)) {
       Composition.SectionComponent sectionComponent = new Composition.SectionComponent();
       sectionComponent.setTitle(BundleCompositionIdentifier.DOCUMENT_REFERENCE);
       for (DocumentReference documentReference : documentReferenceList) {
         sectionComponent.addEntry(
-            new Reference()
-                .setReference(
-                    BundleResourceIdentifier.DOCUMENT_REFERENCE + "/" + documentReference.getId()));
+            Utils.buildReference(documentReference.getId(), "DocumentReference"));
       }
-      sectionComponentList.add(sectionComponent);
+      sections.add(sectionComponent);
     }
-    return sectionComponentList;
   }
 }

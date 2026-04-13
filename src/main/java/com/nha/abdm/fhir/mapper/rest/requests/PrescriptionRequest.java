@@ -1,6 +1,7 @@
 /* (C) 2024 */
 package com.nha.abdm.fhir.mapper.rest.requests;
 
+import com.nha.abdm.fhir.mapper.rest.common.constants.ValidationConstants;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.DocumentResource;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.OrganisationResource;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.PatientResource;
@@ -21,31 +22,32 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class PrescriptionRequest {
-  @Pattern(regexp = "PrescriptionRecord")
-  @NotBlank(message = "BundleType is mandatory and must not be empty : 'PrescriptionRecord'")
+  @Pattern(regexp = ValidationConstants.PRESCRIPTION_RECORD)
+  @NotBlank(
+      message = ValidationConstants.BUNDLE_TYPE_MESSAGE + ValidationConstants.PRESCRIPTION_RECORD)
   private String bundleType;
 
-  @NotBlank(message = "careContextReference is mandatory and must not be empty")
+  @NotBlank(message = ValidationConstants.CARE_CONTEXT_MANDATORY)
   private String careContextReference;
 
   @Valid
-  @NotNull(message = "Patient demographic details are mandatory and must not be empty") private PatientResource patient;
+  @NotNull(message = ValidationConstants.PATIENT_MANDATORY) private PatientResource patient;
 
   @Pattern(
-      regexp = "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z)?$",
-      message = "Value must match either yyyy-MM-dd or yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-  @NotBlank(message = "authoredOn is mandatory timestamp")
+      regexp = ValidationConstants.DATE_TIME_PATTERN,
+      message = ValidationConstants.DATE_TIME_FORMAT_MESSAGE)
+  @NotBlank(message = ValidationConstants.AUTHORED_ON_MANDATORY)
   private String authoredOn;
 
   private String encounter;
 
   @Valid
-  @NotNull(message = "practitioners are mandatory and must not be empty") private List<PractitionerResource> practitioners;
+  @NotNull(message = ValidationConstants.PRACTITIONER_MANDATORY) private List<PractitionerResource> practitioners;
 
   private OrganisationResource organisation;
 
   @Valid
-  @NotNull(message = "prescription is mandatory and must not be empty") private List<PrescriptionResource> prescriptions;
+  @NotNull(message = ValidationConstants.PRESCRIPTION_MANDATORY) private List<PrescriptionResource> prescriptions;
 
   @Valid private List<DocumentResource> documents;
 }

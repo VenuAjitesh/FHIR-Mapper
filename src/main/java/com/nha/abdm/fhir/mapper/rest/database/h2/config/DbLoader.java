@@ -10,6 +10,7 @@ import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,55 +94,33 @@ public class DbLoader {
   }
 
   private TypeReference<?> getTypeReference(String entityName) {
-    return switch (entityName) {
-      case "SnomedConditionProcedure" -> new TypeReference<List<SnomedConditionProcedure>>() {};
-      case "SnomedDiagnostic" -> new TypeReference<List<SnomedDiagnostic>>() {};
-      case "SnomedEncounter" -> new TypeReference<List<SnomedEncounter>>() {};
-      case "SnomedMedicineRoute" -> new TypeReference<List<SnomedMedicineRoute>>() {};
-      case "SnomedMedicine" -> new TypeReference<List<SnomedMedicine>>() {};
-      case "SnomedObservation" -> new TypeReference<List<SnomedObservation>>() {};
-      case "SnomedSpecimen" -> new TypeReference<List<SnomedSpecimen>>() {};
-      case "SnomedVaccine" -> new TypeReference<List<SnomedVaccine>>() {};
-      case "TypeChargeItem" -> new TypeReference<List<TypeChargeItem>>() {};
-      case "TypeInvoice" -> new TypeReference<List<TypeChargeItem>>() {};
-      default -> throw new IllegalArgumentException("Unknown entity name: " + entityName);
-    };
+    Map<String, TypeReference<?>> typeMap =
+        Map.of(
+            "SnomedConditionProcedure", new TypeReference<List<SnomedConditionProcedure>>() {},
+            "SnomedDiagnostic", new TypeReference<List<SnomedDiagnostic>>() {},
+            "SnomedEncounter", new TypeReference<List<SnomedEncounter>>() {},
+            "SnomedMedicineRoute", new TypeReference<List<SnomedMedicineRoute>>() {},
+            "SnomedMedicine", new TypeReference<List<SnomedMedicine>>() {},
+            "SnomedObservation", new TypeReference<List<SnomedObservation>>() {},
+            "SnomedSpecimen", new TypeReference<List<SnomedSpecimen>>() {},
+            "SnomedVaccine", new TypeReference<List<SnomedVaccine>>() {},
+            "TypeChargeItem", new TypeReference<List<TypeChargeItem>>() {},
+            "TypeInvoice", new TypeReference<List<TypeChargeItem>>() {});
+    TypeReference<?> typeRef = typeMap.get(entityName);
+    if (typeRef == null) {
+      throw new IllegalArgumentException("Unknown entity name: " + entityName);
+    }
+    return typeRef;
   }
 
   @Transactional
   public void addIndexesTransactional(String entityName) {
-
     String tableName = "\"" + convertToSnakeCase(entityName) + "\"";
     String indexName = "idx_" + convertToSnakeCase(entityName) + "_display_code";
-    String sql =
-        switch (entityName) {
-          case "SnomedEncounter" ->
-              "CREATE INDEX " + indexName + " ON " + tableName + " (\"code\", \"display\");";
-          case "SnomedDiagnostic" ->
-              "CREATE INDEX " + indexName + " ON " + tableName + " (\"code\", \"display\");";
-          case "SnomedConditionProcedure" ->
-              "CREATE INDEX " + indexName + " ON " + tableName + " (\"code\", \"display\");";
-          case "SnomedMedicineRoute" ->
-              "CREATE INDEX " + indexName + " ON " + tableName + " (\"code\", \"display\");";
-          case "SnomedMedicine" ->
-              "CREATE INDEX " + indexName + " ON " + tableName + " (\"code\", \"display\");";
-          case "SnomedObservation" ->
-              "CREATE INDEX " + indexName + " ON " + tableName + " (\"code\", \"display\");";
-          case "SnomedSpecimen" ->
-              "CREATE INDEX " + indexName + " ON " + tableName + " (\"code\", \"display\");";
-          case "SnomedVaccine" ->
-              "CREATE INDEX " + indexName + " ON " + tableName + " (\"code\", \"display\");";
-          case "TypeChargeItem" ->
-              "CREATE INDEX " + indexName + " ON " + tableName + " (\"code\", \"display\");";
-          case "TypeInvoice" ->
-              "CREATE INDEX " + indexName + " ON " + tableName + " (\"code\", \"display\");";
-          default -> null;
-        };
+    String sql = "CREATE INDEX " + indexName + " ON " + tableName + " (\"code\", \"display\");";
 
-    if (sql != null) {
-      EntityManager em = applicationContext.getBean(EntityManager.class);
-      em.createNativeQuery(sql).executeUpdate();
-    }
+    EntityManager em = applicationContext.getBean(EntityManager.class);
+    em.createNativeQuery(sql).executeUpdate();
   }
 
   private String convertToSnakeCase(String className) {

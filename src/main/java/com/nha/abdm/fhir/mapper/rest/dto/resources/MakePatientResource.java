@@ -44,6 +44,7 @@ public class MakePatientResource {
     patient.setMeta(meta);
     patient.addIdentifier(identifier);
     patient.setId(UUID.randomUUID().toString());
+    Utils.setNarrative(patient, "Patient: " + patientResource.getName());
     return patient;
   }
 }

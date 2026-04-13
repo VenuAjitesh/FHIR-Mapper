@@ -1,6 +1,7 @@
 /* (C) 2024 */
 package com.nha.abdm.fhir.mapper.rest.requests.helpers;
 
+import com.nha.abdm.fhir.mapper.rest.common.constants.ValidationConstants;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -13,20 +14,24 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class PrescriptionResource {
-  @NotBlank(message = "medicine is mandatory")
+  @NotBlank(message = "medicine" + ValidationConstants.MANDATORY_MESSAGE)
   private String medicine;
 
-  @NotBlank(message = "dosage is mandatory")
+  @NotBlank(message = "dosage" + ValidationConstants.MANDATORY_MESSAGE)
   private String dosage;
 
+  private double doseQuantity;
+  private String doseUnit;
+
   @Pattern(
-      regexp = "^\\d{1,2}-\\d{1,2}-(S|MIN|H|D|WK|MO)$",
-      message =
-          "timing should have frequency-period-periodUnit '(0-99)-(0-99)-(S ~ seconds | MIN ~ minutes | H ~ hours | D ~ days| WK ~ week| MO ~ month' ex: 1-2-D")
+      regexp = ValidationConstants.TIMING_PATTERN,
+      message = ValidationConstants.TIMING_FORMAT_MESSAGE)
   private String timing;
 
+  private String duration;
   private String route;
   private String method;
   private String additionalInstructions;
   private String reason;
+  private String note;
 }

@@ -1,8 +1,8 @@
-/* (C) 2024 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
+import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import com.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedEncounter;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.CarePlanResource;
@@ -27,14 +27,23 @@ public class MakeCarePlanResource {
       carePlan.setDescription(carePlanResource.getDescription());
     }
     carePlan.setTitle(carePlanResource.getType());
-    carePlan.setSubject(
-        new Reference()
-            .setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
-            .setDisplay(
-                patient.getName().stream()
-                    .map(HumanName::getText)
-                    .collect(Collectors.joining(" "))));
+    carePlan.setSubject(createSubject(patient));
+    carePlan.setCategory(Collections.singletonList(createCategory(carePlanResource)));
+    setActivityAndNotes(carePlan, carePlanResource);
+    return carePlan;
+  }
 
+  private Reference createSubject(Patient patient) {
+    return new Reference()
+        .setReference(
+            BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
+        .setDisplay(
+            patient.getName().stream()
+                .map(HumanName::getText)
+                .collect(Collectors.joining(" ")));
+  }
+
+  private CodeableConcept createCategory(CarePlanResource carePlanResource) {
     CodeableConcept codeableConcept = new CodeableConcept();
     Coding carePlanCoding = new Coding();
     SnomedEncounter snomed = snomedService.getSnomedEncounterCode(carePlanResource.getType());
@@ -42,15 +51,14 @@ public class MakeCarePlanResource {
     carePlanCoding.setSystem(BundleUrlIdentifier.SNOMED_URL);
     carePlanCoding.setCode(snomed.getCode());
     codeableConcept.addCoding(carePlanCoding);
-    carePlan.setCategory(Collections.singletonList(codeableConcept));
+    return codeableConcept;
+  }
 
+  private void setActivityAndNotes(CarePlan carePlan, CarePlanResource carePlanResource) {
     if (carePlanResource.getNotes() != null) {
-      // Detail
       CarePlan.CarePlanActivityDetailComponent activityDetailComponent =
           new CarePlan.CarePlanActivityDetailComponent();
       activityDetailComponent.setDescription(carePlanResource.getNotes());
-      //    activityDetailComponent.setScheduled(new
-      // Period().setStartElement(carePlanResource.getPeriod().getFrom()).setEndElement(carePlanResource.getPeriod().getTo()))
       carePlan.setActivity(
           Collections.singletonList(
               new CarePlan.CarePlanActivityComponent().setDetail(activityDetailComponent)));
@@ -58,6 +66,5 @@ public class MakeCarePlanResource {
       annotation.setText(carePlanResource.getNotes());
       carePlan.setNote(Collections.singletonList(annotation));
     }
-    return carePlan;
   }
 }

@@ -46,6 +46,7 @@ public class MakeOrganisationResource {
     organization.setMeta(meta);
     organization.addIdentifier(identifier);
     organization.setId(UUID.randomUUID().toString());
+    Utils.setNarrative(organization, "Organization: " + organization.getName());
     return organization;
   }
 }

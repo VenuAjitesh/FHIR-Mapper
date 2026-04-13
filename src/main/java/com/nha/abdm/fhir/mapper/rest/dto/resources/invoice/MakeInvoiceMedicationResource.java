@@ -4,6 +4,7 @@ package com.nha.abdm.fhir.mapper.rest.dto.resources.invoice;
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
+import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import com.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.InvoiceMedicationResource;
 import java.text.ParseException;
@@ -42,7 +43,10 @@ public class MakeInvoiceMedicationResource {
 
     medication.setManufacturer(
         new Reference()
-            .setReference(BundleResourceIdentifier.MANUFACTURER + "/" + manufacturer.getId()));
+            .setReference(
+                BundleResourceIdentifier.MANUFACTURER
+                    + MapperConstants.SLASH
+                    + manufacturer.getId()));
 
     medication.setBatch(
         new Medication.MedicationBatchComponent()

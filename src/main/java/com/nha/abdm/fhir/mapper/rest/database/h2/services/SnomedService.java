@@ -8,20 +8,21 @@ import com.nha.abdm.fhir.mapper.rest.database.h2.repositories.*;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.text.similarity.CosineSimilarity;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SnomedService {
-  @Autowired private final SnomedMedicineRepo snomedMedicineRepo;
-  @Autowired private final SnomedConditionProcedureRepo snomedConditionProcedureRepo;
-  @Autowired private final SnomedEncounterRepo snomedEncounterRepo;
-  @Autowired private final SnomedSpecimenRepo snomedSpecimenRepo;
-  @Autowired private final SnomedObservationRepo snomedObservationRepo;
-  @Autowired private final SnomedVaccineRepo snomedVaccineRepo;
-  @Autowired private final SnomedDiagnosticRepo snomedDiagnosticRepo;
-  @Autowired private final SnomedMedicineRouteRepo snomedMedicineRouteRepo;
+  private final SnomedMedicineRepo snomedMedicineRepo;
+  private final SnomedConditionProcedureRepo snomedConditionProcedureRepo;
+  private final SnomedEncounterRepo snomedEncounterRepo;
+  private final SnomedSpecimenRepo snomedSpecimenRepo;
+  private final SnomedObservationRepo snomedObservationRepo;
+  private final SnomedVaccineRepo snomedVaccineRepo;
+  private final SnomedDiagnosticRepo snomedDiagnosticRepo;
+  private final SnomedMedicineRouteRepo snomedMedicineRouteRepo;
 
   public SnomedService(
       SnomedMedicineRepo snomedMedicineRepo,
@@ -42,11 +43,12 @@ public class SnomedService {
     this.snomedMedicineRouteRepo = snomedMedicineRouteRepo;
   }
 
+  @Cacheable(value = "snomed_condition_procedure", key = "#display", condition = "#display != null")
   public SnomedConditionProcedure getConditionProcedureCode(String display) {
     SnomedConditionProcedure snomedCode =
         (SnomedConditionProcedure)
             fuzzyMatch(
-                snomedConditionProcedureRepo.findByDisplay(display),
+                snomedConditionProcedureRepo.findTop20ByDisplayContainingIgnoreCase(display),
                 display,
                 SnomedConditionProcedure.class);
     return snomedCode == null
@@ -61,11 +63,14 @@ public class SnomedService {
     return snomedConditionProcedureRepo.findAll();
   }
 
+  @Cacheable(value = "snomed_diagnostic", key = "#display", condition = "#display != null")
   public SnomedDiagnostic getSnomedDiagnosticCode(String display) {
     SnomedDiagnostic snomedCode =
         (SnomedDiagnostic)
             fuzzyMatch(
-                snomedDiagnosticRepo.findByDisplay(display), display, SnomedDiagnostic.class);
+                snomedDiagnosticRepo.findTop20ByDisplayContainingIgnoreCase(display),
+                display,
+                SnomedDiagnostic.class);
     return snomedCode != null
         ? snomedCode
         : SnomedDiagnostic.builder()
@@ -78,6 +83,7 @@ public class SnomedService {
     return snomedDiagnosticRepo.findAll();
   }
 
+  @Cacheable(value = "snomed_encounter", key = "#display", condition = "#display != null")
   public SnomedEncounter getSnomedEncounterCode(String display) {
     if (display == null) {
       return SnomedEncounter.builder()
@@ -87,7 +93,10 @@ public class SnomedService {
     }
     SnomedEncounter snomedCode =
         (SnomedEncounter)
-            fuzzyMatch(snomedEncounterRepo.findByDisplay(display), display, SnomedEncounter.class);
+            fuzzyMatch(
+                snomedEncounterRepo.findTop20ByDisplayContainingIgnoreCase(display),
+                display,
+                SnomedEncounter.class);
     return snomedCode != null
         ? snomedCode
         : SnomedEncounter.builder()
@@ -100,10 +109,14 @@ public class SnomedService {
     return snomedEncounterRepo.findAll();
   }
 
+  @Cacheable(value = "snomed_medicine", key = "#display", condition = "#display != null")
   public SnomedMedicine getSnomedMedicineCode(String display) {
     SnomedMedicine snomedCode =
         (SnomedMedicine)
-            fuzzyMatch(snomedMedicineRepo.findByDisplay(display), display, SnomedMedicine.class);
+            fuzzyMatch(
+                snomedMedicineRepo.findTop20ByDisplayContainingIgnoreCase(display),
+                display,
+                SnomedMedicine.class);
     return snomedCode != null
         ? snomedCode
         : SnomedMedicine.builder()
@@ -116,11 +129,14 @@ public class SnomedService {
     return snomedMedicineRepo.findAll();
   }
 
+  @Cacheable(value = "snomed_observation", key = "#display", condition = "#display != null")
   public SnomedObservation getSnomedObservationCode(String display) {
     SnomedObservation snomedObservation =
         (SnomedObservation)
             fuzzyMatch(
-                snomedObservationRepo.findByDisplay(display), display, SnomedObservation.class);
+                snomedObservationRepo.findTop20ByDisplayContainingIgnoreCase(display),
+                display,
+                SnomedObservation.class);
     return snomedObservation != null
         ? snomedObservation
         : SnomedObservation.builder()
@@ -133,10 +149,14 @@ public class SnomedService {
     return snomedObservationRepo.findAll();
   }
 
+  @Cacheable(value = "snomed_specimen", key = "#display", condition = "#display != null")
   public SnomedSpecimen getSnomedSpecimenCode(String display) {
     SnomedSpecimen snomedCode =
         (SnomedSpecimen)
-            fuzzyMatch(snomedSpecimenRepo.findByDisplay(display), display, SnomedSpecimen.class);
+            fuzzyMatch(
+                snomedSpecimenRepo.findTop20ByDisplayContainingIgnoreCase(display),
+                display,
+                SnomedSpecimen.class);
     return snomedCode != null
         ? snomedCode
         : SnomedSpecimen.builder()
@@ -149,10 +169,14 @@ public class SnomedService {
     return snomedSpecimenRepo.findAll();
   }
 
+  @Cacheable(value = "snomed_vaccine", key = "#display", condition = "#display != null")
   public SnomedVaccine getSnomedVaccineCode(String display) {
     SnomedVaccine snomedCode =
         (SnomedVaccine)
-            fuzzyMatch(snomedVaccineRepo.findByDisplay(display), display, SnomedVaccine.class);
+            fuzzyMatch(
+                snomedVaccineRepo.findTop20ByDisplayContainingIgnoreCase(display),
+                display,
+                SnomedVaccine.class);
     return snomedCode != null
         ? snomedCode
         : SnomedVaccine.builder()
@@ -165,11 +189,14 @@ public class SnomedService {
     return snomedVaccineRepo.findAll();
   }
 
+  @Cacheable(value = "snomed_route", key = "#display", condition = "#display != null")
   public SnomedMedicineRoute getSnomedMedicineRouteCode(String display) {
     SnomedMedicineRoute snomedCode =
         (SnomedMedicineRoute)
             fuzzyMatch(
-                snomedMedicineRouteRepo.findByDisplay(display), display, SnomedMedicineRoute.class);
+                snomedMedicineRouteRepo.findTop20ByDisplayContainingIgnoreCase(display),
+                display,
+                SnomedMedicineRoute.class);
     return snomedCode != null
         ? snomedCode
         : SnomedMedicineRoute.builder()
@@ -183,47 +210,38 @@ public class SnomedService {
   }
 
   public SnomedResponse getSnomedCodes(String resource) {
-    if (resource.equalsIgnoreCase(SnomedCodeIdentifier.SNOMED_CONDITION)
-        || resource.equalsIgnoreCase(SnomedCodeIdentifier.SNOMED_PROCEDURE)) {
-      return SnomedResponse.builder()
-          .snomedConditionProcedureCodes(getAllConditionProcedureCode())
-          .build();
-    }
-    if (resource.equalsIgnoreCase(SnomedCodeIdentifier.SNOMED_DIAGNOSTICS)) {
-      return SnomedResponse.builder().snomedDiagnosticCodes(getAllSnomedDiagnosticCode()).build();
-    }
-    if (resource.equalsIgnoreCase(SnomedCodeIdentifier.SNOMED_ENCOUNTER)) {
-      return SnomedResponse.builder().snomedEncounterCodes(getAllSnomedEncounterCode()).build();
-    }
-    if (resource.equalsIgnoreCase(SnomedCodeIdentifier.SNOMED_MEDICATION_ROUTE)) {
-      return SnomedResponse.builder()
-          .snomedMedicineRouteCodes(getAllSnomedMedicineRouteCode())
-          .build();
-    }
-    if (resource.equalsIgnoreCase(SnomedCodeIdentifier.SNOMED_MEDICATIONS)) {
-      return SnomedResponse.builder().snomedMedicineCodes(getAllSnomedMedicineCode()).build();
-    }
-    if (resource.equalsIgnoreCase(SnomedCodeIdentifier.SNOMED_OBSERVATIONS)) {
-      return SnomedResponse.builder().snomedObservationCodes(getAllSnomedObservationCode()).build();
-    }
-    if (resource.equalsIgnoreCase(SnomedCodeIdentifier.SNOMED_SPECIMEN)) {
-      return SnomedResponse.builder().snomedSpecimenCodes(getAllSnomedSpecimenCode()).build();
-    }
-    if (resource.equalsIgnoreCase(SnomedCodeIdentifier.SNOMED_VACCINES)) {
-      return SnomedResponse.builder().snomedVaccineCodes(getAllSnomedVaccineCode()).build();
-    }
-    return null;
+    Map<String, SnomedResponse.SnomedResponseBuilder> responseMap =
+        Map.of(
+            SnomedCodeIdentifier.SNOMED_CONDITION,
+                SnomedResponse.builder()
+                    .snomedConditionProcedureCodes(getAllConditionProcedureCode()),
+            SnomedCodeIdentifier.SNOMED_PROCEDURE,
+                SnomedResponse.builder()
+                    .snomedConditionProcedureCodes(getAllConditionProcedureCode()),
+            SnomedCodeIdentifier.SNOMED_DIAGNOSTICS,
+                SnomedResponse.builder().snomedDiagnosticCodes(getAllSnomedDiagnosticCode()),
+            SnomedCodeIdentifier.SNOMED_ENCOUNTER,
+                SnomedResponse.builder().snomedEncounterCodes(getAllSnomedEncounterCode()),
+            SnomedCodeIdentifier.SNOMED_MEDICATION_ROUTE,
+                SnomedResponse.builder().snomedMedicineRouteCodes(getAllSnomedMedicineRouteCode()),
+            SnomedCodeIdentifier.SNOMED_MEDICATIONS,
+                SnomedResponse.builder().snomedMedicineCodes(getAllSnomedMedicineCode()),
+            SnomedCodeIdentifier.SNOMED_OBSERVATIONS,
+                SnomedResponse.builder().snomedObservationCodes(getAllSnomedObservationCode()),
+            SnomedCodeIdentifier.SNOMED_SPECIMEN,
+                SnomedResponse.builder().snomedSpecimenCodes(getAllSnomedSpecimenCode()),
+            SnomedCodeIdentifier.SNOMED_VACCINES,
+                SnomedResponse.builder().snomedVaccineCodes(getAllSnomedVaccineCode()));
+    return responseMap.get(resource.toLowerCase()).build();
   }
 
   private static boolean hasValidWordDifference(String input, String display) {
     if (input == null || display == null) return false;
     int inputWordCount = countWords(input);
     int displayWordCount = countWords(display);
-
     return inputWordCount >= 1 && displayWordCount <= inputWordCount + 2;
   }
 
-  // Count words in a string
   private static int countWords(String text) {
     if (text == null || text.trim().isEmpty()) return 0;
     return text.trim().split("\\s+").length;
@@ -232,7 +250,6 @@ public class SnomedService {
   private static Map<CharSequence, Integer> createFrequencyMap(String text) {
     String[] tokens = text.toLowerCase().split("\\s+");
     Map<CharSequence, Integer> frequencyMap = new HashMap<>();
-
     for (String token : tokens) {
       frequencyMap.put(token, frequencyMap.getOrDefault(token, 0) + 1);
     }
@@ -241,30 +258,26 @@ public class SnomedService {
 
   public static <T extends Displayable> Object fuzzyMatch(
       List<T> list, String input, Class<T> type) {
-    CosineSimilarity cosineSimilarity = new CosineSimilarity();
-
-    Map<Object, Double> scoreMap =
-        list.stream()
-            .filter(type::isInstance)
-            .map(type::cast)
-            .filter(
-                obj ->
-                    hasValidWordDifference(
-                        input,
-                        obj.getDisplay())) // filtering the difference in words not more the input
-            // +=2
-            .collect(
-                Collectors.toMap(
-                    obj -> obj,
-                    obj -> {
-                      Map<CharSequence, Integer> inputMap = createFrequencyMap(input);
-                      Map<CharSequence, Integer> displayMap = createFrequencyMap(obj.getDisplay());
-                      return cosineSimilarity.cosineSimilarity(inputMap, displayMap);
-                    }));
-
-    return scoreMap.entrySet().stream()
+    return filterValidItems(list, input, type)
+        .collect(Collectors.toMap(obj -> obj, obj -> calculateSimilarity(input, obj.getDisplay())))
+        .entrySet()
+        .stream()
         .max(Map.Entry.comparingByValue())
         .map(Map.Entry::getKey)
         .orElse(null);
+  }
+
+  private static <T extends Displayable> Stream<T> filterValidItems(
+      List<T> list, String input, Class<T> type) {
+    return list.stream()
+        .filter(type::isInstance)
+        .filter(obj -> hasValidWordDifference(input, obj.getDisplay()));
+  }
+
+  private static double calculateSimilarity(String input, String display) {
+    CosineSimilarity cosineSimilarity = new CosineSimilarity();
+    Map<CharSequence, Integer> inputMap = createFrequencyMap(input);
+    Map<CharSequence, Integer> displayMap = createFrequencyMap(display);
+    return cosineSimilarity.cosineSimilarity(inputMap, displayMap);
   }
 }

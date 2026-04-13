@@ -29,6 +29,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class GlobalExceptionHandler {
   private static Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+  @ExceptionHandler(FhirMapperException.class)
+  public ResponseEntity<FacadeError> handleFhirMapperException(FhirMapperException ex) {
+    return new ResponseEntity<>(
+        FacadeError.builder()
+            .error(ErrorResponse.builder().code(ex.getErrorCode()).message(ex.getMessage()).build())
+            .build(),
+        HttpStatus.BAD_REQUEST);
+  }
+
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<FacadeError> handleValidationExceptions(

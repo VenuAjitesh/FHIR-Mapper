@@ -1,6 +1,7 @@
-/* (C) 2024 */
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.requests.helpers;
 
+import com.nha.abdm.fhir.mapper.rest.common.constants.ValidationConstants;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,23 +17,25 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DiagnosticResource {
-  @NotBlank(message = "serviceName is mandatory")
+  @NotBlank(message = "serviceName" + ValidationConstants.MANDATORY_MESSAGE)
   private String serviceName;
 
-  @NotBlank(message = "serviceCategory is mandatory")
+  @NotBlank(message = "serviceCategory" + ValidationConstants.MANDATORY_MESSAGE)
   private String serviceCategory;
 
   @Pattern(
-      regexp = "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z)?$",
-      message = "Value must match either yyyy-MM-dd or yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-  @NotBlank(message = "authoredOn is mandatory timestamp")
+      regexp = ValidationConstants.DATE_TIME_PATTERN,
+      message = ValidationConstants.DATE_TIME_FORMAT_MESSAGE)
+  @NotBlank(message = ValidationConstants.AUTHORED_ON_MANDATORY)
   @NotNull private String authoredOn;
 
   @Valid
-  @NotNull(message = "results of the report is mandatory") private List<ObservationResource> result;
+  @NotNull(message = "results" + ValidationConstants.MANDATORY_MESSAGE) private List<ObservationResource> result;
 
-  @NotBlank(message = "conclusion is mandatory")
+  @NotBlank(message = "conclusion" + ValidationConstants.MANDATORY_MESSAGE)
   private String conclusion;
+
+  private String specimen;
 
   @Valid private DiagnosticPresentedForm presentedForm;
 }

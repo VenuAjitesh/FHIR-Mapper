@@ -35,10 +35,8 @@ public class MakePractitionerResource {
     practitioner.addName(new HumanName().setText(practitionerResource.getName()));
     practitioner.setMeta(meta);
     practitioner.addIdentifier(identifier);
-    practitioner.setId(
-        practitionerResource.getPractitionerId() != null
-            ? practitionerResource.getPractitionerId()
-            : UUID.randomUUID().toString());
+    practitioner.setId(UUID.randomUUID().toString());
+    Utils.setNarrative(practitioner, "Practitioner: " + practitionerResource.getName());
     return practitioner;
   }
 }

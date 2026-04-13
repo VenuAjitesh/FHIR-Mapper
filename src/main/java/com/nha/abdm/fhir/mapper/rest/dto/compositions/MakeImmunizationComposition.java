@@ -1,11 +1,8 @@
-/* (C) 2024 */
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.dto.compositions;
 
 import com.nha.abdm.fhir.mapper.Utils;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleCompositionIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
+import com.nha.abdm.fhir.mapper.rest.common.constants.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,44 +18,71 @@ public class MakeImmunizationComposition {
       Patient patient,
       List<Practitioner> practitionerList,
       Organization organization,
+      Encounter encounter,
       String authoredOn,
       List<Immunization> immunizationList,
       List<DocumentReference> documentList)
       throws ParseException {
     Composition composition = new Composition();
+    composition.setMeta(createMeta());
+    composition.setType(createType());
+    composition.setTitle(BundleCompositionIdentifier.IMMUNIZATION_RECORD);
+    if (Objects.nonNull(organization)) {
+      composition.setCustodian(createCustodian(organization));
+    }
+    composition.setAuthor(createAuthors(practitionerList));
+    composition.setSubject(createSubject(patient));
+    if (Objects.nonNull(encounter)) {
+      composition.setEncounter(Utils.buildReference(encounter.getId(), "Encounter"));
+    }
+    composition.setDateElement(Utils.getFormattedDateTime(authoredOn));
+    composition.addSection(createSection(immunizationList, documentList));
+    composition.setStatus(Composition.CompositionStatus.FINAL);
+    composition.setIdentifier(createIdentifier());
+    composition.setId(UUID.randomUUID().toString());
+    HumanName patientName = patient.getName().get(0);
+    Utils.setNarrative(composition, "Immunization Record for " + patientName.getText());
+    return composition;
+  }
+
+  private Meta createMeta() throws ParseException {
     Meta meta = new Meta();
     meta.setVersionId("1");
     meta.setLastUpdatedElement(Utils.getCurrentTimeStamp());
-    meta.addProfile(ResourceProfileIdentifier.PROFILE_IMMUNIZATION);
-    composition.setMeta(meta);
+    meta.addProfile(ResourceProfileIdentifier.PROFILE_IMMUNIZATION_RECORD);
+    return meta;
+  }
+
+  private CodeableConcept createType() {
     CodeableConcept typeCode = new CodeableConcept();
     Coding typeCoding = new Coding();
     typeCoding.setSystem(BundleUrlIdentifier.SNOMED_URL);
     typeCoding.setCode(BundleCompositionIdentifier.IMMUNIZATION_RECORD_CODE);
     typeCoding.setDisplay(BundleCompositionIdentifier.IMMUNIZATION_RECORD);
     typeCode.addCoding(typeCoding);
-    composition.setType(typeCode);
-    composition.setTitle(BundleCompositionIdentifier.IMMUNIZATION_RECORD);
-    if (Objects.nonNull(organization))
-      composition.setCustodian(
-          new Reference()
-              .setReference(BundleResourceIdentifier.ORGANISATION + "/" + organization.getId()));
+    return typeCode;
+  }
+
+  private Reference createCustodian(Organization organization) {
+    return Utils.buildReference(organization.getId());
+  }
+
+  private List<Reference> createAuthors(List<Practitioner> practitionerList) {
     List<Reference> authorList = new ArrayList<>();
-    HumanName practitionerName = null;
     for (Practitioner author : practitionerList) {
-      practitionerName = author.getName().get(0);
-      authorList.add(
-          new Reference()
-              .setReference(BundleResourceIdentifier.PRACTITIONER + "/" + author.getId())
-              .setDisplay(practitionerName.getText()));
+      HumanName practitionerName = author.getName().get(0);
+      authorList.add(Utils.buildReference(author.getId()).setDisplay(practitionerName.getText()));
     }
-    composition.setAuthor(authorList);
+    return authorList;
+  }
+
+  private Reference createSubject(Patient patient) {
     HumanName patientName = patient.getName().get(0);
-    composition.setSubject(
-        new Reference()
-            .setReference(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
-            .setDisplay(patientName.getText()));
-    composition.setDateElement(Utils.getFormattedDateTime(authoredOn));
+    return Utils.buildReference(patient.getId()).setDisplay(patientName.getText());
+  }
+
+  private Composition.SectionComponent createSection(
+      List<Immunization> immunizationList, List<DocumentReference> documentList) {
     Composition.SectionComponent immunizationSection = new Composition.SectionComponent();
     immunizationSection.setTitle(BundleResourceIdentifier.IMMUNIZATION);
     immunizationSection.setCode(
@@ -70,25 +94,19 @@ public class MakeImmunizationComposition {
                     .setDisplay(BundleCompositionIdentifier.IMMUNIZATION_RECORD)
                     .setSystem(BundleUrlIdentifier.SNOMED_URL)));
     for (Immunization immunization : immunizationList) {
-      Reference entryReference =
-          new Reference()
-              .setReference(BundleResourceIdentifier.IMMUNIZATION + "/" + immunization.getId())
-              .setType(BundleResourceIdentifier.IMMUNIZATION);
-      immunizationSection.addEntry(entryReference);
+      immunizationSection.addEntry(Utils.buildReference(immunization.getId(), "Immunization"));
     }
-    composition.addSection(immunizationSection);
-    for (DocumentReference documentReference : documentList)
+    for (DocumentReference documentReference : documentList) {
       immunizationSection.addEntry(
-          new Reference()
-              .setReference(
-                  BundleResourceIdentifier.DOCUMENT_REFERENCE + "/" + documentReference.getId())
-              .setType(BundleResourceIdentifier.DOCUMENT_REFERENCE));
-    composition.setStatus(Composition.CompositionStatus.FINAL);
+          Utils.buildReference(documentReference.getId(), "DocumentReference"));
+    }
+    return immunizationSection;
+  }
+
+  private Identifier createIdentifier() {
     Identifier identifier = new Identifier();
     identifier.setSystem(BundleUrlIdentifier.WRAPPER_URL);
     identifier.setValue(UUID.randomUUID().toString());
-    composition.setIdentifier(identifier);
-    composition.setId(UUID.randomUUID().toString());
-    return composition;
+    return identifier;
   }
 }

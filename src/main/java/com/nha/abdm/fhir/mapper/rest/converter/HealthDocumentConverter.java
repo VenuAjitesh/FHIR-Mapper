@@ -1,15 +1,11 @@
-/* (C) 2024 */
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleCompositionIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
-import com.nha.abdm.fhir.mapper.rest.common.constants.ErrorCode;
-import com.nha.abdm.fhir.mapper.rest.common.helpers.BundleResponse;
-import com.nha.abdm.fhir.mapper.rest.common.helpers.ErrorResponse;
+import com.nha.abdm.fhir.mapper.rest.common.constants.*;
 import com.nha.abdm.fhir.mapper.rest.dto.compositions.MakeHealthDocumentComposition;
 import com.nha.abdm.fhir.mapper.rest.dto.resources.*;
+import com.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.HealthDocumentRecord;
 import java.text.ParseException;
@@ -50,109 +46,144 @@ public class HealthDocumentConverter {
     this.makeHealthDocumentComposition = makeHealthDocumentComposition;
   }
 
-  public BundleResponse convertToHealthDocumentBundle(HealthDocumentRecord healthDocumentRecord)
+  public Bundle convertToHealthDocumentBundle(HealthDocumentRecord healthDocumentRecord)
       throws ParseException {
     try {
-      Organization organization =
-          Objects.nonNull(healthDocumentRecord.getOrganisation())
-              ? makeOrganisationResource.getOrganization(healthDocumentRecord.getOrganisation())
-              : null;
-      Patient patient = makePatientResource.getPatient(healthDocumentRecord.getPatient());
-      List<Practitioner> practitionerList =
-          Optional.ofNullable(healthDocumentRecord.getPractitioners())
-              .orElse(Collections.emptyList())
-              .stream()
-              .map(StreamUtils.wrapException(makePractitionerResource::getPractitioner))
-              .toList();
-
+      Organization organization = createOrganization(healthDocumentRecord);
+      Patient patient = createPatient(healthDocumentRecord);
+      List<Practitioner> practitionerList = createPractitioners(healthDocumentRecord);
       List<DocumentReference> documentReferenceList =
-          Optional.ofNullable(healthDocumentRecord.getDocuments())
-              .orElse(Collections.emptyList())
-              .stream()
-              .map(
-                  StreamUtils.wrapException(
-                      documentResource ->
-                          makeDocumentResource.getDocument(
-                              patient,
-                              organization,
-                              documentResource,
-                              BundleCompositionIdentifier.HEALTH_DOCUMENT_CODE,
-                              BundleCompositionIdentifier.HEALTH_DOCUMENT)))
-              .toList();
-
-      Encounter encounter =
-          makeEncounterResource.getEncounter(
-              patient,
-              healthDocumentRecord.getEncounter() != null
-                  ? healthDocumentRecord.getEncounter()
-                  : null,
-              healthDocumentRecord.getAuthoredOn());
+          createDocumentReferences(healthDocumentRecord, patient, organization);
+      Encounter encounter = createEncounter(healthDocumentRecord, patient);
       Composition composition =
-          makeHealthDocumentComposition.makeCompositionResource(
+          createComposition(
+              healthDocumentRecord,
               patient,
-              healthDocumentRecord.getAuthoredOn(),
               practitionerList,
               organization,
               encounter,
               documentReferenceList);
-      Bundle bundle = new Bundle();
-      bundle.setId(UUID.randomUUID().toString());
-      bundle.setType(Bundle.BundleType.DOCUMENT);
-      bundle.setTimestampElement(Utils.getCurrentTimeStamp());
-      bundle.setMeta(makeBundleMetaResource.getMeta());
-      bundle.setIdentifier(
-          new Identifier()
-              .setSystem(BundleUrlIdentifier.WRAPPER_URL)
-              .setValue(healthDocumentRecord.getCareContextReference()));
-      List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(BundleResourceIdentifier.COMPOSITION + "/" + composition.getId())
-              .setResource(composition));
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(BundleResourceIdentifier.PATIENT + "/" + patient.getId())
-              .setResource(patient));
-      for (Practitioner practitioner : practitionerList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.PRACTITIONER + "/" + practitioner.getId())
-                .setResource(practitioner));
-      }
-      if (Objects.nonNull(organization)) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.ORGANISATION + "/" + organization.getId())
-                .setResource(organization));
-      }
-      if (Objects.nonNull(encounter)) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(BundleResourceIdentifier.ENCOUNTER + "/" + encounter.getId())
-                .setResource(encounter));
-      }
-      for (DocumentReference documentReference : documentReferenceList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(
-                    BundleResourceIdentifier.DOCUMENT_REFERENCE + "/" + documentReference.getId())
-                .setResource(documentReference));
-      }
-      bundle.setEntry(entries);
-      return BundleResponse.builder().bundle(bundle).build();
+      return buildBundle(
+          healthDocumentRecord,
+          composition,
+          patient,
+          practitionerList,
+          organization,
+          encounter,
+          documentReferenceList);
     } catch (Exception e) {
       if (e instanceof InvalidDataAccessResourceUsageException) {
         log.error(e.getMessage());
-        return BundleResponse.builder()
-            .error(
-                new ErrorResponse(
-                    ErrorCode.DB_ERROR,
-                    " JDBCException Generic SQL Related Error, kindly check logs."))
-            .build();
+        throw new FhirMapperException(
+            ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE);
       }
-      return BundleResponse.builder()
-          .error(ErrorResponse.builder().code("1000").message(e.getMessage()).build())
-          .build();
+      if (e instanceof FhirMapperException) {
+        throw e;
+      }
+      throw new FhirMapperException(ErrorCode.UNKNOWN_ERROR, e.getMessage());
+    }
+  }
+
+  private Organization createOrganization(HealthDocumentRecord healthDocumentRecord)
+      throws ParseException {
+    return Objects.nonNull(healthDocumentRecord.getOrganisation())
+        ? makeOrganisationResource.getOrganization(healthDocumentRecord.getOrganisation())
+        : null;
+  }
+
+  private Patient createPatient(HealthDocumentRecord healthDocumentRecord) throws ParseException {
+    return makePatientResource.getPatient(healthDocumentRecord.getPatient());
+  }
+
+  private List<Practitioner> createPractitioners(HealthDocumentRecord healthDocumentRecord) {
+    return Optional.ofNullable(healthDocumentRecord.getPractitioners())
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(StreamUtils.wrapException(makePractitionerResource::getPractitioner))
+        .toList();
+  }
+
+  private List<DocumentReference> createDocumentReferences(
+      HealthDocumentRecord healthDocumentRecord, Patient patient, Organization organization) {
+    return Optional.ofNullable(healthDocumentRecord.getDocuments())
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(
+            StreamUtils.wrapException(
+                documentResource ->
+                    makeDocumentResource.getDocument(
+                        patient,
+                        organization,
+                        documentResource,
+                        BundleCompositionIdentifier.HEALTH_DOCUMENT_CODE,
+                        BundleCompositionIdentifier.HEALTH_DOCUMENT)))
+        .toList();
+  }
+
+  private Encounter createEncounter(HealthDocumentRecord healthDocumentRecord, Patient patient)
+      throws ParseException {
+    return makeEncounterResource.getEncounter(
+        patient,
+        healthDocumentRecord.getEncounter() != null ? healthDocumentRecord.getEncounter() : null,
+        healthDocumentRecord.getAuthoredOn());
+  }
+
+  private Composition createComposition(
+      HealthDocumentRecord healthDocumentRecord,
+      Patient patient,
+      List<Practitioner> practitionerList,
+      Organization organization,
+      Encounter encounter,
+      List<DocumentReference> documentReferenceList)
+      throws ParseException {
+    return makeHealthDocumentComposition.makeCompositionResource(
+        patient,
+        healthDocumentRecord.getAuthoredOn(),
+        practitionerList,
+        organization,
+        encounter,
+        documentReferenceList);
+  }
+
+  private Bundle buildBundle(
+      HealthDocumentRecord healthDocumentRecord,
+      Composition composition,
+      Patient patient,
+      List<Practitioner> practitionerList,
+      Organization organization,
+      Encounter encounter,
+      List<DocumentReference> documentReferenceList)
+      throws ParseException {
+    Bundle bundle = new Bundle();
+    bundle.setId(UUID.randomUUID().toString());
+    bundle.setType(Bundle.BundleType.DOCUMENT);
+    bundle.setTimestampElement(Utils.getCurrentTimeStamp());
+    bundle.setMeta(makeBundleMetaResource.getMeta());
+    bundle.setIdentifier(
+        new Identifier()
+            .setSystem(BundleUrlIdentifier.WRAPPER_URL)
+            .setValue(healthDocumentRecord.getCareContextReference()));
+    List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
+    addBundleEntry(entries, composition);
+    addBundleEntry(entries, patient);
+    practitionerList.forEach(practitioner -> addBundleEntry(entries, practitioner));
+    if (Objects.nonNull(organization)) {
+      addBundleEntry(entries, organization);
+    }
+    if (Objects.nonNull(encounter)) {
+      addBundleEntry(entries, encounter);
+    }
+    documentReferenceList.forEach(document -> addBundleEntry(entries, document));
+    bundle.setEntry(entries);
+    return bundle;
+  }
+
+  private void addBundleEntry(List<Bundle.BundleEntryComponent> entries, Resource resource) {
+    if (resource != null && resource.getId() != null) {
+      entries.add(
+          new Bundle.BundleEntryComponent()
+              .setFullUrl(MapperConstants.URN_UUID + resource.getId())
+              .setResource(resource));
     }
   }
 }
