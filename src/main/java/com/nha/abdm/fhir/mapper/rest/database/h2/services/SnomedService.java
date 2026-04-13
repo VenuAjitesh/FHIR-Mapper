@@ -8,6 +8,7 @@ import com.nha.abdm.fhir.mapper.rest.database.h2.repositories.*;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.text.similarity.CosineSimilarity;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -209,47 +210,38 @@ public class SnomedService {
   }
 
   public SnomedResponse getSnomedCodes(String resource) {
-    if (resource.equalsIgnoreCase(SnomedCodeIdentifier.SNOMED_CONDITION)
-        || resource.equalsIgnoreCase(SnomedCodeIdentifier.SNOMED_PROCEDURE)) {
-      return SnomedResponse.builder()
-          .snomedConditionProcedureCodes(getAllConditionProcedureCode())
-          .build();
-    }
-    if (resource.equalsIgnoreCase(SnomedCodeIdentifier.SNOMED_DIAGNOSTICS)) {
-      return SnomedResponse.builder().snomedDiagnosticCodes(getAllSnomedDiagnosticCode()).build();
-    }
-    if (resource.equalsIgnoreCase(SnomedCodeIdentifier.SNOMED_ENCOUNTER)) {
-      return SnomedResponse.builder().snomedEncounterCodes(getAllSnomedEncounterCode()).build();
-    }
-    if (resource.equalsIgnoreCase(SnomedCodeIdentifier.SNOMED_MEDICATION_ROUTE)) {
-      return SnomedResponse.builder()
-          .snomedMedicineRouteCodes(getAllSnomedMedicineRouteCode())
-          .build();
-    }
-    if (resource.equalsIgnoreCase(SnomedCodeIdentifier.SNOMED_MEDICATIONS)) {
-      return SnomedResponse.builder().snomedMedicineCodes(getAllSnomedMedicineCode()).build();
-    }
-    if (resource.equalsIgnoreCase(SnomedCodeIdentifier.SNOMED_OBSERVATIONS)) {
-      return SnomedResponse.builder().snomedObservationCodes(getAllSnomedObservationCode()).build();
-    }
-    if (resource.equalsIgnoreCase(SnomedCodeIdentifier.SNOMED_SPECIMEN)) {
-      return SnomedResponse.builder().snomedSpecimenCodes(getAllSnomedSpecimenCode()).build();
-    }
-    if (resource.equalsIgnoreCase(SnomedCodeIdentifier.SNOMED_VACCINES)) {
-      return SnomedResponse.builder().snomedVaccineCodes(getAllSnomedVaccineCode()).build();
-    }
-    return null;
+    Map<String, SnomedResponse.SnomedResponseBuilder> responseMap =
+        Map.of(
+            SnomedCodeIdentifier.SNOMED_CONDITION,
+                SnomedResponse.builder()
+                    .snomedConditionProcedureCodes(getAllConditionProcedureCode()),
+            SnomedCodeIdentifier.SNOMED_PROCEDURE,
+                SnomedResponse.builder()
+                    .snomedConditionProcedureCodes(getAllConditionProcedureCode()),
+            SnomedCodeIdentifier.SNOMED_DIAGNOSTICS,
+                SnomedResponse.builder().snomedDiagnosticCodes(getAllSnomedDiagnosticCode()),
+            SnomedCodeIdentifier.SNOMED_ENCOUNTER,
+                SnomedResponse.builder().snomedEncounterCodes(getAllSnomedEncounterCode()),
+            SnomedCodeIdentifier.SNOMED_MEDICATION_ROUTE,
+                SnomedResponse.builder().snomedMedicineRouteCodes(getAllSnomedMedicineRouteCode()),
+            SnomedCodeIdentifier.SNOMED_MEDICATIONS,
+                SnomedResponse.builder().snomedMedicineCodes(getAllSnomedMedicineCode()),
+            SnomedCodeIdentifier.SNOMED_OBSERVATIONS,
+                SnomedResponse.builder().snomedObservationCodes(getAllSnomedObservationCode()),
+            SnomedCodeIdentifier.SNOMED_SPECIMEN,
+                SnomedResponse.builder().snomedSpecimenCodes(getAllSnomedSpecimenCode()),
+            SnomedCodeIdentifier.SNOMED_VACCINES,
+                SnomedResponse.builder().snomedVaccineCodes(getAllSnomedVaccineCode()));
+    return responseMap.get(resource.toLowerCase()).build();
   }
 
   private static boolean hasValidWordDifference(String input, String display) {
     if (input == null || display == null) return false;
     int inputWordCount = countWords(input);
     int displayWordCount = countWords(display);
-
     return inputWordCount >= 1 && displayWordCount <= inputWordCount + 2;
   }
 
-  // Count words in a string
   private static int countWords(String text) {
     if (text == null || text.trim().isEmpty()) return 0;
     return text.trim().split("\\s+").length;
@@ -258,7 +250,6 @@ public class SnomedService {
   private static Map<CharSequence, Integer> createFrequencyMap(String text) {
     String[] tokens = text.toLowerCase().split("\\s+");
     Map<CharSequence, Integer> frequencyMap = new HashMap<>();
-
     for (String token : tokens) {
       frequencyMap.put(token, frequencyMap.getOrDefault(token, 0) + 1);
     }
@@ -267,30 +258,26 @@ public class SnomedService {
 
   public static <T extends Displayable> Object fuzzyMatch(
       List<T> list, String input, Class<T> type) {
-    CosineSimilarity cosineSimilarity = new CosineSimilarity();
-
-    Map<Object, Double> scoreMap =
-        list.stream()
-            .filter(type::isInstance)
-            .map(type::cast)
-            .filter(
-                obj ->
-                    hasValidWordDifference(
-                        input,
-                        obj.getDisplay())) // filtering the difference in words not more the input
-            // +=2
-            .collect(
-                Collectors.toMap(
-                    obj -> obj,
-                    obj -> {
-                      Map<CharSequence, Integer> inputMap = createFrequencyMap(input);
-                      Map<CharSequence, Integer> displayMap = createFrequencyMap(obj.getDisplay());
-                      return cosineSimilarity.cosineSimilarity(inputMap, displayMap);
-                    }));
-
-    return scoreMap.entrySet().stream()
+    return filterValidItems(list, input, type)
+        .collect(Collectors.toMap(obj -> obj, obj -> calculateSimilarity(input, obj.getDisplay())))
+        .entrySet()
+        .stream()
         .max(Map.Entry.comparingByValue())
         .map(Map.Entry::getKey)
         .orElse(null);
+  }
+
+  private static <T extends Displayable> Stream<T> filterValidItems(
+      List<T> list, String input, Class<T> type) {
+    return list.stream()
+        .filter(type::isInstance)
+        .filter(obj -> hasValidWordDifference(input, obj.getDisplay()));
+  }
+
+  private static double calculateSimilarity(String input, String display) {
+    CosineSimilarity cosineSimilarity = new CosineSimilarity();
+    Map<CharSequence, Integer> inputMap = createFrequencyMap(input);
+    Map<CharSequence, Integer> displayMap = createFrequencyMap(display);
+    return cosineSimilarity.cosineSimilarity(inputMap, displayMap);
   }
 }
