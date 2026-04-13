@@ -1,9 +1,8 @@
-/* (C) 2024 */
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.*;
-import com.nha.abdm.fhir.mapper.rest.common.helpers.DocumentResource;
 import com.nha.abdm.fhir.mapper.rest.dto.compositions.MakeDischargeComposition;
 import com.nha.abdm.fhir.mapper.rest.dto.resources.*;
 import com.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
@@ -77,252 +76,69 @@ public class DischargeSummaryConverter {
   public Bundle convertToDischargeSummary(DischargeSummaryRequest dischargeSummaryRequest)
       throws ParseException {
     try {
+      Organization organization = createOrganization(dischargeSummaryRequest);
+      Patient patient = createPatient(dischargeSummaryRequest);
+      List<Practitioner> practitionerList = createPractitioners(dischargeSummaryRequest);
+      Encounter encounter = createEncounter(patient, dischargeSummaryRequest);
 
-      List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
-
-      Organization organization =
-          makeOrganisationResource.getOrganization(dischargeSummaryRequest.getOrganisation());
-
-      Patient patient = makePatientResource.getPatient(dischargeSummaryRequest.getPatient());
-
-      List<Practitioner> practitionerList =
-          Optional.ofNullable(dischargeSummaryRequest.getPractitioners())
-              .orElse(Collections.emptyList())
-              .stream()
-              .map(StreamUtils.wrapException(makePractitionerResource::getPractitioner))
-              .collect(Collectors.toList());
-
-      Encounter encounter =
-          makeEncounterResource.getEncounter(
-              patient,
-              dischargeSummaryRequest.getEncounter() != null
-                  ? dischargeSummaryRequest.getEncounter()
-                  : null,
-              dischargeSummaryRequest.getAuthoredOn());
-      List<Condition> chiefComplaintList =
-          dischargeSummaryRequest.getChiefComplaints() != null
-              ? makeCheifComplaintsList(dischargeSummaryRequest, patient)
-              : new ArrayList<>();
+      List<Condition> chiefComplaintList = createChiefComplaints(dischargeSummaryRequest, patient);
       List<Observation> physicalObservationList =
-          dischargeSummaryRequest.getPhysicalExaminations() != null
-              ? makePhysicalObservations(dischargeSummaryRequest, patient, practitionerList)
-              : new ArrayList<>();
+          createPhysicalObservations(dischargeSummaryRequest, patient, practitionerList);
       List<AllergyIntolerance> allergieList =
-          dischargeSummaryRequest.getAllergies() != null
-              ? makeAllergiesList(patient, practitionerList, dischargeSummaryRequest)
-              : new ArrayList<>();
-      List<Condition> medicalHistoryList =
-          dischargeSummaryRequest.getMedicalHistories() != null
-              ? makeMedicalHistoryList(dischargeSummaryRequest, patient)
-              : new ArrayList<>();
+          createAllergies(patient, practitionerList, dischargeSummaryRequest);
+      List<Condition> medicalHistoryList = createMedicalHistories(dischargeSummaryRequest, patient);
       List<FamilyMemberHistory> familyMemberHistoryList =
-          dischargeSummaryRequest.getFamilyHistories() != null
-              ? makeFamilyMemberHistory(patient, dischargeSummaryRequest)
-              : new ArrayList<>();
-      List<MedicationRequest> medicationList = new ArrayList<>();
-      List<Condition> medicationConditionList = new ArrayList<>();
-      for (PrescriptionResource prescriptionResource : dischargeSummaryRequest.getMedications()) {
-        Condition medicationCondition =
-            prescriptionResource.getReason() != null
-                ? makeConditionResource.getCondition(
-                    prescriptionResource.getReason(),
-                    patient,
-                    dischargeSummaryRequest.getAuthoredOn(),
-                    null)
-                : null;
-        medicationList.add(
-            makeMedicationRequestResource.getMedicationResource(
-                dischargeSummaryRequest.getAuthoredOn(),
-                prescriptionResource,
-                medicationCondition,
-                organization,
-                practitionerList,
-                patient));
-        if (medicationCondition != null) {
-          medicationConditionList.add(medicationCondition);
-        }
-      }
-      // Diagnostic Reports and Observations
-      List<DiagnosticReport> diagnosticReportList = new ArrayList<>();
-      List<Observation> diagnosticObservationList = new ArrayList<>();
-      Optional.ofNullable(dischargeSummaryRequest.getDiagnostics())
-          .orElse(Collections.emptyList())
-          .forEach(
-              diagnosticResource -> {
-                List<Observation> observationList =
-                    Optional.ofNullable(diagnosticResource.getResult())
-                        .orElse(Collections.emptyList())
-                        .stream()
-                        .map(
-                            StreamUtils.wrapException(
-                                observationResource -> {
-                                  return makeObservationResource.getObservation(
-                                      patient,
-                                      practitionerList,
-                                      observationResource,
-                                      dischargeSummaryRequest.getAuthoredOn());
-                                }))
-                        .peek(diagnosticObservationList::add)
-                        .toList();
+          createFamilyHistories(patient, dischargeSummaryRequest);
 
-                try {
-                  diagnosticReportList.add(
-                      makeDiagnosticLabResource.getDiagnosticReport(
-                          patient,
-                          practitionerList,
-                          observationList,
-                          encounter,
-                          diagnosticResource));
-                } catch (ParseException e) {
-                  throw new RuntimeException(e);
-                }
-              });
+      MedicationsResult medicationsResult =
+          createMedications(dischargeSummaryRequest, patient, organization, practitionerList);
 
-      List<Procedure> procedureList =
-          dischargeSummaryRequest.getProcedures() != null
-              ? makeProcedureList(dischargeSummaryRequest, patient)
-              : new ArrayList<>();
+      DiagnosticsResult diagnosticsResult =
+          createDiagnosticsAndObservations(
+              patient, practitionerList, encounter, dischargeSummaryRequest);
+
+      List<Procedure> procedureList = createProcedures(dischargeSummaryRequest, patient);
       List<DocumentReference> documentReferenceList =
-          Optional.ofNullable(dischargeSummaryRequest.getDocuments())
-              .orElse(Collections.emptyList())
-              .stream()
-              .map(
-                  StreamUtils.wrapException(
-                      documentResource ->
-                          makeDocumentReference(patient, organization, documentResource)))
-              .toList();
+          createDocumentReferences(patient, organization, dischargeSummaryRequest);
 
-      CarePlan carePlan =
-          makeCarePlanResource.getCarePlan(dischargeSummaryRequest.getCarePlan(), patient);
+      CarePlan carePlan = createCarePlan(dischargeSummaryRequest, patient);
 
       Composition composition =
-          makeDischargeComposition.makeDischargeCompositionResource(
+          createComposition(
               patient,
-              dischargeSummaryRequest.getAuthoredOn(),
+              dischargeSummaryRequest,
               encounter,
               practitionerList,
               organization,
               chiefComplaintList,
               physicalObservationList,
               allergieList,
-              medicationList,
-              diagnosticReportList,
+              medicationsResult.medicationList,
+              diagnosticsResult.diagnosticReportList,
               medicalHistoryList,
               familyMemberHistoryList,
               carePlan,
               procedureList,
-              documentReferenceList,
-              BundleCompositionIdentifier.DISCHARGE_SUMMARY_CODE,
-              BundleCompositionIdentifier.DISCHARGE_SUMMARY);
+              documentReferenceList);
 
-      Bundle bundle = new Bundle();
-      bundle.setId(UUID.randomUUID().toString());
-      bundle.setType(Bundle.BundleType.DOCUMENT);
-      bundle.setTimestampElement(Utils.getCurrentTimeStamp());
-      bundle.setMeta(makeBundleMetaResource.getMeta());
-      bundle.setIdentifier(
-          new Identifier()
-              .setSystem(BundleUrlIdentifier.WRAPPER_URL)
-              .setValue(dischargeSummaryRequest.getCareContextReference()));
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + composition.getId())
-              .setResource(composition));
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + patient.getId())
-              .setResource(patient));
-      for (Practitioner practitioner : practitionerList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + practitioner.getId())
-                .setResource(practitioner));
-      }
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + encounter.getId())
-              .setResource(encounter));
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + organization.getId())
-              .setResource(organization));
+      return buildBundle(
+          dischargeSummaryRequest,
+          composition,
+          patient,
+          practitionerList,
+          encounter,
+          organization,
+          chiefComplaintList,
+          physicalObservationList,
+          allergieList,
+          medicalHistoryList,
+          medicationsResult,
+          familyMemberHistoryList,
+          carePlan,
+          diagnosticsResult,
+          procedureList,
+          documentReferenceList);
 
-      for (Condition complaint : chiefComplaintList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + complaint.getId())
-                .setResource(complaint));
-      }
-      for (Observation physicalObservation : physicalObservationList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + physicalObservation.getId())
-                .setResource(physicalObservation));
-      }
-      for (AllergyIntolerance allergyIntolerance : allergieList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + allergyIntolerance.getId())
-                .setResource(allergyIntolerance));
-      }
-      for (Condition medicalHistory : medicalHistoryList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + medicalHistory.getId())
-                .setResource(medicalHistory));
-      }
-      for (Condition medicationCondition : medicationConditionList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + medicationCondition.getId())
-                .setResource(medicationCondition));
-      }
-      for (FamilyMemberHistory familyMemberHistory : familyMemberHistoryList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + familyMemberHistory.getId())
-                .setResource(familyMemberHistory));
-      }
-      if (Objects.nonNull(carePlan)) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + carePlan.getId())
-                .setResource(carePlan));
-      }
-      for (MedicationRequest medicationRequest : medicationList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + medicationRequest.getId())
-                .setResource(medicationRequest));
-      }
-
-      for (DiagnosticReport diagnosticReport : diagnosticReportList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + diagnosticReport.getId())
-                .setResource(diagnosticReport));
-      }
-
-      for (Procedure procedure : procedureList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + procedure.getId())
-                .setResource(procedure));
-      }
-      for (Observation observation : diagnosticObservationList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + observation.getId())
-                .setResource(observation));
-      }
-      for (DocumentReference documentReference : documentReferenceList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + documentReference.getId())
-                .setResource(documentReference));
-      }
-      bundle.setEntry(entries);
-      return bundle;
     } catch (Exception e) {
       if (e instanceof InvalidDataAccessResourceUsageException) {
         log.error(e.getMessage());
@@ -336,77 +152,51 @@ public class DischargeSummaryConverter {
     }
   }
 
-  private DocumentReference makeDocumentReference(
-      Patient patient, Organization organization, DocumentResource documentResource)
+  private Organization createOrganization(DischargeSummaryRequest dischargeSummaryRequest)
       throws ParseException {
-    return makeDocumentResource.getDocument(
-        patient,
-        organization,
-        documentResource,
-        BundleCompositionIdentifier.DISCHARGE_SUMMARY_CODE,
-        BundleCompositionIdentifier.DISCHARGE_SUMMARY);
+    return makeOrganisationResource.getOrganization(dischargeSummaryRequest.getOrganisation());
   }
 
-  private List<Procedure> makeProcedureList(
-      DischargeSummaryRequest dischargeSummaryRequest, Patient patient) throws ParseException {
+  private Patient createPatient(DischargeSummaryRequest dischargeSummaryRequest)
+      throws ParseException {
+    return makePatientResource.getPatient(dischargeSummaryRequest.getPatient());
+  }
 
-    return Optional.ofNullable(dischargeSummaryRequest.getProcedures())
+  private List<Practitioner> createPractitioners(DischargeSummaryRequest dischargeSummaryRequest) {
+    return Optional.ofNullable(dischargeSummaryRequest.getPractitioners())
         .orElse(Collections.emptyList())
         .stream()
-        .map(
-            StreamUtils.wrapException(
-                procedureResource ->
-                    makeProcedureResource.getProcedure(patient, procedureResource)))
-        .toList();
+        .map(StreamUtils.wrapException(makePractitionerResource::getPractitioner))
+        .collect(Collectors.toList());
   }
 
-  private List<FamilyMemberHistory> makeFamilyMemberHistory(
+  private Encounter createEncounter(
       Patient patient, DischargeSummaryRequest dischargeSummaryRequest) throws ParseException {
-    return Optional.ofNullable(dischargeSummaryRequest.getFamilyHistories())
-        .orElse(Collections.emptyList())
-        .stream()
-        .map(
-            StreamUtils.wrapException(
-                familyObservationResource ->
-                    makeFamilyMemberResource.getFamilyHistory(patient, familyObservationResource)))
-        .toList();
+    return makeEncounterResource.getEncounter(
+        patient,
+        dischargeSummaryRequest.getEncounter() != null
+            ? dischargeSummaryRequest.getEncounter()
+            : null,
+        dischargeSummaryRequest.getAuthoredOn());
   }
 
-  private List<Condition> makeMedicalHistoryList(
-      DischargeSummaryRequest dischargeSummaryRequest, Patient patient) throws ParseException {
-    return Optional.ofNullable(dischargeSummaryRequest.getMedicalHistories())
+  private List<Condition> createChiefComplaints(
+      DischargeSummaryRequest dischargeSummaryRequest, Patient patient) {
+    return Optional.ofNullable(dischargeSummaryRequest.getChiefComplaints())
         .orElse(Collections.emptyList())
         .stream()
         .map(
             StreamUtils.wrapException(
-                chiefComplaintResource ->
+                chiefComplaint ->
                     makeConditionResource.getCondition(
-                        chiefComplaintResource.getComplaint(),
+                        chiefComplaint.getComplaint(),
                         patient,
-                        chiefComplaintResource.getRecordedDate(),
-                        chiefComplaintResource.getDateRange())))
+                        chiefComplaint.getRecordedDate(),
+                        chiefComplaint.getDateRange())))
         .toList();
   }
 
-  private List<AllergyIntolerance> makeAllergiesList(
-      Patient patient,
-      List<Practitioner> practitionerList,
-      DischargeSummaryRequest dischargeSummaryRequest) {
-
-    return Optional.ofNullable(dischargeSummaryRequest.getAllergies()).orElse(List.of()).stream()
-        .filter(allergy -> allergy != null && allergy.getAllergy() != null)
-        .map(
-            StreamUtils.wrapException(
-                allergy ->
-                    makeAllergyToleranceResource.getAllergy(
-                        patient,
-                        practitionerList,
-                        allergy,
-                        dischargeSummaryRequest.getAuthoredOn())))
-        .toList();
-  }
-
-  private List<Observation> makePhysicalObservations(
+  private List<Observation> createPhysicalObservations(
       DischargeSummaryRequest dischargeSummaryRequest,
       Patient patient,
       List<Practitioner> practitionerList) {
@@ -424,19 +214,276 @@ public class DischargeSummaryConverter {
         .toList();
   }
 
-  private List<Condition> makeCheifComplaintsList(
-      DischargeSummaryRequest dischargeSummaryRequest, Patient patient) {
-    return Optional.ofNullable(dischargeSummaryRequest.getChiefComplaints())
+  private List<AllergyIntolerance> createAllergies(
+      Patient patient,
+      List<Practitioner> practitionerList,
+      DischargeSummaryRequest dischargeSummaryRequest) {
+    return Optional.ofNullable(dischargeSummaryRequest.getAllergies()).orElse(List.of()).stream()
+        .filter(allergy -> allergy != null && allergy.getAllergy() != null)
+        .map(
+            StreamUtils.wrapException(
+                allergy ->
+                    makeAllergyToleranceResource.getAllergy(
+                        patient,
+                        practitionerList,
+                        allergy,
+                        dischargeSummaryRequest.getAuthoredOn())))
+        .toList();
+  }
+
+  private List<Condition> createMedicalHistories(
+      DischargeSummaryRequest dischargeSummaryRequest, Patient patient) throws ParseException {
+    return Optional.ofNullable(dischargeSummaryRequest.getMedicalHistories())
         .orElse(Collections.emptyList())
         .stream()
         .map(
             StreamUtils.wrapException(
-                chiefComplaint ->
+                chiefComplaintResource ->
                     makeConditionResource.getCondition(
-                        chiefComplaint.getComplaint(),
+                        chiefComplaintResource.getComplaint(),
                         patient,
-                        chiefComplaint.getRecordedDate(),
-                        chiefComplaint.getDateRange())))
+                        chiefComplaintResource.getRecordedDate(),
+                        chiefComplaintResource.getDateRange())))
         .toList();
+  }
+
+  private List<FamilyMemberHistory> createFamilyHistories(
+      Patient patient, DischargeSummaryRequest dischargeSummaryRequest) throws ParseException {
+    return Optional.ofNullable(dischargeSummaryRequest.getFamilyHistories())
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(
+            StreamUtils.wrapException(
+                familyObservationResource ->
+                    makeFamilyMemberResource.getFamilyHistory(patient, familyObservationResource)))
+        .toList();
+  }
+
+  private MedicationsResult createMedications(
+      DischargeSummaryRequest dischargeSummaryRequest,
+      Patient patient,
+      Organization organization,
+      List<Practitioner> practitionerList)
+      throws ParseException {
+    List<MedicationRequest> medicationList = new ArrayList<>();
+    List<Condition> medicationConditionList = new ArrayList<>();
+    for (PrescriptionResource prescriptionResource : dischargeSummaryRequest.getMedications()) {
+      Condition medicationCondition =
+          prescriptionResource.getReason() != null
+              ? makeConditionResource.getCondition(
+                  prescriptionResource.getReason(),
+                  patient,
+                  dischargeSummaryRequest.getAuthoredOn(),
+                  null)
+              : null;
+      medicationList.add(
+          makeMedicationRequestResource.getMedicationResource(
+              dischargeSummaryRequest.getAuthoredOn(),
+              prescriptionResource,
+              medicationCondition,
+              organization,
+              practitionerList,
+              patient));
+      if (medicationCondition != null) {
+        medicationConditionList.add(medicationCondition);
+      }
+    }
+    return new MedicationsResult(medicationList, medicationConditionList);
+  }
+
+  private DiagnosticsResult createDiagnosticsAndObservations(
+      Patient patient,
+      List<Practitioner> practitionerList,
+      Encounter encounter,
+      DischargeSummaryRequest dischargeSummaryRequest) {
+    List<DiagnosticReport> diagnosticReportList = new ArrayList<>();
+    List<Observation> diagnosticObservationList = new ArrayList<>();
+    Optional.ofNullable(dischargeSummaryRequest.getDiagnostics())
+        .orElse(Collections.emptyList())
+        .forEach(
+            diagnosticResource -> {
+              List<Observation> observationList =
+                  Optional.ofNullable(diagnosticResource.getResult())
+                      .orElse(Collections.emptyList())
+                      .stream()
+                      .map(
+                          StreamUtils.wrapException(
+                              observationResource -> {
+                                return makeObservationResource.getObservation(
+                                    patient,
+                                    practitionerList,
+                                    observationResource,
+                                    dischargeSummaryRequest.getAuthoredOn());
+                              }))
+                      .peek(diagnosticObservationList::add)
+                      .toList();
+
+              try {
+                diagnosticReportList.add(
+                    makeDiagnosticLabResource.getDiagnosticReport(
+                        patient, practitionerList, observationList, encounter, diagnosticResource));
+              } catch (ParseException e) {
+                throw new RuntimeException(e);
+              }
+            });
+    return new DiagnosticsResult(diagnosticReportList, diagnosticObservationList);
+  }
+
+  private List<Procedure> createProcedures(
+      DischargeSummaryRequest dischargeSummaryRequest, Patient patient) throws ParseException {
+    return Optional.ofNullable(dischargeSummaryRequest.getProcedures())
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(
+            StreamUtils.wrapException(
+                procedureResource ->
+                    makeProcedureResource.getProcedure(patient, procedureResource)))
+        .toList();
+  }
+
+  private List<DocumentReference> createDocumentReferences(
+      Patient patient, Organization organization, DischargeSummaryRequest dischargeSummaryRequest) {
+    return Optional.ofNullable(dischargeSummaryRequest.getDocuments())
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(
+            StreamUtils.wrapException(
+                documentResource ->
+                    makeDocumentResource.getDocument(
+                        patient,
+                        organization,
+                        documentResource,
+                        BundleCompositionIdentifier.DISCHARGE_SUMMARY_CODE,
+                        BundleCompositionIdentifier.DISCHARGE_SUMMARY)))
+        .toList();
+  }
+
+  private CarePlan createCarePlan(DischargeSummaryRequest dischargeSummaryRequest, Patient patient)
+      throws ParseException {
+    return makeCarePlanResource.getCarePlan(dischargeSummaryRequest.getCarePlan(), patient);
+  }
+
+  private Composition createComposition(
+      Patient patient,
+      DischargeSummaryRequest dischargeSummaryRequest,
+      Encounter encounter,
+      List<Practitioner> practitionerList,
+      Organization organization,
+      List<Condition> chiefComplaintList,
+      List<Observation> physicalObservationList,
+      List<AllergyIntolerance> allergieList,
+      List<MedicationRequest> medicationList,
+      List<DiagnosticReport> diagnosticReportList,
+      List<Condition> medicalHistoryList,
+      List<FamilyMemberHistory> familyMemberHistoryList,
+      CarePlan carePlan,
+      List<Procedure> procedureList,
+      List<DocumentReference> documentReferenceList)
+      throws ParseException {
+    return makeDischargeComposition.makeDischargeCompositionResource(
+        patient,
+        dischargeSummaryRequest.getAuthoredOn(),
+        encounter,
+        practitionerList,
+        organization,
+        chiefComplaintList,
+        physicalObservationList,
+        allergieList,
+        medicationList,
+        diagnosticReportList,
+        medicalHistoryList,
+        familyMemberHistoryList,
+        carePlan,
+        procedureList,
+        documentReferenceList,
+        BundleCompositionIdentifier.DISCHARGE_SUMMARY_CODE,
+        BundleCompositionIdentifier.DISCHARGE_SUMMARY);
+  }
+
+  private Bundle buildBundle(
+      DischargeSummaryRequest dischargeSummaryRequest,
+      Composition composition,
+      Patient patient,
+      List<Practitioner> practitionerList,
+      Encounter encounter,
+      Organization organization,
+      List<Condition> chiefComplaintList,
+      List<Observation> physicalObservationList,
+      List<AllergyIntolerance> allergieList,
+      List<Condition> medicalHistoryList,
+      MedicationsResult medicationsResult,
+      List<FamilyMemberHistory> familyMemberHistoryList,
+      CarePlan carePlan,
+      DiagnosticsResult diagnosticsResult,
+      List<Procedure> procedureList,
+      List<DocumentReference> documentReferenceList)
+      throws ParseException {
+    Bundle bundle = new Bundle();
+    bundle.setId(UUID.randomUUID().toString());
+    bundle.setType(Bundle.BundleType.DOCUMENT);
+    bundle.setTimestampElement(Utils.getCurrentTimeStamp());
+    bundle.setMeta(makeBundleMetaResource.getMeta());
+    bundle.setIdentifier(
+        new Identifier()
+            .setSystem(BundleUrlIdentifier.WRAPPER_URL)
+            .setValue(dischargeSummaryRequest.getCareContextReference()));
+
+    List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
+    addBundleEntry(entries, composition);
+    addBundleEntry(entries, patient);
+    practitionerList.forEach(practitioner -> addBundleEntry(entries, practitioner));
+    addBundleEntry(entries, encounter);
+    addBundleEntry(entries, organization);
+
+    chiefComplaintList.forEach(complaint -> addBundleEntry(entries, complaint));
+    physicalObservationList.forEach(observation -> addBundleEntry(entries, observation));
+    allergieList.forEach(allergy -> addBundleEntry(entries, allergy));
+    medicalHistoryList.forEach(history -> addBundleEntry(entries, history));
+    medicationsResult.medicationConditionList.forEach(
+        condition -> addBundleEntry(entries, condition));
+    familyMemberHistoryList.forEach(history -> addBundleEntry(entries, history));
+    if (Objects.nonNull(carePlan)) {
+      addBundleEntry(entries, carePlan);
+    }
+    medicationsResult.medicationList.forEach(medication -> addBundleEntry(entries, medication));
+    diagnosticsResult.diagnosticReportList.forEach(report -> addBundleEntry(entries, report));
+    procedureList.forEach(procedure -> addBundleEntry(entries, procedure));
+    diagnosticsResult.diagnosticObservationList.forEach(
+        observation -> addBundleEntry(entries, observation));
+    documentReferenceList.forEach(document -> addBundleEntry(entries, document));
+
+    bundle.setEntry(entries);
+    return bundle;
+  }
+
+  private void addBundleEntry(List<Bundle.BundleEntryComponent> entries, Resource resource) {
+    if (resource != null && resource.getId() != null) {
+      entries.add(
+          new Bundle.BundleEntryComponent()
+              .setFullUrl(MapperConstants.URN_UUID + resource.getId())
+              .setResource(resource));
+    }
+  }
+
+  private static class MedicationsResult {
+    final List<MedicationRequest> medicationList;
+    final List<Condition> medicationConditionList;
+
+    MedicationsResult(
+        List<MedicationRequest> medicationList, List<Condition> medicationConditionList) {
+      this.medicationList = medicationList;
+      this.medicationConditionList = medicationConditionList;
+    }
+  }
+
+  private static class DiagnosticsResult {
+    final List<DiagnosticReport> diagnosticReportList;
+    final List<Observation> diagnosticObservationList;
+
+    DiagnosticsResult(
+        List<DiagnosticReport> diagnosticReportList, List<Observation> diagnosticObservationList) {
+      this.diagnosticReportList = diagnosticReportList;
+      this.diagnosticObservationList = diagnosticObservationList;
+    }
   }
 }

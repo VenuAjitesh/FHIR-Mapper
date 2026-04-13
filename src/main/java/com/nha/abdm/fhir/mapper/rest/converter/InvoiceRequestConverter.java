@@ -1,4 +1,4 @@
-/* (C) 2025 */
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
@@ -64,114 +64,35 @@ public class InvoiceRequestConverter {
 
   public Bundle makeInvoiceBundle(InvoiceBundleRequest invoiceBundleRequest) throws ParseException {
     try {
-      Bundle bundle = new Bundle();
-      bundle.setId(UUID.randomUUID().toString());
-      bundle.setType(Bundle.BundleType.DOCUMENT);
-      bundle.setTimestampElement(Utils.getCurrentTimeStamp());
-      bundle.setMeta(makeBundleMetaResource.getMeta());
-      bundle.setIdentifier(
-          new Identifier()
-              .setSystem(BundleUrlIdentifier.WRAPPER_URL)
-              .setValue(invoiceBundleRequest.getCareContextReference()));
-
-      Patient patient = makePatientResource.getPatient(invoiceBundleRequest.getPatient());
-
-      List<Practitioner> practitionerList =
-          Optional.ofNullable(invoiceBundleRequest.getPractitioners())
-              .orElse(Collections.emptyList())
-              .stream()
-              .map(StreamUtils.wrapException(makePractitionerResource::getPractitioner))
-              .toList();
-
-      Organization organization =
-          makeOrganisationResource.getOrganization(invoiceBundleRequest.getOrganisation());
-
-      Encounter encounter =
-          makeEncounterResource.getEncounter(
-              patient,
-              invoiceBundleRequest.getEncounter() != null
-                  ? invoiceBundleRequest.getEncounter()
-                  : null,
-              invoiceBundleRequest.getInvoiceDate());
-
-      List<Organization> manufactureList = new ArrayList<>();
-      List<Device> deviceList = new ArrayList<>();
-      List<Substance> substanceList = new ArrayList<>();
-      List<Medication> medicationList = new ArrayList<>();
-
-      List<ChargeItem> chargeItemList =
-          Optional.ofNullable(invoiceBundleRequest.getChargeItems())
-              .orElse(Collections.emptyList())
-              .stream()
-              .map(
-                  item -> {
-                    try {
-                      return generateProductAndChargeItem(
-                          item,
-                          deviceList,
-                          substanceList,
-                          medicationList,
-                          manufactureList,
-                          invoiceBundleRequest);
-                    } catch (ParseException e) {
-                      throw new RuntimeException(e);
-                    }
-                  })
-              .toList();
-
+      Patient patient = createPatient(invoiceBundleRequest);
+      List<Practitioner> practitionerList = createPractitioners(invoiceBundleRequest);
+      Organization organization = createOrganization(invoiceBundleRequest);
+      Encounter encounter = createEncounter(invoiceBundleRequest, patient);
+      ChargeItemsResult chargeItemsResult = createChargeItemsAndProducts(invoiceBundleRequest);
       Invoice invoice =
-          makeInvoiceResource.buildInvoice(
-              invoiceBundleRequest, chargeItemList, patient, organization);
-
-      PaymentReconciliation paymentReconciliation = null;
-      if (Objects.nonNull(invoiceBundleRequest.getPayment())) {
-        paymentReconciliation =
-            makeInvoicePaymentResource.buildInvoicePayment(invoiceBundleRequest);
-      }
-
+          createInvoice(
+              invoiceBundleRequest, chargeItemsResult.chargeItemList, patient, organization);
+      PaymentReconciliation paymentReconciliation =
+          createPaymentReconciliation(invoiceBundleRequest);
       Composition composition =
-          makeInvoiceComposition.makeCompositionResource(
+          createComposition(
+              invoiceBundleRequest,
               patient,
               practitionerList,
               organization,
               invoice,
-              chargeItemList,
-              deviceList,
-              substanceList,
-              medicationList,
+              chargeItemsResult,
               paymentReconciliation);
-
-      List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
-
-      addEntry(entries, BundleResourceIdentifier.COMPOSITION, composition);
-      addEntry(entries, BundleResourceIdentifier.PATIENT, patient);
-      practitionerList.forEach(
-          practitioner -> addEntry(entries, BundleResourceIdentifier.PRACTITIONER, practitioner));
-      if (organization != null)
-        addEntry(entries, BundleResourceIdentifier.ORGANISATION, organization);
-      if (encounter != null) addEntry(entries, BundleResourceIdentifier.ENCOUNTER, encounter);
-      manufactureList.forEach(
-          manufacturer -> addEntry(entries, BundleResourceIdentifier.MANUFACTURER, manufacturer));
-      addEntry(entries, BundleResourceIdentifier.INVOICE, invoice);
-
-      chargeItemList.forEach(
-          chargeItem -> addEntry(entries, BundleResourceIdentifier.CHARGE_ITEM, chargeItem));
-      deviceList.forEach(device -> addEntry(entries, BundleResourceIdentifier.DEVICE, device));
-      substanceList.forEach(
-          substance -> addEntry(entries, BundleResourceIdentifier.SUBSTANCE, substance));
-      medicationList.forEach(
-          medication -> addEntry(entries, BundleResourceIdentifier.MEDICATION, medication));
-      if (paymentReconciliation != null) {
-        addEntry(
-            entries,
-            BundleResourceIdentifier.INVOICE_PAYMENT_RECONCILIATION,
-            paymentReconciliation);
-      }
-
-      bundle.setEntry(entries);
-
-      return bundle;
-
+      return buildBundle(
+          invoiceBundleRequest,
+          composition,
+          patient,
+          practitionerList,
+          organization,
+          encounter,
+          chargeItemsResult,
+          invoice,
+          paymentReconciliation);
     } catch (Exception e) {
       if (e instanceof InvalidDataAccessResourceUsageException) {
         log.error(e.getMessage());
@@ -183,6 +104,146 @@ public class InvoiceRequestConverter {
       }
       throw new FhirMapperException(ErrorCode.UNKNOWN_ERROR, e.getMessage());
     }
+  }
+
+  private Patient createPatient(InvoiceBundleRequest invoiceBundleRequest) throws ParseException {
+    return makePatientResource.getPatient(invoiceBundleRequest.getPatient());
+  }
+
+  private List<Practitioner> createPractitioners(InvoiceBundleRequest invoiceBundleRequest) {
+    return Optional.ofNullable(invoiceBundleRequest.getPractitioners())
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(StreamUtils.wrapException(makePractitionerResource::getPractitioner))
+        .toList();
+  }
+
+  private Organization createOrganization(InvoiceBundleRequest invoiceBundleRequest)
+      throws ParseException {
+    return makeOrganisationResource.getOrganization(invoiceBundleRequest.getOrganisation());
+  }
+
+  private Encounter createEncounter(InvoiceBundleRequest invoiceBundleRequest, Patient patient)
+      throws ParseException {
+    return makeEncounterResource.getEncounter(
+        patient,
+        invoiceBundleRequest.getEncounter() != null ? invoiceBundleRequest.getEncounter() : null,
+        invoiceBundleRequest.getInvoiceDate());
+  }
+
+  private ChargeItemsResult createChargeItemsAndProducts(
+      InvoiceBundleRequest invoiceBundleRequest) {
+    List<Organization> manufactureList = new ArrayList<>();
+    List<Device> deviceList = new ArrayList<>();
+    List<Substance> substanceList = new ArrayList<>();
+    List<Medication> medicationList = new ArrayList<>();
+    List<ChargeItem> chargeItemList =
+        Optional.ofNullable(invoiceBundleRequest.getChargeItems())
+            .orElse(Collections.emptyList())
+            .stream()
+            .map(
+                item -> {
+                  try {
+                    return generateProductAndChargeItem(
+                        item,
+                        deviceList,
+                        substanceList,
+                        medicationList,
+                        manufactureList,
+                        invoiceBundleRequest);
+                  } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                  }
+                })
+            .toList();
+    return new ChargeItemsResult(
+        chargeItemList, deviceList, substanceList, medicationList, manufactureList);
+  }
+
+  private Invoice createInvoice(
+      InvoiceBundleRequest invoiceBundleRequest,
+      List<ChargeItem> chargeItemList,
+      Patient patient,
+      Organization organization)
+      throws ParseException {
+    return makeInvoiceResource.buildInvoice(
+        invoiceBundleRequest, chargeItemList, patient, organization);
+  }
+
+  private PaymentReconciliation createPaymentReconciliation(
+      InvoiceBundleRequest invoiceBundleRequest) throws ParseException {
+    if (Objects.nonNull(invoiceBundleRequest.getPayment())) {
+      return makeInvoicePaymentResource.buildInvoicePayment(invoiceBundleRequest);
+    }
+    return null;
+  }
+
+  private Composition createComposition(
+      InvoiceBundleRequest invoiceBundleRequest,
+      Patient patient,
+      List<Practitioner> practitionerList,
+      Organization organization,
+      Invoice invoice,
+      ChargeItemsResult chargeItemsResult,
+      PaymentReconciliation paymentReconciliation)
+      throws ParseException {
+    return makeInvoiceComposition.makeCompositionResource(
+        patient,
+        practitionerList,
+        organization,
+        invoice,
+        chargeItemsResult.chargeItemList,
+        chargeItemsResult.deviceList,
+        chargeItemsResult.substanceList,
+        chargeItemsResult.medicationList,
+        paymentReconciliation);
+  }
+
+  private Bundle buildBundle(
+      InvoiceBundleRequest invoiceBundleRequest,
+      Composition composition,
+      Patient patient,
+      List<Practitioner> practitionerList,
+      Organization organization,
+      Encounter encounter,
+      ChargeItemsResult chargeItemsResult,
+      Invoice invoice,
+      PaymentReconciliation paymentReconciliation)
+      throws ParseException {
+    Bundle bundle = new Bundle();
+    bundle.setId(UUID.randomUUID().toString());
+    bundle.setType(Bundle.BundleType.DOCUMENT);
+    bundle.setTimestampElement(Utils.getCurrentTimeStamp());
+    bundle.setMeta(makeBundleMetaResource.getMeta());
+    bundle.setIdentifier(
+        new Identifier()
+            .setSystem(BundleUrlIdentifier.WRAPPER_URL)
+            .setValue(invoiceBundleRequest.getCareContextReference()));
+    List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
+    addEntry(entries, BundleResourceIdentifier.COMPOSITION, composition);
+    addEntry(entries, BundleResourceIdentifier.PATIENT, patient);
+    practitionerList.forEach(
+        practitioner -> addEntry(entries, BundleResourceIdentifier.PRACTITIONER, practitioner));
+    if (organization != null)
+      addEntry(entries, BundleResourceIdentifier.ORGANISATION, organization);
+    if (encounter != null) addEntry(entries, BundleResourceIdentifier.ENCOUNTER, encounter);
+    chargeItemsResult.manufactureList.forEach(
+        manufacturer -> addEntry(entries, BundleResourceIdentifier.MANUFACTURER, manufacturer));
+    addEntry(entries, BundleResourceIdentifier.INVOICE, invoice);
+    chargeItemsResult.chargeItemList.forEach(
+        chargeItem -> addEntry(entries, BundleResourceIdentifier.CHARGE_ITEM, chargeItem));
+    chargeItemsResult.deviceList.forEach(
+        device -> addEntry(entries, BundleResourceIdentifier.DEVICE, device));
+    chargeItemsResult.substanceList.forEach(
+        substance -> addEntry(entries, BundleResourceIdentifier.SUBSTANCE, substance));
+    chargeItemsResult.medicationList.forEach(
+        medication -> addEntry(entries, BundleResourceIdentifier.MEDICATION, medication));
+    if (paymentReconciliation != null) {
+      addEntry(
+          entries, BundleResourceIdentifier.INVOICE_PAYMENT_RECONCILIATION, paymentReconciliation);
+    }
+    bundle.setEntry(entries);
+    return bundle;
   }
 
   private void addEntry(
@@ -230,6 +291,27 @@ public class InvoiceRequestConverter {
     } else {
       throw new IllegalArgumentException(
           LogMessageConstants.UNKNOWN_PRODUCT_TYPE + item.getProductType());
+    }
+  }
+
+  private static class ChargeItemsResult {
+    final List<ChargeItem> chargeItemList;
+    final List<Device> deviceList;
+    final List<Substance> substanceList;
+    final List<Medication> medicationList;
+    final List<Organization> manufactureList;
+
+    ChargeItemsResult(
+        List<ChargeItem> chargeItemList,
+        List<Device> deviceList,
+        List<Substance> substanceList,
+        List<Medication> medicationList,
+        List<Organization> manufactureList) {
+      this.chargeItemList = chargeItemList;
+      this.deviceList = deviceList;
+      this.substanceList = substanceList;
+      this.medicationList = medicationList;
+      this.manufactureList = manufactureList;
     }
   }
 }

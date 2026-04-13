@@ -1,4 +1,4 @@
-/* (C) 2024 */
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
@@ -55,246 +55,32 @@ public class WellnessRecordConverter {
   public Bundle getWellnessBundle(WellnessRecordRequest wellnessRecordRequest)
       throws ParseException {
     try {
-      Organization organization =
-          makeOrganisationResource.getOrganization(wellnessRecordRequest.getOrganisation());
-
-      Patient patient = makePatientResource.getPatient(wellnessRecordRequest.getPatient());
-
-      List<Practitioner> practitionerList =
-          Optional.ofNullable(wellnessRecordRequest.getPractitioners())
-              .orElse(Collections.emptyList())
-              .stream()
-              .map(StreamUtils.wrapException(makePractitionerResource::getPractitioner))
-              .toList();
-
-      Encounter encounter =
-          makeEncounterResource.getEncounter(
-              patient,
-              wellnessRecordRequest.getEncounter() != null
-                  ? wellnessRecordRequest.getEncounter()
-                  : null,
-              wellnessRecordRequest.getAuthoredOn());
-
-      List<Observation> vitalSignsList =
-          Optional.ofNullable(wellnessRecordRequest.getVitalSigns())
-              .orElse(Collections.emptyList())
-              .stream()
-              .map(
-                  StreamUtils.wrapException(
-                      vitalSign ->
-                          makeWellnessObservationResource.getObservation(
-                              patient,
-                              practitionerList,
-                              vitalSign,
-                              BundleFieldIdentifier.VITAL_SIGNS,
-                              wellnessRecordRequest.getAuthoredOn())))
-              .toList();
-
-      List<Observation> bodyMeasurementList =
-          Optional.ofNullable(wellnessRecordRequest.getBodyMeasurements())
-              .filter(Objects::nonNull)
-              .orElse(Collections.emptyList())
-              .stream()
-              .map(
-                  StreamUtils.wrapException(
-                      bodyMeasurement ->
-                          makeWellnessObservationResource.getObservation(
-                              patient,
-                              practitionerList,
-                              bodyMeasurement,
-                              BundleFieldIdentifier.BODY_MEASUREMENT,
-                              wellnessRecordRequest.getAuthoredOn())))
-              .toList();
-
-      List<Observation> physicalActivityList =
-          Optional.ofNullable(wellnessRecordRequest.getPhysicalActivities())
-              .orElse(Collections.emptyList())
-              .stream()
-              .map(
-                  StreamUtils.wrapException(
-                      physicalActivity ->
-                          makeWellnessObservationResource.getObservation(
-                              patient,
-                              practitionerList,
-                              physicalActivity,
-                              BundleFieldIdentifier.PHYSICAL_ACTIVITY,
-                              wellnessRecordRequest.getAuthoredOn())))
-              .toList();
-
-      List<Observation> generalAssessmentList =
-          Optional.ofNullable(wellnessRecordRequest.getGeneralAssessments())
-              .orElse(Collections.emptyList())
-              .stream()
-              .map(
-                  StreamUtils.wrapException(
-                      generalAssessment ->
-                          makeWellnessObservationResource.getObservation(
-                              patient,
-                              practitionerList,
-                              generalAssessment,
-                              BundleFieldIdentifier.GENERAL_ASSESSMENT,
-                              wellnessRecordRequest.getAuthoredOn())))
-              .toList();
-
-      List<Observation> womanHealthList =
-          Optional.ofNullable(wellnessRecordRequest.getWomanHealths())
-              .orElse(Collections.emptyList())
-              .stream()
-              .map(
-                  StreamUtils.wrapException(
-                      womanHealth ->
-                          makeWellnessObservationResource.getObservation(
-                              patient,
-                              practitionerList,
-                              womanHealth,
-                              BundleFieldIdentifier.WOMAN_HEALTH,
-                              wellnessRecordRequest.getAuthoredOn())))
-              .toList();
-
-      List<Observation> lifeStyleList =
-          Optional.ofNullable(wellnessRecordRequest.getLifeStyles())
-              .orElse(Collections.emptyList())
-              .stream()
-              .map(
-                  StreamUtils.wrapException(
-                      lifeStyle ->
-                          makeWellnessObservationResource.getObservation(
-                              patient,
-                              practitionerList,
-                              lifeStyle,
-                              BundleFieldIdentifier.LIFE_STYLE,
-                              wellnessRecordRequest.getAuthoredOn())))
-              .toList();
-
-      List<Observation> otherObservationList =
-          Optional.ofNullable(wellnessRecordRequest.getOtherObservations())
-              .orElse(Collections.emptyList())
-              .stream()
-              .map(
-                  StreamUtils.wrapException(
-                      otherObservation ->
-                          makeObservationResource.getObservation(
-                              patient,
-                              practitionerList,
-                              otherObservation,
-                              wellnessRecordRequest.getAuthoredOn())))
-              .toList();
-
+      Organization organization = createOrganization(wellnessRecordRequest);
+      Patient patient = createPatient(wellnessRecordRequest);
+      List<Practitioner> practitionerList = createPractitioners(wellnessRecordRequest);
+      Encounter encounter = createEncounter(wellnessRecordRequest, patient);
+      WellnessObservationsResult observationsResult =
+          createObservations(wellnessRecordRequest, patient, practitionerList);
       List<DocumentReference> documentReferenceList =
-          Optional.ofNullable(wellnessRecordRequest.getDocuments())
-              .orElse(Collections.emptyList())
-              .stream()
-              .map(
-                  StreamUtils.wrapException(
-                      documentResource -> {
-                        return makeDocumentResource.getDocument(
-                            patient,
-                            organization,
-                            documentResource,
-                            BundleCompositionIdentifier.HEALTH_DOCUMENT_CODE,
-                            BundleCompositionIdentifier.HEALTH_DOCUMENT);
-                      }))
-              .toList();
-
+          createDocumentReferences(wellnessRecordRequest, patient, organization);
       Composition composition =
-          makeWellnessComposition.makeWellnessComposition(
+          createComposition(
+              wellnessRecordRequest,
               patient,
-              wellnessRecordRequest.getAuthoredOn(),
               encounter,
               practitionerList,
               organization,
-              vitalSignsList,
-              bodyMeasurementList,
-              physicalActivityList,
-              generalAssessmentList,
-              womanHealthList,
-              lifeStyleList,
-              otherObservationList,
+              observationsResult,
               documentReferenceList);
-
-      Bundle bundle = new Bundle();
-      bundle.setId(UUID.randomUUID().toString());
-      bundle.setType(Bundle.BundleType.DOCUMENT);
-      bundle.setTimestampElement(Utils.getCurrentTimeStamp());
-      bundle.setMeta(makeBundleMetaResource.getMeta());
-      bundle.setIdentifier(
-          new Identifier()
-              .setSystem(BundleUrlIdentifier.WRAPPER_URL)
-              .setValue(wellnessRecordRequest.getCareContextReference()));
-      List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + composition.getId())
-              .setResource(composition));
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + patient.getId())
-              .setResource(patient));
-      for (Practitioner practitioner : practitionerList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + practitioner.getId())
-                .setResource(practitioner));
-      }
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + encounter.getId())
-              .setResource(encounter));
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + organization.getId())
-              .setResource(organization));
-
-      for (Observation observation : vitalSignsList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + observation.getId())
-                .setResource(observation));
-      }
-      for (Observation observation : bodyMeasurementList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + observation.getId())
-                .setResource(observation));
-      }
-      for (Observation observation : physicalActivityList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + observation.getId())
-                .setResource(observation));
-      }
-      for (Observation observation : generalAssessmentList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + observation.getId())
-                .setResource(observation));
-      }
-      for (Observation observation : womanHealthList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + observation.getId())
-                .setResource(observation));
-      }
-      for (Observation observation : lifeStyleList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + observation.getId())
-                .setResource(observation));
-      }
-      for (Observation observation : otherObservationList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + observation.getId())
-                .setResource(observation));
-      }
-      for (DocumentReference documentReference : documentReferenceList) {
-        entries.add(
-            new Bundle.BundleEntryComponent()
-                .setFullUrl(MapperConstants.URN_UUID + documentReference.getId())
-                .setResource(documentReference));
-      }
-      bundle.setEntry(entries);
-      return bundle;
+      return buildBundle(
+          wellnessRecordRequest,
+          composition,
+          patient,
+          practitionerList,
+          encounter,
+          organization,
+          observationsResult,
+          documentReferenceList);
     } catch (Exception e) {
       if (e instanceof InvalidDataAccessResourceUsageException) {
         log.error(e.getMessage());
@@ -305,6 +91,357 @@ public class WellnessRecordConverter {
         throw e;
       }
       throw new FhirMapperException(ErrorCode.UNKNOWN_ERROR, e.getMessage());
+    }
+  }
+
+  private Organization createOrganization(WellnessRecordRequest wellnessRecordRequest)
+      throws ParseException {
+    return makeOrganisationResource.getOrganization(wellnessRecordRequest.getOrganisation());
+  }
+
+  private Patient createPatient(WellnessRecordRequest wellnessRecordRequest) throws ParseException {
+    return makePatientResource.getPatient(wellnessRecordRequest.getPatient());
+  }
+
+  private List<Practitioner> createPractitioners(WellnessRecordRequest wellnessRecordRequest) {
+    return Optional.ofNullable(wellnessRecordRequest.getPractitioners())
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(StreamUtils.wrapException(makePractitionerResource::getPractitioner))
+        .toList();
+  }
+
+  private Encounter createEncounter(WellnessRecordRequest wellnessRecordRequest, Patient patient)
+      throws ParseException {
+    return makeEncounterResource.getEncounter(
+        patient,
+        wellnessRecordRequest.getEncounter() != null ? wellnessRecordRequest.getEncounter() : null,
+        wellnessRecordRequest.getAuthoredOn());
+  }
+
+  private WellnessObservationsResult createObservations(
+      WellnessRecordRequest wellnessRecordRequest,
+      Patient patient,
+      List<Practitioner> practitionerList) {
+    List<Observation> vitalSignsList =
+        createVitalSigns(wellnessRecordRequest, patient, practitionerList);
+    List<Observation> bodyMeasurementList =
+        createBodyMeasurements(wellnessRecordRequest, patient, practitionerList);
+    List<Observation> physicalActivityList =
+        createPhysicalActivities(wellnessRecordRequest, patient, practitionerList);
+    List<Observation> generalAssessmentList =
+        createGeneralAssessments(wellnessRecordRequest, patient, practitionerList);
+    List<Observation> womanHealthList =
+        createWomanHealths(wellnessRecordRequest, patient, practitionerList);
+    List<Observation> lifeStyleList =
+        createLifeStyles(wellnessRecordRequest, patient, practitionerList);
+    List<Observation> otherObservationList =
+        createOtherObservations(wellnessRecordRequest, patient, practitionerList);
+    return new WellnessObservationsResult(
+        vitalSignsList,
+        bodyMeasurementList,
+        physicalActivityList,
+        generalAssessmentList,
+        womanHealthList,
+        lifeStyleList,
+        otherObservationList);
+  }
+
+  private List<Observation> createVitalSigns(
+      WellnessRecordRequest wellnessRecordRequest,
+      Patient patient,
+      List<Practitioner> practitionerList) {
+    return Optional.ofNullable(wellnessRecordRequest.getVitalSigns())
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(
+            StreamUtils.wrapException(
+                vitalSign ->
+                    makeWellnessObservationResource.getObservation(
+                        patient,
+                        practitionerList,
+                        vitalSign,
+                        BundleFieldIdentifier.VITAL_SIGNS,
+                        wellnessRecordRequest.getAuthoredOn())))
+        .toList();
+  }
+
+  private List<Observation> createBodyMeasurements(
+      WellnessRecordRequest wellnessRecordRequest,
+      Patient patient,
+      List<Practitioner> practitionerList) {
+    return Optional.ofNullable(wellnessRecordRequest.getBodyMeasurements())
+        .filter(Objects::nonNull)
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(
+            StreamUtils.wrapException(
+                bodyMeasurement ->
+                    makeWellnessObservationResource.getObservation(
+                        patient,
+                        practitionerList,
+                        bodyMeasurement,
+                        BundleFieldIdentifier.BODY_MEASUREMENT,
+                        wellnessRecordRequest.getAuthoredOn())))
+        .toList();
+  }
+
+  private List<Observation> createPhysicalActivities(
+      WellnessRecordRequest wellnessRecordRequest,
+      Patient patient,
+      List<Practitioner> practitionerList) {
+    return Optional.ofNullable(wellnessRecordRequest.getPhysicalActivities())
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(
+            StreamUtils.wrapException(
+                physicalActivity ->
+                    makeWellnessObservationResource.getObservation(
+                        patient,
+                        practitionerList,
+                        physicalActivity,
+                        BundleFieldIdentifier.PHYSICAL_ACTIVITY,
+                        wellnessRecordRequest.getAuthoredOn())))
+        .toList();
+  }
+
+  private List<Observation> createGeneralAssessments(
+      WellnessRecordRequest wellnessRecordRequest,
+      Patient patient,
+      List<Practitioner> practitionerList) {
+    return Optional.ofNullable(wellnessRecordRequest.getGeneralAssessments())
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(
+            StreamUtils.wrapException(
+                generalAssessment ->
+                    makeWellnessObservationResource.getObservation(
+                        patient,
+                        practitionerList,
+                        generalAssessment,
+                        BundleFieldIdentifier.GENERAL_ASSESSMENT,
+                        wellnessRecordRequest.getAuthoredOn())))
+        .toList();
+  }
+
+  private List<Observation> createWomanHealths(
+      WellnessRecordRequest wellnessRecordRequest,
+      Patient patient,
+      List<Practitioner> practitionerList) {
+    return Optional.ofNullable(wellnessRecordRequest.getWomanHealths())
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(
+            StreamUtils.wrapException(
+                womanHealth ->
+                    makeWellnessObservationResource.getObservation(
+                        patient,
+                        practitionerList,
+                        womanHealth,
+                        BundleFieldIdentifier.WOMAN_HEALTH,
+                        wellnessRecordRequest.getAuthoredOn())))
+        .toList();
+  }
+
+  private List<Observation> createLifeStyles(
+      WellnessRecordRequest wellnessRecordRequest,
+      Patient patient,
+      List<Practitioner> practitionerList) {
+    return Optional.ofNullable(wellnessRecordRequest.getLifeStyles())
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(
+            StreamUtils.wrapException(
+                lifeStyle ->
+                    makeWellnessObservationResource.getObservation(
+                        patient,
+                        practitionerList,
+                        lifeStyle,
+                        BundleFieldIdentifier.LIFE_STYLE,
+                        wellnessRecordRequest.getAuthoredOn())))
+        .toList();
+  }
+
+  private List<Observation> createOtherObservations(
+      WellnessRecordRequest wellnessRecordRequest,
+      Patient patient,
+      List<Practitioner> practitionerList) {
+    return Optional.ofNullable(wellnessRecordRequest.getOtherObservations())
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(
+            StreamUtils.wrapException(
+                otherObservation ->
+                    makeObservationResource.getObservation(
+                        patient,
+                        practitionerList,
+                        otherObservation,
+                        wellnessRecordRequest.getAuthoredOn())))
+        .toList();
+  }
+
+  private List<DocumentReference> createDocumentReferences(
+      WellnessRecordRequest wellnessRecordRequest, Patient patient, Organization organization) {
+    return Optional.ofNullable(wellnessRecordRequest.getDocuments())
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(
+            StreamUtils.wrapException(
+                documentResource -> {
+                  return makeDocumentResource.getDocument(
+                      patient,
+                      organization,
+                      documentResource,
+                      BundleCompositionIdentifier.HEALTH_DOCUMENT_CODE,
+                      BundleCompositionIdentifier.HEALTH_DOCUMENT);
+                }))
+        .toList();
+  }
+
+  private Composition createComposition(
+      WellnessRecordRequest wellnessRecordRequest,
+      Patient patient,
+      Encounter encounter,
+      List<Practitioner> practitionerList,
+      Organization organization,
+      WellnessObservationsResult observationsResult,
+      List<DocumentReference> documentReferenceList)
+      throws ParseException {
+    return makeWellnessComposition.makeWellnessComposition(
+        patient,
+        wellnessRecordRequest.getAuthoredOn(),
+        encounter,
+        practitionerList,
+        organization,
+        observationsResult.vitalSignsList,
+        observationsResult.bodyMeasurementList,
+        observationsResult.physicalActivityList,
+        observationsResult.generalAssessmentList,
+        observationsResult.womanHealthList,
+        observationsResult.lifeStyleList,
+        observationsResult.otherObservationList,
+        documentReferenceList);
+  }
+
+  private Bundle buildBundle(
+      WellnessRecordRequest wellnessRecordRequest,
+      Composition composition,
+      Patient patient,
+      List<Practitioner> practitionerList,
+      Encounter encounter,
+      Organization organization,
+      WellnessObservationsResult observationsResult,
+      List<DocumentReference> documentReferenceList)
+      throws ParseException {
+    Bundle bundle = new Bundle();
+    bundle.setId(UUID.randomUUID().toString());
+    bundle.setType(Bundle.BundleType.DOCUMENT);
+    bundle.setTimestampElement(Utils.getCurrentTimeStamp());
+    bundle.setMeta(makeBundleMetaResource.getMeta());
+    bundle.setIdentifier(
+        new Identifier()
+            .setSystem(BundleUrlIdentifier.WRAPPER_URL)
+            .setValue(wellnessRecordRequest.getCareContextReference()));
+    List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
+    entries.add(
+        new Bundle.BundleEntryComponent()
+            .setFullUrl(MapperConstants.URN_UUID + composition.getId())
+            .setResource(composition));
+    entries.add(
+        new Bundle.BundleEntryComponent()
+            .setFullUrl(MapperConstants.URN_UUID + patient.getId())
+            .setResource(patient));
+    for (Practitioner practitioner : practitionerList) {
+      entries.add(
+          new Bundle.BundleEntryComponent()
+              .setFullUrl(MapperConstants.URN_UUID + practitioner.getId())
+              .setResource(practitioner));
+    }
+    entries.add(
+        new Bundle.BundleEntryComponent()
+            .setFullUrl(MapperConstants.URN_UUID + encounter.getId())
+            .setResource(encounter));
+    entries.add(
+        new Bundle.BundleEntryComponent()
+            .setFullUrl(MapperConstants.URN_UUID + organization.getId())
+            .setResource(organization));
+
+    for (Observation observation : observationsResult.vitalSignsList) {
+      entries.add(
+          new Bundle.BundleEntryComponent()
+              .setFullUrl(MapperConstants.URN_UUID + observation.getId())
+              .setResource(observation));
+    }
+    for (Observation observation : observationsResult.bodyMeasurementList) {
+      entries.add(
+          new Bundle.BundleEntryComponent()
+              .setFullUrl(MapperConstants.URN_UUID + observation.getId())
+              .setResource(observation));
+    }
+    for (Observation observation : observationsResult.physicalActivityList) {
+      entries.add(
+          new Bundle.BundleEntryComponent()
+              .setFullUrl(MapperConstants.URN_UUID + observation.getId())
+              .setResource(observation));
+    }
+    for (Observation observation : observationsResult.generalAssessmentList) {
+      entries.add(
+          new Bundle.BundleEntryComponent()
+              .setFullUrl(MapperConstants.URN_UUID + observation.getId())
+              .setResource(observation));
+    }
+    for (Observation observation : observationsResult.womanHealthList) {
+      entries.add(
+          new Bundle.BundleEntryComponent()
+              .setFullUrl(MapperConstants.URN_UUID + observation.getId())
+              .setResource(observation));
+    }
+    for (Observation observation : observationsResult.lifeStyleList) {
+      entries.add(
+          new Bundle.BundleEntryComponent()
+              .setFullUrl(MapperConstants.URN_UUID + observation.getId())
+              .setResource(observation));
+    }
+    for (Observation observation : observationsResult.otherObservationList) {
+      entries.add(
+          new Bundle.BundleEntryComponent()
+              .setFullUrl(MapperConstants.URN_UUID + observation.getId())
+              .setResource(observation));
+    }
+    for (DocumentReference documentReference : documentReferenceList) {
+      entries.add(
+          new Bundle.BundleEntryComponent()
+              .setFullUrl(MapperConstants.URN_UUID + documentReference.getId())
+              .setResource(documentReference));
+    }
+    bundle.setEntry(entries);
+    return bundle;
+  }
+
+  private static class WellnessObservationsResult {
+    final List<Observation> vitalSignsList;
+    final List<Observation> bodyMeasurementList;
+    final List<Observation> physicalActivityList;
+    final List<Observation> generalAssessmentList;
+    final List<Observation> womanHealthList;
+    final List<Observation> lifeStyleList;
+    final List<Observation> otherObservationList;
+
+    WellnessObservationsResult(
+        List<Observation> vitalSignsList,
+        List<Observation> bodyMeasurementList,
+        List<Observation> physicalActivityList,
+        List<Observation> generalAssessmentList,
+        List<Observation> womanHealthList,
+        List<Observation> lifeStyleList,
+        List<Observation> otherObservationList) {
+      this.vitalSignsList = vitalSignsList;
+      this.bodyMeasurementList = bodyMeasurementList;
+      this.physicalActivityList = physicalActivityList;
+      this.generalAssessmentList = generalAssessmentList;
+      this.womanHealthList = womanHealthList;
+      this.lifeStyleList = lifeStyleList;
+      this.otherObservationList = otherObservationList;
     }
   }
 }
