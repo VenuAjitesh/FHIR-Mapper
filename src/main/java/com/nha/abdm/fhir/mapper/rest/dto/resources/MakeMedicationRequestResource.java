@@ -1,4 +1,3 @@
-/* (C) 2024 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import com.nha.abdm.fhir.mapper.Utils;
@@ -28,31 +27,37 @@ public class MakeMedicationRequestResource {
       Patient patient)
       throws ParseException {
     MedicationRequest medicationRequest = new MedicationRequest();
-
-    medicationRequest.setMeta(
-        new Meta()
-            .addProfile(ResourceProfileIdentifier.PROFILE_MEDICATION_REQUEST)
-            .setLastUpdatedElement(Utils.getCurrentTimeStamp()));
-
+    medicationRequest.setMeta(createMeta());
     mapMedicationDetails(medicationRequest, prescriptionResource);
     mapDosageInstruction(medicationRequest, prescriptionResource);
     mapReasonAndRequester(medicationRequest, practitioners, medicationCondition);
     mapSubject(medicationRequest, patient);
-
-    if (authoredOn != null) {
-      medicationRequest.setAuthoredOnElement(Utils.getFormattedDateTime(authoredOn));
-    }
-
-    if (Objects.nonNull(prescriptionResource.getNote())) {
-      medicationRequest.addNote(new Annotation().setText(prescriptionResource.getNote()));
-    }
-
+    setAuthoredOn(medicationRequest, authoredOn);
+    setNote(medicationRequest, prescriptionResource);
     medicationRequest.setStatus(MedicationRequest.MedicationRequestStatus.COMPLETED);
     medicationRequest.setIntent(MedicationRequest.MedicationRequestIntent.ORDER);
     medicationRequest.setId(UUID.randomUUID().toString());
     Utils.setNarrative(
         medicationRequest, "Medication Request: " + prescriptionResource.getMedicine());
     return medicationRequest;
+  }
+
+  private Meta createMeta() throws ParseException {
+    return new Meta()
+        .addProfile(ResourceProfileIdentifier.PROFILE_MEDICATION_REQUEST)
+        .setLastUpdatedElement(Utils.getCurrentTimeStamp());
+  }
+
+  private void setAuthoredOn(MedicationRequest medicationRequest, String authoredOn) throws ParseException {
+    if (authoredOn != null) {
+      medicationRequest.setAuthoredOnElement(Utils.getFormattedDateTime(authoredOn));
+    }
+  }
+
+  private void setNote(MedicationRequest medicationRequest, PrescriptionResource prescriptionResource) {
+    if (Objects.nonNull(prescriptionResource.getNote())) {
+      medicationRequest.addNote(new Annotation().setText(prescriptionResource.getNote()));
+    }
   }
 
   private void mapMedicationDetails(

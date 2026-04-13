@@ -1,4 +1,3 @@
-/* (C) 2024 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import com.nha.abdm.fhir.mapper.Utils;
@@ -14,7 +13,6 @@ public class MakeBundleMetaResource {
   public Meta getMeta() throws ParseException {
     Meta meta = new Meta();
     meta.setVersionId("1");
-    //    meta.setLastUpdated(Utils.getCurrentTimeStamp());
     meta.setLastUpdatedElement(Utils.getCurrentTimeStamp());
     meta.addProfile(ResourceProfileIdentifier.PROFILE_DOCUMENT_BUNDLE);
     meta.addSecurity(

@@ -1,4 +1,3 @@
-/* (C) 2024 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import com.nha.abdm.fhir.mapper.Utils;
@@ -31,74 +30,110 @@ public class MakeImmunizationResource {
 
     Immunization immunization = new Immunization();
     immunization.setId(UUID.randomUUID().toString());
-    immunization.setMeta(
-        new Meta()
-            .setVersionId("1")
-            .setLastUpdatedElement(Utils.getCurrentTimeStamp())
-            .addProfile(ResourceProfileIdentifier.PROFILE_IMMUNIZATION));
+    immunization.setMeta(createMeta());
     immunization.setStatus(Immunization.ImmunizationStatus.COMPLETED);
-    immunization.setPatient(Utils.buildReference(patient.getId()));
+    immunization.setPatient(createPatient(patient));
     immunization.setPrimarySource(true);
+    setOccurrence(immunization, immunizationResource);
+    setRecorded(immunization, immunizationResource);
+    setExpirationDate(immunization, immunizationResource);
+    mapVaccineDetails(immunization, immunizationResource);
+    setManufacturer(immunization, organization, immunizationResource);
+    setLotNumber(immunization, immunizationResource);
+    setSite(immunization, immunizationResource);
+    setRoute(immunization, immunizationResource);
+    handleDoseAndProtocol(immunization, immunizationResource);
+    setNote(immunization, immunizationResource);
+    addReasonCode(immunization, immunizationResource);
+    addReaction(immunization, immunizationResource);
+    addPerformers(immunization, practitionerList);
+    return immunization;
+  }
 
+  private Meta createMeta() throws ParseException {
+    return new Meta()
+        .setVersionId("1")
+        .setLastUpdatedElement(Utils.getCurrentTimeStamp())
+        .addProfile(ResourceProfileIdentifier.PROFILE_IMMUNIZATION);
+  }
+
+  private Reference createPatient(Patient patient) {
+    return Utils.buildReference(patient.getId());
+  }
+
+  private void setOccurrence(Immunization immunization, ImmunizationResource immunizationResource) throws ParseException {
     if (Objects.nonNull(immunizationResource.getDate())) {
       immunization.setOccurrence(Utils.getFormattedDateTime(immunizationResource.getDate()));
     }
+  }
 
+  private void setRecorded(Immunization immunization, ImmunizationResource immunizationResource) throws ParseException {
     if (Objects.nonNull(immunizationResource.getRecorded())) {
       immunization.setRecordedElement(
           Utils.getFormattedDateTime(immunizationResource.getRecorded()));
     }
+  }
 
+  private void setExpirationDate(Immunization immunization, ImmunizationResource immunizationResource) throws ParseException {
     if (Objects.nonNull(immunizationResource.getExpirationDate())) {
       immunization.setExpirationDate(
           Utils.getFormattedDate(immunizationResource.getExpirationDate()));
     }
+  }
 
-    if (Objects.nonNull(immunizationResource.getVaccineName())) {
-      mapVaccineDetails(immunization, immunizationResource);
-    }
-
+  private void setManufacturer(Immunization immunization, Organization organization, ImmunizationResource immunizationResource) {
     if (Objects.nonNull(immunizationResource.getManufacturer())) {
       immunization.setManufacturer(
           Utils.buildReference(organization.getId()).setDisplay(organization.getName()));
     }
+  }
 
+  private void setLotNumber(Immunization immunization, ImmunizationResource immunizationResource) {
     if (Objects.nonNull(immunizationResource.getLotNumber())) {
       immunization.setLotNumber(immunizationResource.getLotNumber());
     }
+  }
 
+  private void setSite(Immunization immunization, ImmunizationResource immunizationResource) {
     if (Objects.nonNull(immunizationResource.getSite())) {
       immunization.setSite(new CodeableConcept().setText(immunizationResource.getSite()));
     }
+  }
 
+  private void setRoute(Immunization immunization, ImmunizationResource immunizationResource) {
     if (Objects.nonNull(immunizationResource.getRoute())) {
       immunization.setRoute(new CodeableConcept().setText(immunizationResource.getRoute()));
     }
+  }
 
-    handleDoseAndProtocol(immunization, immunizationResource);
-
+  private void setNote(Immunization immunization, ImmunizationResource immunizationResource) {
     if (Objects.nonNull(immunizationResource.getNote())) {
       immunization.setNote(
           Collections.singletonList(new Annotation().setText(immunizationResource.getNote())));
     }
+  }
 
+  private void addReasonCode(Immunization immunization, ImmunizationResource immunizationResource) {
     if (Objects.nonNull(immunizationResource.getReasonCode())) {
       immunization.addReasonCode(
           new CodeableConcept().setText(immunizationResource.getReasonCode()));
     }
+  }
 
+  private void addReaction(Immunization immunization, ImmunizationResource immunizationResource) {
     if (Objects.nonNull(immunizationResource.getReaction())) {
       immunization.addReaction(
           new Immunization.ImmunizationReactionComponent()
               .setDetail(new Reference().setDisplay(immunizationResource.getReaction())));
     }
+  }
 
+  private void addPerformers(Immunization immunization, List<Practitioner> practitionerList) {
     for (Practitioner practitioner : practitionerList) {
       immunization.addPerformer(
           new Immunization.ImmunizationPerformerComponent()
               .setActor(Utils.buildReference(practitioner.getId())));
     }
-    return immunization;
   }
 
   private void mapVaccineDetails(Immunization immunization, ImmunizationResource resource) {

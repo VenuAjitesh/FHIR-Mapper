@@ -1,4 +1,3 @@
-/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import com.nha.abdm.fhir.mapper.Utils;
@@ -24,42 +23,52 @@ public class MakeEncounterResource {
     Encounter encounter = new Encounter();
     encounter.setId(UUID.randomUUID().toString());
     encounter.setStatus(Encounter.EncounterStatus.FINISHED);
-    encounter.setMeta(
-        new Meta()
-            .setLastUpdatedElement(Utils.getCurrentTimeStamp())
-            .addProfile(ResourceProfileIdentifier.PROFILE_ENCOUNTER));
-
-    SnomedEncounter snomedEncounter;
-    if (encounterName == null || encounterName.trim().isEmpty()) {
-      snomedEncounter =
-          SnomedEncounter.builder()
-              .code(SnomedCodeIdentifier.SNOMED_ENCOUNTER_AMBULATORY)
-              .display(BundleFieldIdentifier.AMBULATORY)
-              .build();
-    } else {
-      snomedEncounter = snomedService.getSnomedEncounterCode(encounterName);
-    }
-
-    encounter.setClass_(
-        new Coding()
-            .setSystem(ResourceProfileIdentifier.ENCOUNTER_CLASS_SYSTEM)
-            .setCode(snomedEncounter.getCode())
-            .setDisplay(
-                (snomedEncounter.getCode().equals(SnomedCodeIdentifier.SNOMED_ENCOUNTER_AMBULATORY))
-                    ? BundleFieldIdentifier.AMBULATORY
-                    : (encounterName != null && !encounterName.trim().isEmpty())
-                        ? encounterName
-                        : BundleFieldIdentifier.AMBULATORY));
-
-    encounter.setSubject(
-        Utils.buildReference(patient.getId()).setDisplay(patient.getName().get(0).getText()));
-
-    if (visitDate != null) {
-      encounter.setPeriod(new Period().setStartElement(Utils.getFormattedDateTime(visitDate)));
-    }
-
+    encounter.setMeta(createMeta());
+    SnomedEncounter snomedEncounter = createSnomedEncounter(encounterName);
+    encounter.setClass_(createClass(snomedEncounter, encounterName));
+    encounter.setSubject(createSubject(patient));
+    setPeriod(encounter, visitDate);
     Utils.setNarrative(
         encounter, "Encounter: " + (encounterName != null ? encounterName : "ambulatory"));
     return encounter;
+  }
+
+  private Meta createMeta() throws ParseException {
+    return new Meta()
+        .setLastUpdatedElement(Utils.getCurrentTimeStamp())
+        .addProfile(ResourceProfileIdentifier.PROFILE_ENCOUNTER);
+  }
+
+  private SnomedEncounter createSnomedEncounter(String encounterName) {
+    if (encounterName == null || encounterName.trim().isEmpty()) {
+      return SnomedEncounter.builder()
+          .code(SnomedCodeIdentifier.SNOMED_ENCOUNTER_AMBULATORY)
+          .display(BundleFieldIdentifier.AMBULATORY)
+          .build();
+    } else {
+      return snomedService.getSnomedEncounterCode(encounterName);
+    }
+  }
+
+  private Coding createClass(SnomedEncounter snomedEncounter, String encounterName) {
+    return new Coding()
+        .setSystem(ResourceProfileIdentifier.ENCOUNTER_CLASS_SYSTEM)
+        .setCode(snomedEncounter.getCode())
+        .setDisplay(
+            (snomedEncounter.getCode().equals(SnomedCodeIdentifier.SNOMED_ENCOUNTER_AMBULATORY))
+                ? BundleFieldIdentifier.AMBULATORY
+                : (encounterName != null && !encounterName.trim().isEmpty())
+                    ? encounterName
+                    : BundleFieldIdentifier.AMBULATORY);
+  }
+
+  private Reference createSubject(Patient patient) {
+    return Utils.buildReference(patient.getId()).setDisplay(patient.getName().get(0).getText());
+  }
+
+  private void setPeriod(Encounter encounter, String visitDate) throws ParseException {
+    if (visitDate != null) {
+      encounter.setPeriod(new Period().setStartElement(Utils.getFormattedDateTime(visitDate)));
+    }
   }
 }
