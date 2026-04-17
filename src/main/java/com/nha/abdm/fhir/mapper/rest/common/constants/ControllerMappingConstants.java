@@ -11,4 +11,6 @@ public class ControllerMappingConstants {
   public static final String DISCHARGE_SUMMARY_PATH = "/discharge-summary";
   public static final String WELLNESS_RECORD_PATH = "/wellness-record";
   public static final String INVOICE_PATH = "/invoice";
+  public static final String VALIDATE_PATH = "/validate";
+  public static final String SNOMED_BASE_PATH = "/v1/snomed";
 }
