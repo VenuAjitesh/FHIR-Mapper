@@ -129,6 +129,8 @@ public class GlobalExceptionHandler {
     return ResponseEntity.badRequest()
         .body(
             ErrorUtils.buildFacadeError(
-                ErrorCode.PARSE_ERROR, LogMessageConstants.FHIR_PARSING_ERROR_PREFIX + ex.getMessage(), null));
+                ErrorCode.PARSE_ERROR,
+                LogMessageConstants.FHIR_PARSING_ERROR_PREFIX + ex.getMessage(),
+                null));
   }
 }

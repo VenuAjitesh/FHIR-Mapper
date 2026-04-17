@@ -2,12 +2,15 @@
 package com.nha.abdm.fhir.mapper.rest.requests;
 
 import com.nha.abdm.fhir.mapper.rest.common.constants.InvoiceStatus;
+import com.nha.abdm.fhir.mapper.rest.common.constants.SwaggerConstants;
+import com.nha.abdm.fhir.mapper.rest.common.constants.ValidationConstants;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.OrganisationResource;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.PatientResource;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.PractitionerResource;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.ChargeItemResource;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.InvoicePaymentResource;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.InvoiceResource;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,36 +25,49 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = SwaggerConstants.INVOICE_REQ_DESC)
 public class InvoiceBundleRequest {
-  @Pattern(regexp = "Invoice")
-  @NotBlank(message = "BundleType is mandatory and must not be empty : 'Invoice'")
+  @Schema(
+      description = SwaggerConstants.BUNDLE_TYPE_DESC,
+      example = SwaggerConstants.INVOICE_BUNDLE_TYPE_EXAMPLE)
+  @Pattern(regexp = ValidationConstants.INVOICE_RECORD)
+  @NotBlank(message = ValidationConstants.BUNDLE_TYPE_MESSAGE + ValidationConstants.INVOICE_RECORD)
   private String bundleType;
 
-  @NotBlank(message = "careContextReference is mandatory and must not be empty")
+  @Schema(
+      description = SwaggerConstants.CARE_CONTEXT_DESC,
+      example = SwaggerConstants.CARE_CONTEXT_EXAMPLE)
+  @NotBlank(message = ValidationConstants.CARE_CONTEXT_MANDATORY)
   private String careContextReference;
 
+  @Schema(
+      description = SwaggerConstants.INVOICE_DATE_DESC,
+      example = SwaggerConstants.INVOICE_DATE_EXAMPLE)
   @Pattern(
-      regexp = "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z)?$",
-      message = "Value must match either yyyy-MM-dd or yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-  @NotNull(message = "authoredOn is mandatory timestamp") private String invoiceDate;
+      regexp = ValidationConstants.DATE_TIME_PATTERN,
+      message = ValidationConstants.DATE_TIME_FORMAT_MESSAGE)
+  @NotNull(message = ValidationConstants.AUTHORED_ON_MANDATORY) private String invoiceDate;
 
+  @Schema(
+      description = SwaggerConstants.ENCOUNTER_DESC,
+      example = SwaggerConstants.ENCOUNTER_EXAMPLE)
   private String encounter;
 
   @Valid
-  @NotNull(message = "Patient demographic details are mandatory and must not be empty") private PatientResource patient;
+  @NotNull(message = ValidationConstants.PATIENT_MANDATORY) private PatientResource patient;
 
   @Valid
-  @NotNull(message = "practitioners are mandatory and must not be empty") private List<PractitionerResource> practitioners;
+  @NotNull(message = ValidationConstants.PRACTITIONER_MANDATORY) private List<PractitionerResource> practitioners;
 
   @Valid
-  @NotNull(message = "organisation is mandatory") private OrganisationResource organisation;
+  @NotNull(message = ValidationConstants.ORGANISATION_MANDATORY) private OrganisationResource organisation;
 
-  @NotNull(message = "invoice is mandatory") private InvoiceResource invoice;
+  @NotNull(message = ValidationConstants.INVOICE_MANDATORY) private InvoiceResource invoice;
 
-  @NotNull(message = "status is mandatory") private InvoiceStatus status;
+  @NotNull(message = ValidationConstants.STATUS_MANDATORY) private InvoiceStatus status;
 
   @Valid
-  @NotNull(message = "chargeItems are mandatory and must not be empty") private List<ChargeItemResource> chargeItems;
+  @NotNull(message = ValidationConstants.CHARGE_ITEMS_MANDATORY) private List<ChargeItemResource> chargeItems;
 
   @Valid private InvoicePaymentResource payment;
 }

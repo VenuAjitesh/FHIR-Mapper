@@ -3,11 +3,13 @@ package com.nha.abdm.fhir.mapper.rest.common.constants;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
+@Schema(description = SwaggerConstants.DEVICE_STATUS_DESC)
 public enum DeviceStatus {
   ACTIVE("active"),
   INACTIVE("inactive"),

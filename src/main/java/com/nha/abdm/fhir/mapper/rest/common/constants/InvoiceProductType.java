@@ -3,21 +3,22 @@ package com.nha.abdm.fhir.mapper.rest.common.constants;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Getter
 @AllArgsConstructor
+@Getter
+@Schema(description = SwaggerConstants.INVOICE_PRODUCT_TYPE_DESC)
 public enum InvoiceProductType {
-  MEDICATION("medication"),
-  DEVICE("device"),
-  SUBSTANCE("substance");
+  EXAMINATION("examination"),
+  DRUG("drug");
 
   private final String value;
 
   @JsonValue
   public String getValue() {
-    return this.value;
+    return value;
   }
 
   @JsonCreator
@@ -27,6 +28,6 @@ public enum InvoiceProductType {
         return type;
       }
     }
-    throw new IllegalArgumentException("Invalid InvoiceProductType: " + value);
+    throw new IllegalArgumentException("Unknown value: " + value);
   }
 }

@@ -1,7 +1,9 @@
 /* (C) 2024 */
 package com.nha.abdm.fhir.mapper.rest.requests.helpers;
 
+import com.nha.abdm.fhir.mapper.rest.common.constants.SwaggerConstants;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ValidationConstants;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -13,12 +15,26 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
+@Schema(description = SwaggerConstants.PRESCRIPTION_RES_DESC)
 public class PrescriptionResource {
-  @NotBlank(message = "medicine" + ValidationConstants.MANDATORY_MESSAGE)
+  @Schema(description = SwaggerConstants.MEDICINE_DESC, example = SwaggerConstants.MEDICINE_EXAMPLE)
+  @NotBlank(message = ValidationConstants.MEDICINE_NAME_MANDATORY_MSG)
   private String medicine;
 
-  @NotBlank(message = "dosage" + ValidationConstants.MANDATORY_MESSAGE)
+  @Schema(description = SwaggerConstants.DOSAGE_DESC, example = SwaggerConstants.DOSAGE_EXAMPLE)
+  @NotBlank(message = ValidationConstants.DOSAGE_INSTRUCTIONS_MANDATORY)
   private String dosage;
+
+  @Schema(description = SwaggerConstants.FORM_DESC, example = SwaggerConstants.FORM_EXAMPLE)
+  private String form;
+
+  @Schema(description = SwaggerConstants.DURATION_DESC, example = SwaggerConstants.DURATION_EXAMPLE)
+  private String duration;
+
+  @Schema(
+      description = SwaggerConstants.ADDITIONAL_INSTRUCTIONS_DESC,
+      example = SwaggerConstants.ADDITIONAL_INSTRUCTIONS_EXAMPLE)
+  private String additionalInstructions;
 
   private double doseQuantity;
   private String doseUnit;
@@ -28,10 +44,8 @@ public class PrescriptionResource {
       message = ValidationConstants.TIMING_FORMAT_MESSAGE)
   private String timing;
 
-  private String duration;
   private String route;
   private String method;
-  private String additionalInstructions;
   private String reason;
   private String note;
 }

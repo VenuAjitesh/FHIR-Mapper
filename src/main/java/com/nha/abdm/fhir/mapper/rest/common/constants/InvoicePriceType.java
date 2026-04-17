@@ -3,11 +3,13 @@ package com.nha.abdm.fhir.mapper.rest.common.constants;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
+@Schema(description = SwaggerConstants.INVOICE_PRICE_TYPE_DESC)
 public enum InvoicePriceType {
   BASE("base", "00", "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-price-components", "MRP"),
   SURCHARGE(

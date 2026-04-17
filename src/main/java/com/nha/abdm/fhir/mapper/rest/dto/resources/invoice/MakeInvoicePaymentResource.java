@@ -45,9 +45,7 @@ public class MakeInvoicePaymentResource {
 
     if (paymentReq.getPaidAmount() != null && paymentReq.getPaidAmount().doubleValue() > 0) {
       paymentReconciliation.setPaymentAmount(
-          new Money()
-              .setValue(paymentReq.getPaidAmount())
-              .setCurrency(invoiceReq != null ? invoiceReq.getCurrency() : "INR"));
+          new Money().setValue(paymentReq.getPaidAmount()).setCurrency("INR"));
     }
 
     if (paymentReq.getTransactionId() != null && !paymentReq.getTransactionId().isBlank()) {

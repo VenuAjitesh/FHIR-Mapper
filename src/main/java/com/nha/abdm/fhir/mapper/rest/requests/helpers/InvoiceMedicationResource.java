@@ -1,6 +1,7 @@
 /* (C) 2025 */
 package com.nha.abdm.fhir.mapper.rest.requests.helpers;
 
+import com.nha.abdm.fhir.mapper.rest.common.constants.ValidationConstants;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InvoiceMedicationResource {
-  @NotNull(message = "medicineName is mandatory and must not be empty") private String medicineName;
+  @NotNull(message = ValidationConstants.MEDICINE_NAME_MANDATORY) private String medicineName;
 
   private String manufacturer;
   private String medicationForm;

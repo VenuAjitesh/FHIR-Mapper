@@ -2,6 +2,7 @@
 package com.nha.abdm.fhir.mapper.rest.requests.helpers;
 
 import com.nha.abdm.fhir.mapper.rest.common.constants.DeviceStatus;
+import com.nha.abdm.fhir.mapper.rest.common.constants.ValidationConstants;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InvoiceDeviceResource {
-  @NotNull(message = "deviceName is mandatory and must not be empty") private String deviceName;
+  @NotNull(message = ValidationConstants.DEVICE_NAME_MANDATORY) private String deviceName;
 
   private String udiCarrier;
   private String manufacturer;

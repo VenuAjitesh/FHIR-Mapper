@@ -25,8 +25,7 @@ public class MakeInvoicePriceComponent {
         || chargeItemResource.getPrice() == null
         || chargeItemResource.getPrice().isEmpty()
         || invoiceBundleRequest == null
-        || invoiceBundleRequest.getInvoice() == null
-        || invoiceBundleRequest.getInvoice().getCurrency() == null) {
+        || invoiceBundleRequest.getInvoice() == null) {
       return List.of();
     }
 

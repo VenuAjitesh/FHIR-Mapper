@@ -1,11 +1,14 @@
 /* (C) 2024 */
 package com.nha.abdm.fhir.mapper.rest.requests;
 
+import com.nha.abdm.fhir.mapper.rest.common.constants.SwaggerConstants;
+import com.nha.abdm.fhir.mapper.rest.common.constants.ValidationConstants;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.DocumentResource;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.OrganisationResource;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.PatientResource;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.PractitionerResource;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,39 +23,62 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
+@Schema(description = SwaggerConstants.DISCHARGE_SUMMARY_REQ_DESC)
 public class DischargeSummaryRequest {
-  @Pattern(regexp = "DischargeSummaryRecord")
-  @NotBlank(message = "BundleType is mandatory and must not be empty : 'DischargeSummaryRecord'")
+  @Schema(
+      description = SwaggerConstants.BUNDLE_TYPE_DESC,
+      example = SwaggerConstants.DISCHARGE_SUMMARY_BUNDLE_TYPE_EXAMPLE)
+  @Pattern(regexp = ValidationConstants.DISCHARGE_SUMMARY_RECORD)
+  @NotBlank(
+      message =
+          ValidationConstants.BUNDLE_TYPE_MESSAGE + ValidationConstants.DISCHARGE_SUMMARY_RECORD)
   private String bundleType;
 
-  @NotBlank(message = "careContextReference is mandatory and must not be empty")
+  @Schema(
+      description = SwaggerConstants.CARE_CONTEXT_DESC,
+      example = SwaggerConstants.CARE_CONTEXT_EXAMPLE)
+  @NotBlank(message = ValidationConstants.CARE_CONTEXT_MANDATORY)
   private String careContextReference;
 
   @Valid
-  @NotNull(message = "Patient demographic details are mandatory and must not be empty") private PatientResource patient;
+  @NotNull(message = ValidationConstants.PATIENT_MANDATORY) private PatientResource patient;
 
+  @Schema(
+      description = SwaggerConstants.ENCOUNTER_DESC,
+      example = SwaggerConstants.ENCOUNTER_EXAMPLE)
   private String encounter;
 
   @Valid
-  @NotNull(message = "practitioners are mandatory and must not be empty") private List<PractitionerResource> practitioners;
+  @NotNull(message = ValidationConstants.PRACTITIONER_MANDATORY) private List<PractitionerResource> practitioners;
 
   @Valid
-  @NotNull(message = "organisation is mandatory") private OrganisationResource organisation;
+  @NotNull(message = ValidationConstants.ORGANISATION_MANDATORY) private OrganisationResource organisation;
 
   @Valid private List<ChiefComplaintResource> chiefComplaints;
+
   @Valid private List<ObservationResource> physicalExaminations;
+
   @Valid private List<AllergyResource> allergies;
+
   @Valid private List<ChiefComplaintResource> medicalHistories;
+
   @Valid private List<FamilyObservationResource> familyHistories;
+
   @Valid private List<DiagnosticResource> diagnostics;
+
   @Valid private CarePlanResource carePlan;
 
+  @Schema(
+      description = SwaggerConstants.AUTHORED_ON_DESC,
+      example = SwaggerConstants.AUTHORED_ON_EXAMPLE)
   @Pattern(
-      regexp = "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z)?$",
-      message = "Value must match either yyyy-MM-dd or yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-  @NotNull(message = "authoredOn is mandatory timestamp") @NotNull private String authoredOn;
+      regexp = ValidationConstants.DATE_TIME_PATTERN,
+      message = ValidationConstants.DATE_TIME_FORMAT_MESSAGE)
+  @NotNull(message = ValidationConstants.AUTHORED_ON_MANDATORY) @NotNull private String authoredOn;
 
   @Valid private List<PrescriptionResource> medications;
+
   @Valid private List<ProcedureResource> procedures;
+
   @Valid private List<DocumentResource> documents;
 }
