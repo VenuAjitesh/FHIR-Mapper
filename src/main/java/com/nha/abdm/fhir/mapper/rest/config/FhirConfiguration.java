@@ -3,10 +3,13 @@ package com.nha.abdm.fhir.mapper.rest.config;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport;
+import ca.uhn.fhir.context.support.IValidationSupport;
 import ca.uhn.fhir.validation.FhirValidator;
+import com.nha.abdm.fhir.mapper.rest.common.constants.LogMessageConstants;
 import java.util.List;
 import org.hl7.fhir.common.hapi.validation.support.*;
 import org.hl7.fhir.common.hapi.validation.validator.FhirInstanceValidator;
+import org.hl7.fhir.r5.utils.validation.constants.BestPracticeWarningLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +21,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class FhirConfiguration implements WebMvcConfigurer {
 
   private static final Logger log = LoggerFactory.getLogger(FhirConfiguration.class);
+  private static final String NPM_PACKAGE_PATH = "/package.tgz";
 
   @Bean
   public FhirContext fhirContext() {
@@ -31,52 +35,59 @@ public class FhirConfiguration implements WebMvcConfigurer {
 
   @Bean
   public FhirValidator fhirValidator(FhirContext fhirContext) {
+    FhirValidator validator = fhirContext.newValidator();
 
-    NpmPackageValidationSupport npmPackageSupport = new NpmPackageValidationSupport(fhirContext);
-    try {
-      npmPackageSupport.loadPackageFromClasspath("/package.tgz");
-      log.info("Successfully loaded FHIR NPM package from classpath: /package.tgz");
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to load ABDM NPM package from classpath", e);
-    }
+    IValidationSupport chain = createValidationSupportChain(fhirContext);
 
+    FhirInstanceValidator instanceValidator = configureInstanceValidator(chain);
+
+    validator.registerValidatorModule(instanceValidator);
+    return validator;
+  }
+
+  private IValidationSupport createValidationSupportChain(FhirContext fhirContext) {
     DefaultProfileValidationSupport defaultSupport =
         new DefaultProfileValidationSupport(fhirContext);
-
+    CommonCodeSystemsTerminologyService commonTerminology =
+        new CommonCodeSystemsTerminologyService(fhirContext);
     InMemoryTerminologyServerValidationSupport inMemoryTerminology =
         new InMemoryTerminologyServerValidationSupport(fhirContext);
 
-    CommonCodeSystemsTerminologyService commonCodeSystems =
-        new CommonCodeSystemsTerminologyService(fhirContext);
+    // ABDM Profile Support (NPM Package)
+    NpmPackageValidationSupport npmSupport = new NpmPackageValidationSupport(fhirContext);
+    loadABDMProfiles(npmSupport);
 
-    RemoteTerminologyServiceValidationSupport remoteTerminologySupport =
+    // Remote Terminology Support (tx.fhir.org)
+    RemoteTerminologyServiceValidationSupport remoteTerminology =
         new RemoteTerminologyServiceValidationSupport(fhirContext);
-    remoteTerminologySupport.setBaseUrl("https://tx.fhir.org/r4");
+    remoteTerminology.setBaseUrl("https://tx.fhir.org/r4");
 
-    SnapshotGeneratingValidationSupport snapshotSupport =
-        new SnapshotGeneratingValidationSupport(fhirContext);
-
-    ValidationSupportChain validationSupportChain =
+    ValidationSupportChain chain =
         new ValidationSupportChain(
-            npmPackageSupport,
+            npmSupport,
             defaultSupport,
             inMemoryTerminology,
-            commonCodeSystems,
-            remoteTerminologySupport,
-            snapshotSupport);
+            commonTerminology,
+            remoteTerminology,
+            new SnapshotGeneratingValidationSupport(fhirContext));
 
-    CachingValidationSupport cachingSupport = new CachingValidationSupport(validationSupportChain);
+    return new CachingValidationSupport(chain);
+  }
 
-    FhirInstanceValidator instanceValidator = new FhirInstanceValidator(cachingSupport);
-    instanceValidator.setErrorForUnknownProfiles(true);
-    instanceValidator.setNoTerminologyChecks(false);
+  private void loadABDMProfiles(NpmPackageValidationSupport npmSupport) {
+    try {
+      npmSupport.loadPackageFromClasspath(NPM_PACKAGE_PATH);
+      log.info(LogMessageConstants.NPM_LOAD_SUCCESS);
+    } catch (Exception e) {
+      log.error(LogMessageConstants.NPM_LOAD_FAILED, e.getMessage());
+    }
+  }
+
+  private FhirInstanceValidator configureInstanceValidator(IValidationSupport support) {
+    FhirInstanceValidator instanceValidator = new FhirInstanceValidator(support);
     instanceValidator.setAnyExtensionsAllowed(false);
-    //        instanceValidator.setValidateManagedMessages(true);
-    instanceValidator.setBestPracticeWarningLevel(
-        org.hl7.fhir.r5.utils.validation.constants.BestPracticeWarningLevel.Warning);
-
-    FhirValidator validator = fhirContext.newValidator();
-    validator.registerValidatorModule(instanceValidator);
-    return validator;
+    instanceValidator.setErrorForUnknownProfiles(true);
+    instanceValidator.setBestPracticeWarningLevel(BestPracticeWarningLevel.Warning);
+    return instanceValidator;
   }
 }
