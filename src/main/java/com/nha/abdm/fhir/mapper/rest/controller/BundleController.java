@@ -3,10 +3,15 @@ package com.nha.abdm.fhir.mapper.rest.controller;
 
 import com.nha.abdm.fhir.mapper.rest.common.constants.ControllerMappingConstants;
 import com.nha.abdm.fhir.mapper.rest.converter.*;
+import com.nha.abdm.fhir.mapper.rest.dto.validation.ValidationResult;
+import com.nha.abdm.fhir.mapper.rest.exceptions.FhirValidationException;
 import com.nha.abdm.fhir.mapper.rest.requests.*;
+import com.nha.abdm.fhir.mapper.rest.services.FhirValidationService;
 import jakarta.validation.Valid;
 import java.text.ParseException;
+import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.Bundle;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(path = ControllerMappingConstants.BUNDLE_BASE_PATH)
 @Validated
+@Slf4j
 public class BundleController {
 
   private final ImmunizationConverter immunizationConverter;
@@ -24,6 +30,10 @@ public class BundleController {
   private final DischargeSummaryConverter dischargeSummaryConverter;
   private final WellnessRecordConverter wellnessRecordConverter;
   private final InvoiceRequestConverter invoiceRequestConverter;
+  private final FhirValidationService fhirValidationService;
+
+  @Value("${fhir.validation.failOnError:true}")
+  private boolean failOnValidationError;
 
   public BundleController(
       ImmunizationConverter immunizationConverter,
@@ -33,7 +43,8 @@ public class BundleController {
       DiagnosticReportConverter diagnosticReportConverter,
       DischargeSummaryConverter dischargeSummaryConverter,
       WellnessRecordConverter wellnessRecordConverter,
-      InvoiceRequestConverter invoiceRequestConverter) {
+      InvoiceRequestConverter invoiceRequestConverter,
+      FhirValidationService fhirValidationService) {
     this.immunizationConverter = immunizationConverter;
     this.prescriptionConverter = prescriptionConverter;
     this.healthDocumentConverter = healthDocumentConverter;
@@ -42,6 +53,7 @@ public class BundleController {
     this.dischargeSummaryConverter = dischargeSummaryConverter;
     this.wellnessRecordConverter = wellnessRecordConverter;
     this.invoiceRequestConverter = invoiceRequestConverter;
+    this.fhirValidationService = fhirValidationService;
   }
 
   /**
@@ -53,7 +65,8 @@ public class BundleController {
   @ResponseStatus(HttpStatus.CREATED)
   public Bundle createImmunizationBundle(
       @Valid @RequestBody ImmunizationRequest immunizationRequest) throws ParseException {
-    return immunizationConverter.makeImmunizationBundle(immunizationRequest);
+    Bundle bundle = immunizationConverter.makeImmunizationBundle(immunizationRequest);
+    return validateAndReturnBundle(bundle);
   }
 
   /**
@@ -65,7 +78,8 @@ public class BundleController {
   @ResponseStatus(HttpStatus.CREATED)
   public Bundle createPrescriptionBundle(
       @Valid @RequestBody PrescriptionRequest prescriptionRequest) throws ParseException {
-    return prescriptionConverter.convertToPrescriptionBundle(prescriptionRequest);
+    Bundle bundle = prescriptionConverter.convertToPrescriptionBundle(prescriptionRequest);
+    return validateAndReturnBundle(bundle);
   }
 
   /**
@@ -77,7 +91,8 @@ public class BundleController {
   @ResponseStatus(HttpStatus.CREATED)
   public Bundle createOPConsultationBundle(
       @Valid @RequestBody OPConsultationRequest opConsultationRequest) throws ParseException {
-    return opConsultationConverter.convertToOPConsultationBundle(opConsultationRequest);
+    Bundle bundle = opConsultationConverter.convertToOPConsultationBundle(opConsultationRequest);
+    return validateAndReturnBundle(bundle);
   }
 
   /**
@@ -89,7 +104,8 @@ public class BundleController {
   @ResponseStatus(HttpStatus.CREATED)
   public Bundle createHealthDocumentBundle(
       @Valid @RequestBody HealthDocumentRecord healthDocumentRecord) throws ParseException {
-    return healthDocumentConverter.convertToHealthDocumentBundle(healthDocumentRecord);
+    Bundle bundle = healthDocumentConverter.convertToHealthDocumentBundle(healthDocumentRecord);
+    return validateAndReturnBundle(bundle);
   }
 
   /**
@@ -102,7 +118,8 @@ public class BundleController {
   @ResponseStatus(HttpStatus.CREATED)
   public Bundle createDiagnosticReportBundle(
       @Valid @RequestBody DiagnosticReportRequest diagnosticReportRequest) throws ParseException {
-    return diagnosticReportConverter.convertToDiagnosticBundle(diagnosticReportRequest);
+    Bundle bundle = diagnosticReportConverter.convertToDiagnosticBundle(diagnosticReportRequest);
+    return validateAndReturnBundle(bundle);
   }
 
   /**
@@ -114,7 +131,8 @@ public class BundleController {
   @ResponseStatus(HttpStatus.CREATED)
   public Bundle createDischargeSummaryBundle(
       @Valid @RequestBody DischargeSummaryRequest dischargeSummaryRequest) throws ParseException {
-    return dischargeSummaryConverter.convertToDischargeSummary(dischargeSummaryRequest);
+    Bundle bundle = dischargeSummaryConverter.convertToDischargeSummary(dischargeSummaryRequest);
+    return validateAndReturnBundle(bundle);
   }
 
   /**
@@ -125,7 +143,8 @@ public class BundleController {
   @ResponseStatus(HttpStatus.CREATED)
   public Bundle createWellnessBundle(
       @Valid @RequestBody WellnessRecordRequest wellnessRecordRequest) throws ParseException {
-    return wellnessRecordConverter.getWellnessBundle(wellnessRecordRequest);
+    Bundle bundle = wellnessRecordConverter.getWellnessBundle(wellnessRecordRequest);
+    return validateAndReturnBundle(bundle);
   }
 
   /**
@@ -137,6 +156,23 @@ public class BundleController {
   @ResponseStatus(HttpStatus.CREATED)
   public Bundle createInvoiceBundle(@Valid @RequestBody InvoiceBundleRequest invoiceBundleRequest)
       throws ParseException {
-    return invoiceRequestConverter.makeInvoiceBundle(invoiceBundleRequest);
+    Bundle bundle = invoiceRequestConverter.makeInvoiceBundle(invoiceBundleRequest);
+    return validateAndReturnBundle(bundle);
+  }
+
+  private Bundle validateAndReturnBundle(Bundle bundle) {
+    ValidationResult validationResult = fhirValidationService.validateBundle(bundle);
+
+    if (!validationResult.isValid()) {
+      if (failOnValidationError) {
+        throw new FhirValidationException(validationResult);
+      } else {
+        log.warn(
+            "FHIR validation failed but continuing: {} errors, {} warnings",
+            validationResult.getErrorCount(),
+            validationResult.getWarningCount());
+      }
+    }
+    return bundle;
   }
 }

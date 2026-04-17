@@ -1,6 +1,7 @@
 /* (C) 2024 */
 package com.nha.abdm.fhir.mapper.rest.exceptions;
 
+import ca.uhn.fhir.parser.DataFormatException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ErrorCode;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.JsonParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ControllerAdvice
 public class GlobalExceptionHandler {
   private static Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+  @Value("${fhir.validation.fail-on-error:false}")
+  private boolean failOnValidationError;
+
+  @Value("${fhir.validation.log-details:false}")
+  private boolean logValidationDetails;
 
   @ExceptionHandler(FhirMapperException.class)
   public ResponseEntity<FacadeError> handleFhirMapperException(FhirMapperException ex) {
@@ -129,5 +137,40 @@ public class GlobalExceptionHandler {
         + fieldPath
         + "': "
         + jsonMappingException.getOriginalMessage();
+  }
+
+  @ExceptionHandler(FhirValidationException.class)
+  public ResponseEntity<?> handleFhirValidationException(FhirValidationException e) {
+    if (logValidationDetails) {
+      log.warn("FHIR validation failed: {}", e.getValidationResult().getErrorCount() + " errors");
+      e.getValidationResult()
+          .getIssues()
+          .forEach(
+              issue ->
+                  log.debug("Validation issue: {} - {}", issue.getSeverity(), issue.getDetails()));
+    }
+
+    if (failOnValidationError) {
+      return ResponseEntity.badRequest().body(e.getValidationResult());
+    } else {
+      log.warn(
+          "FHIR validation failed but continuing due to fail-on-error=false: {} errors",
+          e.getValidationResult().getErrorCount());
+      return null;
+    }
+  }
+
+  @ExceptionHandler(DataFormatException.class)
+  public ResponseEntity<FacadeError> handleDataFormatException(DataFormatException ex) {
+    log.error("FHIR Parsing Error: {}", ex.getMessage());
+    return new ResponseEntity<>(
+        FacadeError.builder()
+            .error(
+                ErrorResponse.builder()
+                    .code(ErrorCode.PARSE_ERROR)
+                    .message("FHIR Parsing Error: " + ex.getMessage())
+                    .build())
+            .build(),
+        HttpStatus.BAD_REQUEST);
   }
 }
