@@ -3,48 +3,31 @@ package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.*;
+import com.nha.abdm.fhir.mapper.rest.common.helpers.BundleUtils;
 import com.nha.abdm.fhir.mapper.rest.dto.compositions.MakeHealthDocumentComposition;
 import com.nha.abdm.fhir.mapper.rest.dto.resources.*;
-import com.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
+import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.HealthDocumentRecord;
 import java.text.ParseException;
 import java.util.*;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class HealthDocumentConverter {
   private static final Logger log = LoggerFactory.getLogger(HealthDocumentConverter.class);
   private final MakeOrganisationResource makeOrganisationResource;
   private final MakeBundleMetaResource makeBundleMetaResource;
-
   private final MakePatientResource makePatientResource;
-
   private final MakePractitionerResource makePractitionerResource;
   private final MakeDocumentResource makeDocumentResource;
   private final MakeEncounterResource makeEncounterResource;
   private final MakeHealthDocumentComposition makeHealthDocumentComposition;
-
-  public HealthDocumentConverter(
-      MakeOrganisationResource makeOrganisationResource,
-      MakeBundleMetaResource makeBundleMetaResource,
-      MakePatientResource makePatientResource,
-      MakePractitionerResource makePractitionerResource,
-      MakeDocumentResource makeDocumentResource,
-      MakeEncounterResource makeEncounterResource,
-      MakeHealthDocumentComposition makeHealthDocumentComposition) {
-    this.makeOrganisationResource = makeOrganisationResource;
-    this.makeBundleMetaResource = makeBundleMetaResource;
-    this.makePatientResource = makePatientResource;
-    this.makePractitionerResource = makePractitionerResource;
-    this.makeDocumentResource = makeDocumentResource;
-    this.makeEncounterResource = makeEncounterResource;
-    this.makeHealthDocumentComposition = makeHealthDocumentComposition;
-  }
 
   public Bundle convertToHealthDocumentBundle(HealthDocumentRecord healthDocumentRecord)
       throws ParseException {
@@ -72,15 +55,7 @@ public class HealthDocumentConverter {
           encounter,
           documentReferenceList);
     } catch (Exception e) {
-      if (e instanceof InvalidDataAccessResourceUsageException) {
-        log.error(e.getMessage());
-        throw new FhirMapperException(
-            ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE);
-      }
-      if (e instanceof FhirMapperException) {
-        throw e;
-      }
-      throw new FhirMapperException(ErrorCode.UNKNOWN_ERROR, e.getMessage());
+      throw ExceptionHandler.handle(e, log);
     }
   }
 
@@ -163,27 +138,14 @@ public class HealthDocumentConverter {
         new Identifier()
             .setSystem(BundleUrlIdentifier.WRAPPER_URL)
             .setValue(healthDocumentRecord.getCareContextReference()));
-    List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
-    addBundleEntry(entries, composition);
-    addBundleEntry(entries, patient);
-    practitionerList.forEach(practitioner -> addBundleEntry(entries, practitioner));
-    if (Objects.nonNull(organization)) {
-      addBundleEntry(entries, organization);
-    }
-    if (Objects.nonNull(encounter)) {
-      addBundleEntry(entries, encounter);
-    }
-    documentReferenceList.forEach(document -> addBundleEntry(entries, document));
-    bundle.setEntry(entries);
-    return bundle;
-  }
 
-  private void addBundleEntry(List<Bundle.BundleEntryComponent> entries, Resource resource) {
-    if (resource != null && resource.getId() != null) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + resource.getId())
-              .setResource(resource));
-    }
+    BundleUtils.addEntry(bundle, composition);
+    BundleUtils.addEntry(bundle, patient);
+    BundleUtils.addEntries(bundle, practitionerList);
+    BundleUtils.addEntry(bundle, organization);
+    BundleUtils.addEntry(bundle, encounter);
+    BundleUtils.addEntries(bundle, documentReferenceList);
+
+    return bundle;
   }
 }

@@ -1,6 +1,8 @@
 /* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.controller;
 
+import com.nha.abdm.fhir.mapper.rest.common.constants.ControllerMappingConstants;
+import com.nha.abdm.fhir.mapper.rest.common.constants.SwaggerConstants;
 import com.nha.abdm.fhir.mapper.rest.dto.validation.ValidationResult;
 import com.nha.abdm.fhir.mapper.rest.services.FhirValidationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,25 +16,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/v1/bundle")
+@RequestMapping(ControllerMappingConstants.BUNDLE_BASE_PATH)
 @RequiredArgsConstructor
-@Tag(name = "FHIR Validation", description = "Endpoints for validating FHIR bundles")
+@Tag(name = SwaggerConstants.VALIDATION_CONTROLLER_TAG, description = SwaggerConstants.VALIDATION_CONTROLLER_DESCRIPTION)
 public class ValidationController {
 
   private final FhirValidationService fhirValidationService;
 
-  @PostMapping("/validate")
+  @PostMapping(ControllerMappingConstants.VALIDATE_PATH)
   @Operation(
-      summary = "Validate FHIR Bundle",
-      description = "Validates a FHIR bundle against structural requirements and NDHM profiles")
+      summary = SwaggerConstants.VALIDATE_BUNDLE_SUMMARY,
+      description = SwaggerConstants.VALIDATE_BUNDLE_DESCRIPTION)
   @ApiResponses(
       value = {
-        @ApiResponse(responseCode = "200", description = "Validation completed successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid FHIR bundle"),
-        @ApiResponse(responseCode = "500", description = "Internal server error")
+        @ApiResponse(responseCode = SwaggerConstants.HTTP_200, description = SwaggerConstants.VALIDATION_SUCCESS_DESCRIPTION),
+        @ApiResponse(responseCode = SwaggerConstants.HTTP_400, description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION),
+        @ApiResponse(responseCode = SwaggerConstants.HTTP_500, description = SwaggerConstants.INTERNAL_SERVER_ERROR_DESCRIPTION)
       })
   public ResponseEntity<ValidationResult> validateBundle(
-      @Parameter(description = "FHIR Bundle to validate") @RequestBody Bundle bundle) {
+      @Parameter(description = SwaggerConstants.BUNDLE_PARAMETER_DESCRIPTION) @RequestBody Bundle bundle) {
 
     ValidationResult result = fhirValidationService.validateBundle(bundle);
     return ResponseEntity.ok(result);

@@ -1,9 +1,11 @@
 /* (C) 2026 */
 package com.nha.abdm.fhir.mapper;
 
+import static com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants.ISO_DATE_TIME_FORMAT;
+
+import com.nha.abdm.fhir.mapper.rest.common.constants.LogMessageConstants;
 import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.utilities.xhtml.NodeType;
@@ -14,9 +16,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Utils {
-  private static final SimpleDateFormat ISO_DATE_TIME_FORMAT =
-      new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-  private static final SimpleDateFormat DATE_ONLY_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
   private static final Logger log = LoggerFactory.getLogger(Utils.class);
 
   public static InstantType getCurrentTimeStamp() throws ParseException {
@@ -27,7 +27,7 @@ public class Utils {
 
   public static DateTimeType getFormattedDateTime(String dateTimeString) throws ParseException {
     if (dateTimeString == null || dateTimeString.isEmpty()) {
-      log.error("DateTime string is null or empty");
+      log.error(LogMessageConstants.DATETIME_NULL_OR_EMPTY);
       return null;
     }
     dateTimeString = dateTimeString.trim();
@@ -41,7 +41,7 @@ public class Utils {
 
   public static Date getFormattedDate(String dateTimeString) {
     if (dateTimeString == null || dateTimeString.isEmpty()) {
-      log.error("DateTime string is null or empty");
+      log.error(LogMessageConstants.DATETIME_NULL_OR_EMPTY);
       return null;
     }
     dateTimeString = dateTimeString.trim();

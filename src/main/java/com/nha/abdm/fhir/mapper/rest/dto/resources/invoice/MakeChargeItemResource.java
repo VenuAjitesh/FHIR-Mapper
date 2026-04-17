@@ -1,20 +1,25 @@
-/* (C) 2025 */
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources.invoice;
 
 import com.nha.abdm.fhir.mapper.Utils;
+import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import com.nha.abdm.fhir.mapper.rest.database.h2.repositories.TypeChargeItemRepo;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.TypeChargeItem;
+import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.ChargeItemResource;
 import java.util.Objects;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MakeChargeItemResource {
+  private static final Logger log = LoggerFactory.getLogger(MakeChargeItemResource.class);
   @Autowired private TypeChargeItemRepo typeChargeItemRepo;
 
   public ChargeItem getChargeItems(ChargeItemResource resource, String baseUrl) {
@@ -35,7 +40,7 @@ public class MakeChargeItemResource {
         chargeItem.setStatus(
             ChargeItem.ChargeItemStatus.valueOf(resource.getStatus().getValue().toUpperCase()));
       } catch (IllegalArgumentException e) {
-        chargeItem.setStatus(ChargeItem.ChargeItemStatus.NULL);
+        throw ExceptionHandler.handle(e, log);
       }
     }
 
@@ -68,7 +73,8 @@ public class MakeChargeItemResource {
     }
 
     if (resource.getQuantity() != null && resource.getQuantity() > 0) {
-      chargeItem.setQuantity(new Quantity().setValue(resource.getQuantity()).setUnit("pcs"));
+      chargeItem.setQuantity(
+          new Quantity().setValue(resource.getQuantity()).setUnit(MapperConstants.PCS));
     }
 
     if (Objects.nonNull(resource.getMedication())) {

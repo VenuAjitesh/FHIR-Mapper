@@ -15,36 +15,49 @@ import org.springframework.stereotype.Component;
 public class MakePatientResource {
 
   public Patient getPatient(PatientResource patientResource) throws ParseException {
-    Coding coding = new Coding();
-    coding.setCode("MR");
-    coding.setSystem(ResourceProfileIdentifier.PROFILE_PROVIDER);
-    coding.setDisplay("Medical record number");
-    CodeableConcept codeableConcept = new CodeableConcept();
-    codeableConcept.addCoding(coding);
-    Identifier identifier = new Identifier();
-    identifier.setType(codeableConcept);
-    identifier.setSystem(BundleUrlIdentifier.HEALTH_ID_URL);
-    identifier.setValue(patientResource.getPatientReference());
-
-    Meta meta = new Meta();
-    meta.setVersionId("1");
-    meta.setLastUpdatedElement(Utils.getCurrentTimeStamp());
-    meta.addProfile(ResourceProfileIdentifier.PROFILE_PATIENT);
-
     Patient patient = new Patient();
+    patient.setId(UUID.randomUUID().toString());
+    patient.setMeta(buildMeta());
+    patient.addIdentifier(buildIdentifier(patientResource));
     patient.addName(new HumanName().setText(patientResource.getName()));
+    buildGender(patient, patientResource);
+    buildBirthDate(patient, patientResource);
+    Utils.setNarrative(patient, "Patient: " + patientResource.getName());
+    return patient;
+  }
+
+  private Meta buildMeta() throws ParseException {
+    return new Meta()
+        .setVersionId("1")
+        .setLastUpdatedElement(Utils.getCurrentTimeStamp())
+        .addProfile(ResourceProfileIdentifier.PROFILE_PATIENT);
+  }
+
+  private Identifier buildIdentifier(PatientResource patientResource) {
+    Coding coding =
+        new Coding()
+            .setCode("MR")
+            .setSystem(ResourceProfileIdentifier.PROFILE_PROVIDER)
+            .setDisplay("Medical record number");
+
+    return new Identifier()
+        .setType(new CodeableConcept().addCoding(coding))
+        .setSystem(BundleUrlIdentifier.HEALTH_ID_URL)
+        .setValue(patientResource.getPatientReference());
+  }
+
+  private void buildGender(Patient patient, PatientResource patientResource) {
     if (patientResource.getGender() != null) {
       patient.setGender(
           Enumerations.AdministrativeGender.fromCode(
               patientResource.getGender().toLowerCase(Locale.ROOT)));
     }
+  }
+
+  private void buildBirthDate(Patient patient, PatientResource patientResource)
+      throws ParseException {
     if (patientResource.getBirthDate() != null) {
       patient.setBirthDate(Utils.getFormattedDateTime(patientResource.getBirthDate()).getValue());
     }
-    patient.setMeta(meta);
-    patient.addIdentifier(identifier);
-    patient.setId(UUID.randomUUID().toString());
-    Utils.setNarrative(patient, "Patient: " + patientResource.getName());
-    return patient;
   }
 }

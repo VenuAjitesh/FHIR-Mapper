@@ -1,3 +1,4 @@
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import com.nha.abdm.fhir.mapper.Utils;
@@ -8,13 +9,14 @@ import com.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedConditionProcedure;
 import java.text.ParseException;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.r4.model.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class MakeConditionResource {
-  @Autowired SnomedService snomedService;
+  private final SnomedService snomedService;
 
   public Condition getCondition(
       String conditionDetails, Patient patient, String recordedDate, DateRange dateRange)

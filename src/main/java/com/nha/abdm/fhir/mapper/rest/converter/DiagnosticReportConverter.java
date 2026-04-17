@@ -1,10 +1,12 @@
-/* (C) 2024 */
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.*;
+import com.nha.abdm.fhir.mapper.rest.common.helpers.BundleUtils;
 import com.nha.abdm.fhir.mapper.rest.dto.compositions.MakeDiagnosticComposition;
 import com.nha.abdm.fhir.mapper.rest.dto.resources.*;
+import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.DiagnosticReportRequest;
@@ -14,7 +16,6 @@ import java.util.*;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -92,8 +93,7 @@ public class DiagnosticReportConverter {
           documentReferenceList);
 
     } catch (Exception e) {
-      handleException(e);
-      return null;
+      throw ExceptionHandler.handle(e, log);
     }
   }
 
@@ -228,44 +228,16 @@ public class DiagnosticReportConverter {
             .setSystem(BundleUrlIdentifier.WRAPPER_URL)
             .setValue(diagnosticReportRequest.getCareContextReference()));
 
-    List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
-    addBundleEntry(entries, composition, BundleResourceIdentifier.COMPOSITION);
-    addBundleEntry(entries, patient, BundleResourceIdentifier.PATIENT);
-    practitionerList.forEach(
-        practitioner ->
-            addBundleEntry(entries, practitioner, BundleResourceIdentifier.PRACTITIONER));
-    addBundleEntry(entries, organization, BundleResourceIdentifier.ORGANISATION);
-    addBundleEntry(entries, encounter, BundleResourceIdentifier.ENCOUNTER);
-    diagnosticResources.diagnosticReportList.forEach(
-        report -> addBundleEntry(entries, report, BundleResourceIdentifier.DIAGNOSTIC_REPORT));
-    diagnosticResources.diagnosticObservationList.forEach(
-        observation -> addBundleEntry(entries, observation, BundleResourceIdentifier.OBSERVATION));
-    documentReferenceList.forEach(
-        document -> addBundleEntry(entries, document, BundleResourceIdentifier.DOCUMENT_REFERENCE));
+    BundleUtils.addEntry(bundle, composition);
+    BundleUtils.addEntry(bundle, patient);
+    BundleUtils.addEntries(bundle, practitionerList);
+    BundleUtils.addEntry(bundle, organization);
+    BundleUtils.addEntry(bundle, encounter);
+    BundleUtils.addEntries(bundle, diagnosticResources.diagnosticReportList);
+    BundleUtils.addEntries(bundle, diagnosticResources.diagnosticObservationList);
+    BundleUtils.addEntries(bundle, documentReferenceList);
 
-    bundle.setEntry(entries);
     return bundle;
-  }
-
-  private void handleException(Exception e) throws FhirMapperException {
-    if (e instanceof InvalidDataAccessResourceUsageException) {
-      log.error(e.getMessage());
-      throw new FhirMapperException(ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE);
-    }
-    if (e instanceof FhirMapperException) {
-      throw (FhirMapperException) e;
-    }
-    throw new FhirMapperException(ErrorCode.UNKNOWN_ERROR, e.getMessage());
-  }
-
-  private void addBundleEntry(
-      List<Bundle.BundleEntryComponent> entries, Resource resource, String resourceIdentifier) {
-    if (resource != null && resource.getId() != null) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + resource.getId())
-              .setResource(resource));
-    }
   }
 
   private static class DiagnosticResources {

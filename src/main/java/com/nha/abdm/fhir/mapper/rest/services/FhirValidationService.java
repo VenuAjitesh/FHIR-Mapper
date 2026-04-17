@@ -5,6 +5,8 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.validation.FhirValidator;
 import ca.uhn.fhir.validation.SingleValidationMessage;
 import ca.uhn.fhir.validation.ValidationResult;
+import com.nha.abdm.fhir.mapper.rest.common.constants.ConfigurationConstants;
+import com.nha.abdm.fhir.mapper.rest.common.constants.LogMessageConstants;
 import com.nha.abdm.fhir.mapper.rest.dto.validation.ValidationResult.ValidationIssue;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,10 +24,10 @@ public class FhirValidationService {
   private final FhirContext fhirContext;
   private final FhirValidator fhirValidator;
 
-  @Value("${fhir.validation.enabled:false}")
+  @Value(ConfigurationConstants.FHIR_VALIDATION_ENABLED)
   private boolean validationEnabled;
 
-  @Value("${fhir.validation.log-details:false}")
+  @Value(ConfigurationConstants.FHIR_VALIDATION_LOG_DETAILS)
   private boolean logDetails;
 
   public com.nha.abdm.fhir.mapper.rest.dto.validation.ValidationResult validateBundle(
@@ -40,15 +42,17 @@ public class FhirValidationService {
       List<SingleValidationMessage> messages = hapiValidationResult.getMessages();
 
       if (logDetails && !messages.isEmpty()) {
-        log.info("FHIR Validation completed with {} messages", messages.size());
+        log.info(LogMessageConstants.VALIDATION_COMPLETED, messages.size());
         messages.forEach(
-            msg -> log.debug("Validation: {} - {}", msg.getSeverity(), msg.getMessage()));
+            msg ->
+                log.debug(
+                    LogMessageConstants.VALIDATION_ISSUE, msg.getSeverity(), msg.getMessage()));
       }
 
       return createValidationResult(messages);
 
     } catch (Exception e) {
-      log.error("Error during FHIR validation: {}", e.getMessage(), e);
+      log.error(LogMessageConstants.VALIDATION_ERROR, e.getMessage(), e);
       return createErrorResult("Validation failed due to internal error: " + e.getMessage());
     }
   }

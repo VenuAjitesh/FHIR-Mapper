@@ -15,38 +15,46 @@ import org.springframework.stereotype.Component;
 public class MakeOrganisationResource {
   public Organization getOrganization(OrganisationResource organisationResource)
       throws ParseException {
-    Coding coding = new Coding();
-    coding.setCode("PRN");
-    coding.setSystem(ResourceProfileIdentifier.PROFILE_PROVIDER);
-    coding.setDisplay("Provider number");
-    CodeableConcept codeableConcept = new CodeableConcept();
-    codeableConcept.addCoding(coding);
-    Identifier identifier = new Identifier();
-    identifier.setType(codeableConcept);
-    identifier.setSystem(BundleUrlIdentifier.FACILITY_URL);
-    if (Objects.nonNull(organisationResource)) {
-      identifier.setValue(
-          organisationResource.getFacilityId() == null
-              ? UUID.randomUUID().toString()
-              : organisationResource.getFacilityId());
-    } else {
-      identifier.setValue(UUID.randomUUID().toString());
-    }
-
-    Meta meta = new Meta();
-    meta.setVersionId("1");
-    meta.setLastUpdatedElement(Utils.getCurrentTimeStamp());
-    meta.addProfile(ResourceProfileIdentifier.PROFILE_ORGANISATION);
-
     Organization organization = new Organization();
-    organization.setName(
-        organisationResource.getFacilityName() != null
-            ? organisationResource.getFacilityName()
-            : organisationResource.getFacilityId());
-    organization.setMeta(meta);
-    organization.addIdentifier(identifier);
     organization.setId(UUID.randomUUID().toString());
+    organization.setMeta(buildMeta());
+    organization.addIdentifier(buildIdentifier(organisationResource));
+    organization.setName(extractOrganizationName(organisationResource));
     Utils.setNarrative(organization, "Organization: " + organization.getName());
     return organization;
+  }
+
+  private Meta buildMeta() throws ParseException {
+    return new Meta()
+        .setVersionId("1")
+        .setLastUpdatedElement(Utils.getCurrentTimeStamp())
+        .addProfile(ResourceProfileIdentifier.PROFILE_ORGANISATION);
+  }
+
+  private Identifier buildIdentifier(OrganisationResource organisationResource) {
+    Coding coding =
+        new Coding()
+            .setCode("PRN")
+            .setSystem(ResourceProfileIdentifier.PROFILE_PROVIDER)
+            .setDisplay("Provider number");
+
+    String facilityId =
+        Objects.nonNull(organisationResource) && organisationResource.getFacilityId() != null
+            ? organisationResource.getFacilityId()
+            : UUID.randomUUID().toString();
+
+    return new Identifier()
+        .setType(new CodeableConcept().addCoding(coding))
+        .setSystem(BundleUrlIdentifier.FACILITY_URL)
+        .setValue(facilityId);
+  }
+
+  private String extractOrganizationName(OrganisationResource organisationResource) {
+    if (!Objects.nonNull(organisationResource)) {
+      return UUID.randomUUID().toString();
+    }
+    return organisationResource.getFacilityName() != null
+        ? organisationResource.getFacilityName()
+        : organisationResource.getFacilityId();
   }
 }

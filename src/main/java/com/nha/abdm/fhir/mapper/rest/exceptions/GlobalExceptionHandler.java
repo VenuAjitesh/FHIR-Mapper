@@ -4,23 +4,21 @@ package com.nha.abdm.fhir.mapper.rest.exceptions;
 import ca.uhn.fhir.parser.DataFormatException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.nha.abdm.fhir.mapper.rest.common.constants.ConfigurationConstants;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ErrorCode;
+import com.nha.abdm.fhir.mapper.rest.common.constants.LogMessageConstants;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.ErrorResponse;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.FacadeError;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.FieldErrorsResponse;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.ValidationErrorResponse;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.json.JsonParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -31,146 +29,106 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class GlobalExceptionHandler {
   private static Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-  @Value("${fhir.validation.fail-on-error:false}")
+  @Value(ConfigurationConstants.FHIR_VALIDATION_FAIL_ON_ERROR)
   private boolean failOnValidationError;
 
-  @Value("${fhir.validation.log-details:false}")
+  @Value(ConfigurationConstants.FHIR_VALIDATION_LOG_DETAILS)
   private boolean logValidationDetails;
 
   @ExceptionHandler(FhirMapperException.class)
   public ResponseEntity<FacadeError> handleFhirMapperException(FhirMapperException ex) {
-    return new ResponseEntity<>(
-        FacadeError.builder()
-            .error(ErrorResponse.builder().code(ex.getErrorCode()).message(ex.getMessage()).build())
-            .build(),
-        HttpStatus.BAD_REQUEST);
+    return ResponseEntity.badRequest()
+        .body(ErrorUtils.buildFacadeError(ex.getErrorCode(), ex.getMessage(), null));
   }
 
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<FacadeError> handleValidationExceptions(
       MethodArgumentNotValidException ex) {
-    List<FieldErrorsResponse> fieldErrorResponses = new ArrayList<>();
-    for (ObjectError error : ex.getBindingResult().getAllErrors()) {
-      if (error instanceof FieldError) {
-        FieldError fieldError = (FieldError) error;
-        fieldErrorResponses.add(
-            new FieldErrorsResponse(fieldError.getField(), fieldError.getDefaultMessage()));
-      }
-    }
+    List<FieldErrorsResponse> fieldErrors =
+        ex.getBindingResult().getFieldErrors().stream()
+            .map(e -> new FieldErrorsResponse(e.getField(), e.getDefaultMessage()))
+            .toList();
 
     ValidationErrorResponse errorResponse =
-        new ValidationErrorResponse(ErrorCode.VALIDATION_ERROR, fieldErrorResponses);
-    return new ResponseEntity<>(
-        FacadeError.builder().validationErrors(errorResponse).build(), HttpStatus.BAD_REQUEST);
+        new ValidationErrorResponse(ErrorCode.VALIDATION_ERROR, fieldErrors);
+    return ResponseEntity.badRequest()
+        .body(FacadeError.builder().validationErrors(errorResponse).build());
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
-  public ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
-    Throwable cause = ex.getCause();
-    String errorMessage = "Invalid request. Please check the JSON format.";
-
-    if (cause instanceof InvalidFormatException) {
-      InvalidFormatException invalidFormatException = (InvalidFormatException) cause;
-      Class<?> targetType = invalidFormatException.getTargetType();
-      errorMessage =
-          "Invalid input: Unable to map value to "
-              + targetType.getSimpleName()
-              + ", Kindly check base64 data";
-    } else if (cause instanceof JsonMappingException) {
-      errorMessage = "Invalid JSON structure. " + getParseExceptionMessage(cause);
-    } else if (cause instanceof JsonParseException) {
-      errorMessage = "JSON parse error: " + cause.getMessage();
-    } else if (cause != null) {
-      errorMessage += " Error: " + cause.getMessage();
-    }
-
+  public ResponseEntity<FacadeError> handleHttpMessageNotReadable(
+      HttpMessageNotReadableException ex) {
+    String errorMessage = determineErrorMessage(ex.getCause());
     FacadeError response =
-        FacadeError.builder()
-            .description("Invalid request. Please check the JSON format.")
-            .error(
-                ErrorResponse.builder().message(errorMessage).code(ErrorCode.PARSE_ERROR).build())
-            .build();
+        ErrorUtils.buildFacadeError(
+            ErrorCode.PARSE_ERROR, errorMessage, "Invalid request. Please check the JSON format.");
+    return ResponseEntity.badRequest().body(response);
+  }
 
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+  private String determineErrorMessage(Throwable cause) {
+    if (cause instanceof InvalidFormatException invalidEx) {
+      return "Invalid input: Unable to map value to "
+          + invalidEx.getTargetType().getSimpleName()
+          + ", Kindly check base64 data";
+    }
+    if (cause instanceof JsonMappingException) {
+      return "Invalid JSON structure. " + ErrorUtils.getJsonMappingErrorMessage(cause);
+    }
+    if (cause instanceof com.fasterxml.jackson.core.JsonParseException jsonEx) {
+      return "JSON parse error: " + jsonEx.getOriginalMessage();
+    }
+    return cause != null ? cause.getMessage() : "Invalid request format.";
   }
 
   @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
   public ResponseEntity<FacadeError> handleNotAcceptable(HttpMediaTypeNotAcceptableException ex) {
-    log.error("406 Not Acceptable: " + ex.getMessage());
-
-    ErrorResponse errorResponse =
-        new ErrorResponse(
+    log.error(LogMessageConstants.NOT_ACCEPTABLE_ERROR, ex.getMessage());
+    FacadeError response =
+        ErrorUtils.buildFacadeError(
             ErrorCode.PARSE_ERROR,
-            "The requested media type is not supported. Please check the 'Accept' header and base64 data if present");
-    return new ResponseEntity<>(
-        FacadeError.builder()
-            .description("Issue with base64 data or contentType/accept")
-            .error(errorResponse)
-            .build(),
-        HttpStatus.BAD_REQUEST);
+            "The requested media type is not supported. Please check the 'Accept' header.",
+            "Issue with base64 data or contentType/accept");
+    return ResponseEntity.badRequest().body(response);
   }
 
   @ExceptionHandler(ParseException.class)
   public ResponseEntity<ErrorResponse> handleParseException(ParseException ex) {
-    String errorMessage = "ParseError: " + ex.getMessage();
-
-    log.error("Parse error: " + ex.getMessage());
-    ErrorResponse errorResponse = new ErrorResponse(ErrorCode.PARSE_ERROR, errorMessage);
-    return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-  }
-
-  private String getParseExceptionMessage(Throwable cause) {
-    JsonMappingException jsonMappingException = (JsonMappingException) cause;
-
-    StringBuilder fieldPath = new StringBuilder();
-    for (JsonMappingException.Reference ref : jsonMappingException.getPath()) {
-      if (ref.getIndex() != -1) {
-        fieldPath.append("[").append(ref.getIndex()).append("]");
-      } else if (ref.getFieldName() != null) {
-        if (fieldPath.length() > 0) fieldPath.append(".");
-        fieldPath.append(ref.getFieldName());
-      }
-    }
-
-    return "JSON parse error in field '"
-        + fieldPath
-        + "': "
-        + jsonMappingException.getOriginalMessage();
+    log.error(LogMessageConstants.PARSE_ERROR, ex.getMessage());
+    return ResponseEntity.badRequest()
+        .body(new ErrorResponse(ErrorCode.PARSE_ERROR, "ParseError: " + ex.getMessage()));
   }
 
   @ExceptionHandler(FhirValidationException.class)
   public ResponseEntity<?> handleFhirValidationException(FhirValidationException e) {
     if (logValidationDetails) {
-      log.warn("FHIR validation failed: {}", e.getValidationResult().getErrorCount() + " errors");
+      log.warn(
+          LogMessageConstants.VALIDATION_FAILED_COUNT, e.getValidationResult().getErrorCount());
       e.getValidationResult()
           .getIssues()
           .forEach(
               issue ->
-                  log.debug("Validation issue: {} - {}", issue.getSeverity(), issue.getDetails()));
+                  log.debug(
+                      LogMessageConstants.VALIDATION_ISSUE,
+                      issue.getSeverity(),
+                      issue.getDetails()));
     }
 
     if (failOnValidationError) {
       return ResponseEntity.badRequest().body(e.getValidationResult());
-    } else {
-      log.warn(
-          "FHIR validation failed but continuing due to fail-on-error=false: {} errors",
-          e.getValidationResult().getErrorCount());
-      return null;
     }
+    log.warn(
+        LogMessageConstants.VALIDATION_FAILED_CONTINUING_COUNT,
+        e.getValidationResult().getErrorCount());
+    return null;
   }
 
   @ExceptionHandler(DataFormatException.class)
   public ResponseEntity<FacadeError> handleDataFormatException(DataFormatException ex) {
-    log.error("FHIR Parsing Error: {}", ex.getMessage());
-    return new ResponseEntity<>(
-        FacadeError.builder()
-            .error(
-                ErrorResponse.builder()
-                    .code(ErrorCode.PARSE_ERROR)
-                    .message("FHIR Parsing Error: " + ex.getMessage())
-                    .build())
-            .build(),
-        HttpStatus.BAD_REQUEST);
+    log.error(LogMessageConstants.FHIR_PARSING_ERROR, ex.getMessage());
+    return ResponseEntity.badRequest()
+        .body(
+            ErrorUtils.buildFacadeError(
+                ErrorCode.PARSE_ERROR, LogMessageConstants.FHIR_PARSING_ERROR_PREFIX + ex.getMessage(), null));
   }
 }

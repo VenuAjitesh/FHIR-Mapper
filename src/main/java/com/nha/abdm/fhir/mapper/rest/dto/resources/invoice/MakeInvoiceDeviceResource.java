@@ -1,7 +1,8 @@
-/* (C) 2025 */
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources.invoice;
 
 import com.nha.abdm.fhir.mapper.Utils;
+import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.InvoiceDeviceResource;
 import java.text.ParseException;
 import java.util.List;
@@ -11,10 +12,13 @@ import org.hl7.fhir.r4.model.Annotation;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Device;
 import org.hl7.fhir.r4.model.Identifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MakeInvoiceDeviceResource {
+  private static final Logger log = LoggerFactory.getLogger(MakeInvoiceDeviceResource.class);
 
   public Device getDevice(InvoiceDeviceResource deviceResource) throws ParseException {
     if (deviceResource == null) {
@@ -68,7 +72,7 @@ public class MakeInvoiceDeviceResource {
       try {
         device.setStatus(Device.FHIRDeviceStatus.fromCode(deviceResource.getStatus().getValue()));
       } catch (Exception e) {
-        device.setStatus(Device.FHIRDeviceStatus.UNKNOWN);
+        throw ExceptionHandler.handle(e, log);
       }
     }
 

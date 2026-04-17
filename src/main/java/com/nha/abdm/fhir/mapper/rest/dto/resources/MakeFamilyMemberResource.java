@@ -1,3 +1,4 @@
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import com.nha.abdm.fhir.mapper.Utils;
@@ -42,7 +43,9 @@ public class MakeFamilyMemberResource {
     return Utils.buildReference(patient.getId()).setDisplay(patient.getName().get(0).getText());
   }
 
-  private void setRelationship(FamilyMemberHistory familyMemberHistory, FamilyObservationResource familyObservationResource) {
+  private void setRelationship(
+      FamilyMemberHistory familyMemberHistory,
+      FamilyObservationResource familyObservationResource) {
     if (Objects.nonNull(familyObservationResource.getRelationship())) {
       familyMemberHistory.setRelationship(
           new CodeableConcept()
@@ -55,7 +58,9 @@ public class MakeFamilyMemberResource {
     }
   }
 
-  private void addCondition(FamilyMemberHistory familyMemberHistory, FamilyObservationResource familyObservationResource) {
+  private void addCondition(
+      FamilyMemberHistory familyMemberHistory,
+      FamilyObservationResource familyObservationResource) {
     if (Objects.nonNull(familyObservationResource.getObservation())) {
       SnomedObservation snomedCondition =
           snomedService.getSnomedObservationCode(familyObservationResource.getObservation());

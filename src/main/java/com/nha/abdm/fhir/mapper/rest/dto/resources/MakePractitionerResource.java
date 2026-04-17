@@ -15,28 +15,32 @@ import org.springframework.stereotype.Component;
 public class MakePractitionerResource {
   public Practitioner getPractitioner(PractitionerResource practitionerResource)
       throws ParseException {
-    Coding coding = new Coding();
-    coding.setCode("MR");
-    coding.setSystem(ResourceProfileIdentifier.PROFILE_PROVIDER);
-    coding.setDisplay(BundleFieldIdentifier.MEDICAL_RECORD_NUMBER);
-    CodeableConcept codeableConcept = new CodeableConcept();
-    codeableConcept.addCoding(coding);
-    Identifier identifier = new Identifier();
-    identifier.setType(codeableConcept);
-    identifier.setSystem(BundleUrlIdentifier.DOCTOR_ID_URL);
-    identifier.setValue(practitionerResource.getPractitionerId());
-
-    Meta meta = new Meta();
-    meta.setVersionId("1");
-    meta.setLastUpdatedElement(Utils.getCurrentTimeStamp());
-    meta.addProfile(ResourceProfileIdentifier.PROFILE_PRACTITIONER);
-
     Practitioner practitioner = new Practitioner();
-    practitioner.addName(new HumanName().setText(practitionerResource.getName()));
-    practitioner.setMeta(meta);
-    practitioner.addIdentifier(identifier);
     practitioner.setId(UUID.randomUUID().toString());
+    practitioner.setMeta(buildMeta());
+    practitioner.addIdentifier(buildIdentifier(practitionerResource));
+    practitioner.addName(new HumanName().setText(practitionerResource.getName()));
     Utils.setNarrative(practitioner, "Practitioner: " + practitionerResource.getName());
     return practitioner;
+  }
+
+  private Meta buildMeta() throws ParseException {
+    return new Meta()
+        .setVersionId("1")
+        .setLastUpdatedElement(Utils.getCurrentTimeStamp())
+        .addProfile(ResourceProfileIdentifier.PROFILE_PRACTITIONER);
+  }
+
+  private Identifier buildIdentifier(PractitionerResource practitionerResource) {
+    Coding coding =
+        new Coding()
+            .setCode("MR")
+            .setSystem(ResourceProfileIdentifier.PROFILE_PROVIDER)
+            .setDisplay(BundleFieldIdentifier.MEDICAL_RECORD_NUMBER);
+
+    return new Identifier()
+        .setType(new CodeableConcept().addCoding(coding))
+        .setSystem(BundleUrlIdentifier.DOCTOR_ID_URL)
+        .setValue(practitionerResource.getPractitionerId());
   }
 }

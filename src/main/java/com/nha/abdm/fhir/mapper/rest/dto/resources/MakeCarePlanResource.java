@@ -1,3 +1,4 @@
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
@@ -9,14 +10,15 @@ import com.nha.abdm.fhir.mapper.rest.requests.helpers.CarePlanResource;
 import java.util.Collections;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.r4.model.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class MakeCarePlanResource {
 
-  @Autowired SnomedService snomedService;
+  private final SnomedService snomedService;
 
   public CarePlan getCarePlan(CarePlanResource carePlanResource, Patient patient) {
     CarePlan carePlan = new CarePlan();
@@ -35,12 +37,9 @@ public class MakeCarePlanResource {
 
   private Reference createSubject(Patient patient) {
     return new Reference()
-        .setReference(
-            BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
+        .setReference(BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
         .setDisplay(
-            patient.getName().stream()
-                .map(HumanName::getText)
-                .collect(Collectors.joining(" ")));
+            patient.getName().stream().map(HumanName::getText).collect(Collectors.joining(" ")));
   }
 
   private CodeableConcept createCategory(CarePlanResource carePlanResource) {

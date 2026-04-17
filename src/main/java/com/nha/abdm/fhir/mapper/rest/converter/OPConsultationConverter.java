@@ -3,10 +3,11 @@ package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.*;
+import com.nha.abdm.fhir.mapper.rest.common.helpers.BundleUtils;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.DocumentResource;
 import com.nha.abdm.fhir.mapper.rest.dto.compositions.MakeOpComposition;
 import com.nha.abdm.fhir.mapper.rest.dto.resources.*;
-import com.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
+import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.OPConsultationRequest;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.*;
@@ -16,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,8 +38,7 @@ public class OPConsultationConverter {
   private final MakeProcedureResource makeProcedureResource;
   private final MakeOpComposition makeOpComposition;
 
-  public Bundle convertToOPConsultationBundle(OPConsultationRequest opConsultationRequest)
-      throws ParseException {
+  public Bundle convertToOPConsultationBundle(OPConsultationRequest opConsultationRequest) {
     try {
       Organization organization = createOrganization(opConsultationRequest);
       Patient patient = createPatient(opConsultationRequest);
@@ -104,15 +103,7 @@ public class OPConsultationConverter {
           otherObservationList,
           documentReferenceList);
     } catch (Exception e) {
-      if (e instanceof InvalidDataAccessResourceUsageException) {
-        log.error(e.getMessage());
-        throw new FhirMapperException(
-            ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE);
-      }
-      if (e instanceof FhirMapperException) {
-        throw e;
-      }
-      throw new FhirMapperException(ErrorCode.UNKNOWN_ERROR, e.getMessage());
+      throw ExceptionHandler.handle(e, log);
     }
   }
 
@@ -339,109 +330,26 @@ public class OPConsultationConverter {
         new Identifier()
             .setSystem(BundleUrlIdentifier.WRAPPER_URL)
             .setValue(opConsultationRequest.getCareContextReference()));
-    List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
-    entries.add(
-        new Bundle.BundleEntryComponent()
-            .setFullUrl(MapperConstants.URN_UUID + composition.getId())
-            .setResource(composition));
-    entries.add(
-        new Bundle.BundleEntryComponent()
-            .setFullUrl(MapperConstants.URN_UUID + patient.getId())
-            .setResource(patient));
-    for (Practitioner practitioner : practitionerList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + practitioner.getId())
-              .setResource(practitioner));
-    }
-    entries.add(
-        new Bundle.BundleEntryComponent()
-            .setFullUrl(MapperConstants.URN_UUID + encounter.getId())
-            .setResource(encounter));
-    entries.add(
-        new Bundle.BundleEntryComponent()
-            .setFullUrl(MapperConstants.URN_UUID + organization.getId())
-            .setResource(organization));
 
-    for (Condition complaint : chiefComplaintList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + complaint.getId())
-              .setResource(complaint));
-    }
-    for (Observation physicalObservation : physicalObservationList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + physicalObservation.getId())
-              .setResource(physicalObservation));
-    }
-    for (AllergyIntolerance allergyIntolerance : allergieList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + allergyIntolerance.getId())
-              .setResource(allergyIntolerance));
-    }
-    for (Condition medicalHistory : medicalHistoryList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + medicalHistory.getId())
-              .setResource(medicalHistory));
-    }
-    for (FamilyMemberHistory familyMemberHistory : familyMemberHistoryList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + familyMemberHistory.getId())
-              .setResource(familyMemberHistory));
-    }
-    for (ServiceRequest investigation : investigationAdviceList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + investigation.getId())
-              .setResource(investigation));
-    }
-    for (MedicationRequest medicationRequest : medicationsResult.medicationList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + medicationRequest.getId())
-              .setResource(medicationRequest));
-    }
-    for (Condition medicationCondition : medicationsResult.medicationConditionList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + medicationCondition.getId())
-              .setResource(medicationCondition));
-    }
-    for (Appointment followUp : followupList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + followUp.getId())
-              .setResource(followUp));
-    }
-    for (Procedure procedure : procedureList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + procedure.getId())
-              .setResource(procedure));
-    }
-    for (ServiceRequest referral : referralList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + referral.getId())
-              .setResource(referral));
-    }
-    for (Observation observation : otherObservationList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + observation.getId())
-              .setResource(observation));
-    }
-    for (DocumentReference documentReference : documentReferenceList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + documentReference.getId())
-              .setResource(documentReference));
-    }
-    bundle.setEntry(entries);
+    BundleUtils.addEntry(bundle, composition);
+    BundleUtils.addEntry(bundle, patient);
+    BundleUtils.addEntries(bundle, practitionerList);
+    BundleUtils.addEntry(bundle, encounter);
+    BundleUtils.addEntry(bundle, organization);
+    BundleUtils.addEntries(bundle, chiefComplaintList);
+    BundleUtils.addEntries(bundle, physicalObservationList);
+    BundleUtils.addEntries(bundle, allergieList);
+    BundleUtils.addEntries(bundle, medicalHistoryList);
+    BundleUtils.addEntries(bundle, familyMemberHistoryList);
+    BundleUtils.addEntries(bundle, investigationAdviceList);
+    BundleUtils.addEntries(bundle, medicationsResult.medicationList);
+    BundleUtils.addEntries(bundle, medicationsResult.medicationConditionList);
+    BundleUtils.addEntries(bundle, followupList);
+    BundleUtils.addEntries(bundle, procedureList);
+    BundleUtils.addEntries(bundle, referralList);
+    BundleUtils.addEntries(bundle, otherObservationList);
+    BundleUtils.addEntries(bundle, documentReferenceList);
+
     return bundle;
   }
 

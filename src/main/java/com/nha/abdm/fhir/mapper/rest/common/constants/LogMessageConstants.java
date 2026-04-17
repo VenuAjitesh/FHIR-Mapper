@@ -24,4 +24,7 @@ public class LogMessageConstants {
   public static final String VALIDATION_FAILED_CONTINUING =
       "FHIR validation failed but continuing: {} errors, {} warnings";
   public static final String DATETIME_NULL_OR_EMPTY = "DateTime string is null or empty";
+  public static final String VALIDATION_FAILED_CONTINUING_COUNT =
+      "FHIR validation failed but continuing (fail-on-error=false): {} errors";
+  public static final String FHIR_PARSING_ERROR_PREFIX = "FHIR Parsing Error: ";
 }

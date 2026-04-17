@@ -3,21 +3,24 @@ package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.*;
+import com.nha.abdm.fhir.mapper.rest.common.helpers.BundleUtils;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.OrganisationResource;
 import com.nha.abdm.fhir.mapper.rest.dto.compositions.MakeImmunizationComposition;
 import com.nha.abdm.fhir.mapper.rest.dto.resources.*;
+import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.ImmunizationRequest;
 import java.text.ParseException;
 import java.util.*;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class ImmunizationConverter {
   private static final Logger log = LoggerFactory.getLogger(ImmunizationConverter.class);
   private final MakeDocumentResource makeDocumentReference;
@@ -28,25 +31,6 @@ public class ImmunizationConverter {
   private final MakeBundleMetaResource makeBundleMetaResource;
   private final MakeEncounterResource makeEncounterResource;
   private final MakeImmunizationComposition makeImmunizationComposition;
-
-  public ImmunizationConverter(
-      MakeDocumentResource makeDocumentReference,
-      MakePatientResource makePatientResource,
-      MakePractitionerResource makePractitionerResource,
-      MakeOrganisationResource makeOrganisationResource,
-      MakeImmunizationResource makeImmunizationResource,
-      MakeBundleMetaResource makeBundleMetaResource,
-      MakeEncounterResource makeEncounterResource,
-      MakeImmunizationComposition makeImmunizationComposition) {
-    this.makeDocumentReference = makeDocumentReference;
-    this.makePatientResource = makePatientResource;
-    this.makePractitionerResource = makePractitionerResource;
-    this.makeOrganisationResource = makeOrganisationResource;
-    this.makeImmunizationResource = makeImmunizationResource;
-    this.makeBundleMetaResource = makeBundleMetaResource;
-    this.makeEncounterResource = makeEncounterResource;
-    this.makeImmunizationComposition = makeImmunizationComposition;
-  }
 
   public Bundle makeImmunizationBundle(ImmunizationRequest immunizationRequest)
       throws ParseException {
@@ -78,16 +62,13 @@ public class ImmunizationConverter {
           immunizationsResult,
           documentList);
     } catch (Exception e) {
-      if (e instanceof InvalidDataAccessResourceUsageException) {
-        log.error(e.getMessage());
-        throw new FhirMapperException(
-            ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE);
-      }
-      if (e instanceof FhirMapperException) {
-        throw e;
-      }
-      throw new FhirMapperException(ErrorCode.UNKNOWN_ERROR, e.getMessage());
+      handleException(e);
+      return null;
     }
+  }
+
+  private void handleException(Exception e) throws FhirMapperException {
+    throw ExceptionHandler.handle(e, log);
   }
 
   private Patient createPatient(ImmunizationRequest immunizationRequest) throws ParseException {
@@ -197,32 +178,17 @@ public class ImmunizationConverter {
         new Identifier()
             .setSystem(BundleUrlIdentifier.WRAPPER_URL)
             .setValue(immunizationRequest.getCareContextReference()));
-    List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
-    addBundleEntry(entries, composition);
-    addBundleEntry(entries, patient);
-    practitionerList.forEach(practitioner -> addBundleEntry(entries, practitioner));
-    if (Objects.nonNull(organization)) {
-      addBundleEntry(entries, organization);
-    }
-    if (Objects.nonNull(encounter)) {
-      addBundleEntry(entries, encounter);
-    }
-    immunizationsResult.manufactureList.forEach(
-        manufacturer -> addBundleEntry(entries, manufacturer));
-    immunizationsResult.immunizationList.forEach(
-        immunization -> addBundleEntry(entries, immunization));
-    documentList.forEach(document -> addBundleEntry(entries, document));
-    bundle.setEntry(entries);
-    return bundle;
-  }
 
-  private void addBundleEntry(List<Bundle.BundleEntryComponent> entries, Resource resource) {
-    if (resource != null && resource.getId() != null) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + resource.getId())
-              .setResource(resource));
-    }
+    BundleUtils.addEntry(bundle, composition);
+    BundleUtils.addEntry(bundle, patient);
+    BundleUtils.addEntries(bundle, practitionerList);
+    BundleUtils.addEntry(bundle, organization);
+    BundleUtils.addEntry(bundle, encounter);
+    BundleUtils.addEntries(bundle, immunizationsResult.manufactureList);
+    BundleUtils.addEntries(bundle, immunizationsResult.immunizationList);
+    BundleUtils.addEntries(bundle, documentList);
+
+    return bundle;
   }
 
   private static class ImmunizationsResult {

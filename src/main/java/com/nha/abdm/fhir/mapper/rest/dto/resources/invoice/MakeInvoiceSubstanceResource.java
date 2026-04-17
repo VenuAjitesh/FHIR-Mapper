@@ -1,4 +1,4 @@
-/* (C) 2025 */
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources.invoice;
 
 import com.nha.abdm.fhir.mapper.Utils;
@@ -10,10 +10,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Substance;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MakeInvoiceSubstanceResource {
+  private static final Logger log = LoggerFactory.getLogger(MakeInvoiceSubstanceResource.class);
 
   public Substance getSubstance(InvoiceSubstanceResource substanceResource) throws ParseException {
     Substance substance = new Substance();

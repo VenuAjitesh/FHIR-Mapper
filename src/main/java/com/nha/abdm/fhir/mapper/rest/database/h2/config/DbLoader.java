@@ -3,6 +3,7 @@ package com.nha.abdm.fhir.mapper.rest.database.h2.config;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nha.abdm.fhir.mapper.rest.common.constants.LogMessageConstants;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
@@ -65,7 +66,7 @@ public class DbLoader {
     try (InputStream inputStream = resource.getInputStream()) {
       String fileName = resource.getFilename();
       if (fileName == null || !fileName.endsWith(".json")) {
-        log.warn("Skipping invalid resource: {}", fileName);
+        log.warn(LogMessageConstants.SKIPPING_INVALID_RESOURCE, fileName);
         return;
       }
 
@@ -81,14 +82,14 @@ public class DbLoader {
             (List<Object>) dbMapper.readValue(inputStream, getTypeReference(entityName));
         repository.saveAll(entities);
 
-        log.info("Loaded {} records into {}", entities.size(), entityName);
+        log.info(LogMessageConstants.LOADED_RECORDS, entities.size(), entityName);
 
         addIndexesTransactional(entityName);
       } else {
-        log.info("No repository bean found for {}", entityName);
+        log.info(LogMessageConstants.NO_REPOSITORY_FOUND, entityName);
       }
     } catch (Exception e) {
-      log.error("Error processing resource: {}", resource.getFilename(), e);
+      log.error(LogMessageConstants.ERROR_PROCESSING_RESOURCE, resource.getFilename(), e);
       throw new RuntimeException(e);
     }
   }
