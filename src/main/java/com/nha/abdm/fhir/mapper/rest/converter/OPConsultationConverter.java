@@ -476,12 +476,8 @@ public class OPConsultationConverter {
         .stream()
         .map(
             StreamUtils.wrapException(
-                medicalHistory ->
-                    makeConditionResource.getCondition(
-                        medicalHistory.getComplaint(),
-                        patient,
-                        medicalHistory.getRecordedDate(),
-                        medicalHistory.getDateRange())))
+                conditionResource ->
+                    makeConditionResource.getCondition(conditionResource, patient)))
         .toList();
   }
 
@@ -526,12 +522,8 @@ public class OPConsultationConverter {
         .stream()
         .map(
             StreamUtils.wrapException(
-                complaint ->
-                    makeConditionResource.getCondition(
-                        complaint.getComplaint(),
-                        patient,
-                        complaint.getRecordedDate(),
-                        complaint.getDateRange())))
+                conditionResource ->
+                    makeConditionResource.getCondition(conditionResource, patient)))
         .toList();
   }
 

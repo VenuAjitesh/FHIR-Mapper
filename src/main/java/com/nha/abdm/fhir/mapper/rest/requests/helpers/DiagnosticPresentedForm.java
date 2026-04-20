@@ -5,6 +5,7 @@ import com.nha.abdm.fhir.mapper.rest.common.constants.SwaggerConstants;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ValidationConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +24,5 @@ public class DiagnosticPresentedForm {
   private String contentType;
 
   @Schema(description = SwaggerConstants.DOC_DATA_DESC, example = SwaggerConstants.DOC_DATA_EXAMPLE)
-  @NotBlank(message = ValidationConstants.DATA_MANDATORY)
-  private byte[] data;
+  @NotNull(message = ValidationConstants.DATA_MANDATORY) private byte[] data;
 }

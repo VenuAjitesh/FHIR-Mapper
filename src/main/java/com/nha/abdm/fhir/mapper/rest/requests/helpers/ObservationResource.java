@@ -30,17 +30,6 @@ public class ObservationResource {
   private String result;
 
   @Schema(
-      description = SwaggerConstants.OBS_VALUE_DESC,
-      example = SwaggerConstants.OBS_VALUE_EXAMPLE)
-  private double value;
-
-  @Schema(description = SwaggerConstants.OBS_UNIT_DESC, example = SwaggerConstants.OBS_UNIT_EXAMPLE)
-  private String unit;
-
-  @Schema(description = SwaggerConstants.OBS_CODE_DESC, example = SwaggerConstants.OBS_CODE_EXAMPLE)
-  private String code;
-
-  @Schema(
       description = SwaggerConstants.OBS_STATUS_DESC,
       example = SwaggerConstants.OBS_STATUS_EXAMPLE)
   private String status;

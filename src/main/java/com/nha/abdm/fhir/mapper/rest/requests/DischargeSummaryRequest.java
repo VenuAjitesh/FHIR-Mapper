@@ -54,13 +54,13 @@ public class DischargeSummaryRequest {
   @Valid
   @NotNull(message = ValidationConstants.ORGANISATION_MANDATORY) private OrganisationResource organisation;
 
-  @Valid private List<ChiefComplaintResource> chiefComplaints;
+  @Valid private List<ConditionResource> chiefComplaints;
 
   @Valid private List<ObservationResource> physicalExaminations;
 
   @Valid private List<AllergyResource> allergies;
 
-  @Valid private List<ChiefComplaintResource> medicalHistories;
+  @Valid private List<ConditionResource> medicalHistories;
 
   @Valid private List<FamilyObservationResource> familyHistories;
 

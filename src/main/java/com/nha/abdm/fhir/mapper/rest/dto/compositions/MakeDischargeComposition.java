@@ -22,7 +22,7 @@ public class MakeDischargeComposition {
       Encounter encounter,
       List<Practitioner> practitionerList,
       Organization organization,
-      List<Condition> chiefComplaintList,
+      List<Condition> conditionList,
       List<Observation> physicalObservationList,
       List<AllergyIntolerance> allergieList,
       List<MedicationRequest> medicationRequestList,
@@ -31,9 +31,7 @@ public class MakeDischargeComposition {
       List<FamilyMemberHistory> familyMemberHistoryList,
       CarePlan carePlan,
       List<Procedure> procedureList,
-      List<DocumentReference> documentReferenceList,
-      String docCode,
-      String docName)
+      List<DocumentReference> documentReferenceList)
       throws ParseException {
     Composition composition = new Composition();
     composition.setType(createType());
@@ -48,7 +46,7 @@ public class MakeDischargeComposition {
     List<Composition.SectionComponent> sections = new ArrayList<>();
     createSections(
         sections,
-        chiefComplaintList,
+        conditionList,
         physicalObservationList,
         allergieList,
         medicationRequestList,
@@ -98,7 +96,7 @@ public class MakeDischargeComposition {
 
   private void createSections(
       List<Composition.SectionComponent> sections,
-      List<Condition> chiefComplaintList,
+      List<Condition> conditionList,
       List<Observation> physicalObservationList,
       List<AllergyIntolerance> allergieList,
       List<MedicationRequest> medicationRequestList,
@@ -111,7 +109,7 @@ public class MakeDischargeComposition {
 
     CompositionUtils.addSection(
         sections,
-        chiefComplaintList,
+        conditionList,
         BundleResourceIdentifier.CHIEF_COMPLAINTS,
         BundleCompositionIdentifier.CHIEF_COMPLAINTS_CODE);
     CompositionUtils.addSection(

@@ -11,6 +11,7 @@ import com.nha.abdm.fhir.mapper.rest.common.helpers.ErrorResponse;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.FacadeError;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.FieldErrorsResponse;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.ValidationErrorResponse;
+import jakarta.validation.UnexpectedTypeException;
 import java.text.ParseException;
 import java.util.List;
 import org.slf4j.Logger;
@@ -132,5 +133,26 @@ public class GlobalExceptionHandler {
                 ErrorCode.PARSE_ERROR,
                 LogMessageConstants.FHIR_PARSING_ERROR_PREFIX + ex.getMessage(),
                 null));
+  }
+
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ExceptionHandler(UnexpectedTypeException.class)
+  public ResponseEntity<FacadeError> handleUnexpectedTypeException(UnexpectedTypeException ex) {
+    log.error("Validation constraint type mismatch: {}", ex.getMessage());
+    String errorMsg =
+        "Invalid validation configuration: " + extractConstraintField(ex.getMessage());
+    FacadeError response =
+        ErrorUtils.buildFacadeError(
+            ErrorCode.VALIDATION_ERROR,
+            errorMsg,
+            "Please ensure constraint annotations match the field type");
+    return ResponseEntity.badRequest().body(response);
+  }
+
+  private String extractConstraintField(String message) {
+    if (message != null && message.contains("validating type")) {
+      return message;
+    }
+    return "Configuration error in validation constraints";
   }
 }

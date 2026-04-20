@@ -73,15 +73,14 @@ public class DischargeSummaryConverter {
     this.makeCarePlanResource = makeCarePlanResource;
   }
 
-  public Bundle convertToDischargeSummary(DischargeSummaryRequest dischargeSummaryRequest)
-      throws ParseException {
+  public Bundle convertToDischargeSummary(DischargeSummaryRequest dischargeSummaryRequest) {
     try {
       Organization organization = createOrganization(dischargeSummaryRequest);
       Patient patient = createPatient(dischargeSummaryRequest);
       List<Practitioner> practitionerList = createPractitioners(dischargeSummaryRequest);
       Encounter encounter = createEncounter(patient, dischargeSummaryRequest);
 
-      List<Condition> chiefComplaintList = createChiefComplaints(dischargeSummaryRequest, patient);
+      List<Condition> conditionList = createConditions(dischargeSummaryRequest, patient);
       List<Observation> physicalObservationList =
           createPhysicalObservations(dischargeSummaryRequest, patient, practitionerList);
       List<AllergyIntolerance> allergieList =
@@ -110,7 +109,7 @@ public class DischargeSummaryConverter {
               encounter,
               practitionerList,
               organization,
-              chiefComplaintList,
+              conditionList,
               physicalObservationList,
               allergieList,
               medicationsResult.medicationList,
@@ -128,7 +127,7 @@ public class DischargeSummaryConverter {
           practitionerList,
           encounter,
           organization,
-          chiefComplaintList,
+          conditionList,
           physicalObservationList,
           allergieList,
           medicalHistoryList,
@@ -172,20 +171,20 @@ public class DischargeSummaryConverter {
         dischargeSummaryRequest.getAuthoredOn());
   }
 
-  private List<Condition> createChiefComplaints(
+  private List<Condition> createConditions(
       DischargeSummaryRequest dischargeSummaryRequest, Patient patient) {
-    return Optional.ofNullable(dischargeSummaryRequest.getChiefComplaints())
+    List<Condition> allConditions = new ArrayList<>();
+
+    Optional.ofNullable(dischargeSummaryRequest.getChiefComplaints())
         .orElse(Collections.emptyList())
         .stream()
         .map(
             StreamUtils.wrapException(
-                chiefComplaint ->
-                    makeConditionResource.getCondition(
-                        chiefComplaint.getComplaint(),
-                        patient,
-                        chiefComplaint.getRecordedDate(),
-                        chiefComplaint.getDateRange())))
-        .toList();
+                conditionResource ->
+                    makeConditionResource.getCondition(conditionResource, patient)))
+        .forEach(allConditions::add);
+
+    return allConditions;
   }
 
   private List<Observation> createPhysicalObservations(
@@ -230,12 +229,8 @@ public class DischargeSummaryConverter {
         .stream()
         .map(
             StreamUtils.wrapException(
-                chiefComplaintResource ->
-                    makeConditionResource.getCondition(
-                        chiefComplaintResource.getComplaint(),
-                        patient,
-                        chiefComplaintResource.getRecordedDate(),
-                        chiefComplaintResource.getDateRange())))
+                conditionResource ->
+                    makeConditionResource.getCondition(conditionResource, patient)))
         .toList();
   }
 
@@ -361,7 +356,7 @@ public class DischargeSummaryConverter {
       Encounter encounter,
       List<Practitioner> practitionerList,
       Organization organization,
-      List<Condition> chiefComplaintList,
+      List<Condition> conditionList,
       List<Observation> physicalObservationList,
       List<AllergyIntolerance> allergieList,
       List<MedicationRequest> medicationList,
@@ -378,7 +373,7 @@ public class DischargeSummaryConverter {
         encounter,
         practitionerList,
         organization,
-        chiefComplaintList,
+        conditionList,
         physicalObservationList,
         allergieList,
         medicationList,
@@ -387,9 +382,7 @@ public class DischargeSummaryConverter {
         familyMemberHistoryList,
         carePlan,
         procedureList,
-        documentReferenceList,
-        BundleCompositionIdentifier.DISCHARGE_SUMMARY_CODE,
-        BundleCompositionIdentifier.DISCHARGE_SUMMARY);
+        documentReferenceList);
   }
 
   private Bundle buildBundle(
@@ -399,7 +392,7 @@ public class DischargeSummaryConverter {
       List<Practitioner> practitionerList,
       Encounter encounter,
       Organization organization,
-      List<Condition> chiefComplaintList,
+      List<Condition> conditionList,
       List<Observation> physicalObservationList,
       List<AllergyIntolerance> allergieList,
       List<Condition> medicalHistoryList,
@@ -425,7 +418,7 @@ public class DischargeSummaryConverter {
     BundleUtils.addEntries(bundle, practitionerList);
     BundleUtils.addEntry(bundle, encounter);
     BundleUtils.addEntry(bundle, organization);
-    BundleUtils.addEntries(bundle, chiefComplaintList);
+    BundleUtils.addEntries(bundle, conditionList);
     BundleUtils.addEntries(bundle, physicalObservationList);
     BundleUtils.addEntries(bundle, allergieList);
     BundleUtils.addEntries(bundle, medicalHistoryList);
