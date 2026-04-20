@@ -1,7 +1,8 @@
-/* (C) 2025 */
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources.invoice;
 
 import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
+import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.requests.InvoiceBundleRequest;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.ChargeItemResource;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.InvoicePrice;
@@ -9,10 +10,13 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import org.hl7.fhir.r4.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MakeInvoicePriceComponent {
+  private static final Logger log = LoggerFactory.getLogger(MakeInvoicePriceComponent.class);
 
   public List<Invoice.InvoiceLineItemPriceComponentComponent> makeInvoicePriceComponents(
       ChargeItemResource chargeItemResource, InvoiceBundleRequest invoiceBundleRequest) {
@@ -21,8 +25,7 @@ public class MakeInvoicePriceComponent {
         || chargeItemResource.getPrice() == null
         || chargeItemResource.getPrice().isEmpty()
         || invoiceBundleRequest == null
-        || invoiceBundleRequest.getInvoice() == null
-        || invoiceBundleRequest.getInvoice().getCurrency() == null) {
+        || invoiceBundleRequest.getInvoice() == null) {
       return List.of();
     }
 
@@ -44,8 +47,8 @@ public class MakeInvoicePriceComponent {
     if (price.getPriceType() != null && !price.getPriceType().getValue().isBlank()) {
       try {
         type = Invoice.InvoicePriceComponentType.fromCode(price.getPriceType().getValue());
-      } catch (Exception ignored) {
-
+      } catch (Exception e) {
+        throw ExceptionHandler.handle(e, log);
       }
     }
     priceComponent.setType(type);

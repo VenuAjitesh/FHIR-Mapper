@@ -23,15 +23,27 @@ public class MakeProcedureResource {
     Procedure procedure = new Procedure();
     procedure.setId(UUID.randomUUID().toString());
     procedure.setMeta(new Meta().addProfile(ResourceProfileIdentifier.PROFILE_PROCEDURE));
+    buildStatus(procedure, procedureResource);
+    procedure.setSubject(Utils.buildReference(patient.getId()));
+    buildCode(procedure, procedureResource);
+    buildOutcome(procedure, procedureResource);
+    buildReasonCode(procedure, procedureResource);
+    procedure.setPerformed(Utils.getFormattedDateTime(procedureResource.getDate()));
+    Utils.setNarrative(procedure, "Procedure: " + procedureResource.getProcedureName());
+    return procedure;
+  }
+
+  private void buildStatus(Procedure procedure, ProcedureResource procedureResource) {
     if (procedureResource.getStatus() != null) {
       procedure.setStatus(Procedure.ProcedureStatus.valueOf(procedureResource.getStatus()));
     } else {
       procedure.setStatus(Procedure.ProcedureStatus.COMPLETED);
     }
-    procedure.setSubject(Utils.buildReference(patient.getId()));
+  }
+
+  private void buildCode(Procedure procedure, ProcedureResource procedureResource) {
     SnomedConditionProcedure snomedProcedure =
         snomedService.getConditionProcedureCode(procedureResource.getProcedureName());
-
     procedure.setCode(
         new CodeableConcept()
             .setText(procedureResource.getProcedureName())
@@ -40,6 +52,9 @@ public class MakeProcedureResource {
                     .setDisplay(snomedProcedure.getDisplay())
                     .setCode(snomedProcedure.getCode())
                     .setSystem(BundleUrlIdentifier.SNOMED_URL)));
+  }
+
+  private void buildOutcome(Procedure procedure, ProcedureResource procedureResource) {
     if (procedureResource.getOutcome() != null) {
       SnomedConditionProcedure snomedOutcome =
           snomedService.getConditionProcedureCode(procedureResource.getOutcome());
@@ -52,6 +67,9 @@ public class MakeProcedureResource {
                       .setCode(snomedOutcome.getCode())
                       .setDisplay(snomedOutcome.getDisplay())));
     }
+  }
+
+  private void buildReasonCode(Procedure procedure, ProcedureResource procedureResource) {
     SnomedConditionProcedure snomedCondition =
         snomedService.getConditionProcedureCode(procedureResource.getProcedureReason());
     procedure.addReasonCode(
@@ -62,8 +80,5 @@ public class MakeProcedureResource {
                     .setSystem(BundleUrlIdentifier.SNOMED_URL)
                     .setCode(snomedCondition.getCode())
                     .setDisplay(snomedCondition.getDisplay())));
-    procedure.setPerformed((Utils.getFormattedDateTime(procedureResource.getDate())));
-    Utils.setNarrative(procedure, "Procedure: " + procedureResource.getProcedureName());
-    return procedure;
   }
 }

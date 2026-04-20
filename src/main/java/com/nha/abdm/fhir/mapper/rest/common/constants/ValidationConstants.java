@@ -45,4 +45,55 @@ public class ValidationConstants {
       "prescription is mandatory and must not be empty";
   public static final String CARE_CONTEXT_MANDATORY =
       "careContextReference is mandatory and must not be empty";
+  public static final String WELLNESS_RECORD = "WellnessRecord";
+  public static final String HEALTH_DOCUMENT_RECORD = "HealthDocumentRecord";
+  public static final String DIAGNOSTIC_REPORT_RECORD = "DiagnosticReportRecord";
+  public static final String DISCHARGE_SUMMARY_RECORD = "DischargeSummaryRecord";
+  public static final String ORGANISATION_MANDATORY = "organisation is mandatory";
+  public static final String INVOICE_RECORD = "Invoice";
+  public static final String INVOICE_MANDATORY = "invoice is mandatory";
+  public static final String STATUS_MANDATORY = "status is mandatory";
+  public static final String CHARGE_ITEMS_MANDATORY =
+      "chargeItems are mandatory and must not be empty";
+  public static final String IMMUNIZATIONS_MANDATORY = "Immunizations is mandatory";
+
+  public static final String COMPLAINT_MANDATORY = "complaint is mandatory";
+  public static final String RECORDED_DATE_MANDATORY = "recordedDate is mandatory";
+  public static final String OBSERVATION_MANDATORY = "observation is mandatory";
+  public static final String STATUS_MANDATORY_MSG = "status is mandatory";
+  public static final String DETAILS_MANDATORY = "details of service is mandatory";
+  public static final String PROCEDURE_DATE_MANDATORY = "date of the procedure is mandatory";
+  public static final String PROCEDURE_REASON_MANDATORY = "procedureReason is mandatory";
+  public static final String PROCEDURE_NAME_MANDATORY = "procedureName is mandatory";
+  public static final String OBSERVATION_NAME_MANDATORY = "observation name is mandatory";
+  public static final String SERVICE_NAME_MANDATORY = "serviceName is mandatory";
+  public static final String SERVICE_CATEGORY_MANDATORY = "serviceCategory is mandatory";
+  public static final String CODE_MANDATORY =
+      "code is mandatory and must not be empty, ex: LAB-REAGENT-001";
+  public static final String CATEGORY_MANDATORY =
+      "category is mandatory and must not be empty, ex: Chemical";
+  public static final String MEDICINE_NAME_MANDATORY =
+      "medicineName is mandatory and must not be empty";
+  public static final String DEVICE_NAME_MANDATORY =
+      "deviceName is mandatory and must not be empty";
+  public static final String METHOD_MANDATORY = "method is mandatory and must not be empty";
+  public static final String PAID_AMOUNT_MANDATORY =
+      "paidAmount is mandatory and must not be empty";
+  public static final String PATIENT_NAME_MANDATORY = "name of the patient is mandatory";
+  public static final String PATIENT_REF_MANDATORY = "patientReference of the patient is mandatory";
+  public static final String PRACTITIONER_NAME_MANDATORY = "Name of the practitioner is mandatory";
+  public static final String MEDICINE_NAME_MANDATORY_MSG = "medicine name is mandatory";
+  public static final String DOSAGE_INSTRUCTIONS_MANDATORY = "dosage instructions are mandatory";
+  public static final String DATE_OF_VACCINE_MANDATORY = "date of vaccine is mandatory";
+  public static final String VACCINE_NAME_MANDATORY = "vaccineName is mandatory";
+  public static final String CONTENT_TYPE_MANDATORY = "contentType is mandatory";
+  public static final String DATA_MANDATORY = "data is mandatory";
+  public static final String ALLERGY_MANDATORY = "allergy is mandatory";
+  public static final String MANIFESTATION_MANDATORY = "manifestation is mandatory";
+  public static final String DOCUMENTS_MANDATORY = "documents are mandatory";
+
+  public static final String GENDER_PATTERN = "^(?i)(male|female|other|unknown)$";
+  public static final String GENDER_MESSAGE = "gender must be male, female, other, unknown";
+  public static final String INTENT_PATTERN = "^(proposal|plan|order|option)$";
+  public static final String PROCEDURE_STATUS_PATTERN = "COMPLETED|INPROGRESS";
 }

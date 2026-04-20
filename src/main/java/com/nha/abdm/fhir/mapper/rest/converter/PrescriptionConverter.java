@@ -3,53 +3,35 @@ package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.*;
+import com.nha.abdm.fhir.mapper.rest.common.helpers.BundleUtils;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.DocumentResource;
 import com.nha.abdm.fhir.mapper.rest.dto.compositions.MakePrescriptionComposition;
 import com.nha.abdm.fhir.mapper.rest.dto.resources.*;
+import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.PrescriptionRequest;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.PrescriptionResource;
 import java.text.ParseException;
 import java.util.*;
+import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class PrescriptionConverter {
   private static final Logger log = LoggerFactory.getLogger(PrescriptionConverter.class);
   private final MakeOrganisationResource makeOrganisationResource;
-
   private final MakePatientResource makePatientResource;
-
   private final MakePractitionerResource makePractitionerResource;
   private final MakeBundleMetaResource makeBundleMetaResource;
   private final MakeMedicationRequestResource makeMedicationRequestResource;
   private final MakeEncounterResource makeEncounterResource;
   private final MakePrescriptionComposition makePrescriptionComposition;
   private final MakeConditionResource makeConditionResource;
-
-  public PrescriptionConverter(
-      MakeOrganisationResource makeOrganisationResource,
-      MakePatientResource makePatientResource,
-      MakePractitionerResource makePractitionerResource,
-      MakeBundleMetaResource makeBundleMetaResource,
-      MakeMedicationRequestResource makeMedicationRequestResource,
-      MakeEncounterResource makeEncounterResource,
-      MakePrescriptionComposition makePrescriptionComposition,
-      MakeConditionResource makeConditionResource) {
-    this.makeOrganisationResource = makeOrganisationResource;
-    this.makePatientResource = makePatientResource;
-    this.makePractitionerResource = makePractitionerResource;
-    this.makeBundleMetaResource = makeBundleMetaResource;
-    this.makeMedicationRequestResource = makeMedicationRequestResource;
-    this.makeEncounterResource = makeEncounterResource;
-    this.makePrescriptionComposition = makePrescriptionComposition;
-    this.makeConditionResource = makeConditionResource;
-  }
 
   public Bundle convertToPrescriptionBundle(PrescriptionRequest prescriptionRequest)
       throws ParseException {
@@ -80,16 +62,13 @@ public class PrescriptionConverter {
           medicationsResult,
           documentList);
     } catch (Exception e) {
-      if (e instanceof InvalidDataAccessResourceUsageException) {
-        log.error(e.getMessage());
-        throw new FhirMapperException(
-            ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE);
-      }
-      if (e instanceof FhirMapperException) {
-        throw e;
-      }
-      throw new FhirMapperException(ErrorCode.UNKNOWN_ERROR, e.getMessage());
+      handleException(e);
+      return null;
     }
+  }
+
+  private void handleException(Exception e) throws FhirMapperException {
+    throw ExceptionHandler.handle(e, log);
   }
 
   private Organization createOrganization(PrescriptionRequest prescriptionRequest)
@@ -150,21 +129,30 @@ public class PrescriptionConverter {
 
   private List<Binary> createDocumentBinaries(PrescriptionRequest prescriptionRequest)
       throws ParseException {
-    List<Binary> documentList = new ArrayList<>();
-    if (prescriptionRequest.getDocuments() != null) {
-      for (DocumentResource documentResource : prescriptionRequest.getDocuments()) {
-        Binary binary = new Binary();
-        binary.setMeta(
-            new Meta()
-                .setLastUpdatedElement(Utils.getCurrentTimeStamp())
-                .addProfile(ResourceProfileIdentifier.PROFILE_BINARY));
-        binary.setContent(documentResource.getData());
-        binary.setContentType(documentResource.getContentType());
-        binary.setId(UUID.randomUUID().toString());
-        documentList.add(binary);
-      }
-    }
-    return documentList;
+    return Optional.ofNullable(prescriptionRequest.getDocuments())
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(
+            doc -> {
+              try {
+                return createBinary(doc);
+              } catch (ParseException e) {
+                throw new RuntimeException(e);
+              }
+            })
+        .toList();
+  }
+
+  private Binary createBinary(DocumentResource documentResource) throws ParseException {
+    Binary binary = new Binary();
+    binary.setId(UUID.randomUUID().toString());
+    binary.setMeta(
+        new Meta()
+            .setLastUpdatedElement(Utils.getCurrentTimeStamp())
+            .addProfile(ResourceProfileIdentifier.PROFILE_BINARY));
+    binary.setContent(documentResource.getData());
+    binary.setContentType(documentResource.getContentType());
+    return binary;
   }
 
   private Composition createComposition(
@@ -205,52 +193,16 @@ public class PrescriptionConverter {
         new Identifier()
             .setSystem(BundleUrlIdentifier.WRAPPER_URL)
             .setValue(prescriptionRequest.getCareContextReference()));
-    List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
-    entries.add(
-        new Bundle.BundleEntryComponent()
-            .setFullUrl(MapperConstants.URN_UUID + composition.getId())
-            .setResource(composition));
-    entries.add(
-        new Bundle.BundleEntryComponent()
-            .setFullUrl(MapperConstants.URN_UUID + patient.getId())
-            .setResource(patient));
-    for (Practitioner practitioner : practitionerList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + practitioner.getId())
-              .setResource(practitioner));
-    }
-    if (Objects.nonNull(organization)) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + organization.getId())
-              .setResource(organization));
-    }
-    if (Objects.nonNull(encounter)) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + encounter.getId())
-              .setResource(encounter));
-    }
-    for (MedicationRequest medicationRequest : medicationsResult.medicationList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + medicationRequest.getId())
-              .setResource(medicationRequest));
-    }
-    for (Condition medicationCondition : medicationsResult.medicationConditionList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + medicationCondition.getId())
-              .setResource(medicationCondition));
-    }
-    for (Binary binary : documentList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + binary.getId())
-              .setResource(binary));
-    }
-    bundle.setEntry(entries);
+
+    BundleUtils.addEntry(bundle, composition);
+    BundleUtils.addEntry(bundle, patient);
+    BundleUtils.addEntries(bundle, practitionerList);
+    BundleUtils.addEntry(bundle, organization);
+    BundleUtils.addEntry(bundle, encounter);
+    BundleUtils.addEntries(bundle, medicationsResult.medicationList);
+    BundleUtils.addEntries(bundle, medicationsResult.medicationConditionList);
+    BundleUtils.addEntries(bundle, documentList);
+
     return bundle;
   }
 

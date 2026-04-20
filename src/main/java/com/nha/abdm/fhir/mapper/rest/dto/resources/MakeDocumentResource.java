@@ -1,3 +1,4 @@
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import com.nha.abdm.fhir.mapper.Utils;
@@ -37,7 +38,8 @@ public class MakeDocumentResource {
         .addProfile(ResourceProfileIdentifier.PROFILE_DOCUMENT_REFERENCE);
   }
 
-  private Identifier createIdentifier(Organization organization, DocumentResource documentResource) {
+  private Identifier createIdentifier(
+      Organization organization, DocumentResource documentResource) {
     Coding coding = new Coding();
     coding.setCode("MR");
     coding.setSystem(ResourceProfileIdentifier.PROFILE_PROVIDER);
@@ -55,7 +57,8 @@ public class MakeDocumentResource {
     return identifier;
   }
 
-  private DocumentReference.DocumentReferenceContentComponent createContent(DocumentResource documentResource) throws ParseException {
+  private DocumentReference.DocumentReferenceContentComponent createContent(
+      DocumentResource documentResource) throws ParseException {
     Attachment attachment = new Attachment();
     attachment.setContentType(documentResource.getContentType());
     attachment.setData(documentResource.getData());

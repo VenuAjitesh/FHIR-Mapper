@@ -1,12 +1,27 @@
 /* (C) 2024 */
 package com.nha.abdm.fhir.mapper.rest.controller;
 
+import com.nha.abdm.fhir.mapper.rest.common.constants.ConfigurationConstants;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ControllerMappingConstants;
+import com.nha.abdm.fhir.mapper.rest.common.constants.LogMessageConstants;
+import com.nha.abdm.fhir.mapper.rest.common.constants.SwaggerConstants;
 import com.nha.abdm.fhir.mapper.rest.converter.*;
+import com.nha.abdm.fhir.mapper.rest.dto.validation.ValidationResult;
+import com.nha.abdm.fhir.mapper.rest.exceptions.FhirValidationException;
 import com.nha.abdm.fhir.mapper.rest.requests.*;
+import com.nha.abdm.fhir.mapper.rest.services.FhirValidationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.text.ParseException;
+import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.Bundle;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +29,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(path = ControllerMappingConstants.BUNDLE_BASE_PATH)
 @Validated
+@Slf4j
+@Tag(
+    name = SwaggerConstants.BUNDLE_CONTROLLER_TAG,
+    description = SwaggerConstants.BUNDLE_CONTROLLER_DESCRIPTION)
 public class BundleController {
 
   private final ImmunizationConverter immunizationConverter;
@@ -24,6 +43,10 @@ public class BundleController {
   private final DischargeSummaryConverter dischargeSummaryConverter;
   private final WellnessRecordConverter wellnessRecordConverter;
   private final InvoiceRequestConverter invoiceRequestConverter;
+  private final FhirValidationService fhirValidationService;
+
+  @Value(ConfigurationConstants.FHIR_VALIDATION_FAIL_ON_ERROR)
+  private boolean failOnValidationError;
 
   public BundleController(
       ImmunizationConverter immunizationConverter,
@@ -33,7 +56,8 @@ public class BundleController {
       DiagnosticReportConverter diagnosticReportConverter,
       DischargeSummaryConverter dischargeSummaryConverter,
       WellnessRecordConverter wellnessRecordConverter,
-      InvoiceRequestConverter invoiceRequestConverter) {
+      InvoiceRequestConverter invoiceRequestConverter,
+      FhirValidationService fhirValidationService) {
     this.immunizationConverter = immunizationConverter;
     this.prescriptionConverter = prescriptionConverter;
     this.healthDocumentConverter = healthDocumentConverter;
@@ -42,6 +66,7 @@ public class BundleController {
     this.dischargeSummaryConverter = dischargeSummaryConverter;
     this.wellnessRecordConverter = wellnessRecordConverter;
     this.invoiceRequestConverter = invoiceRequestConverter;
+    this.fhirValidationService = fhirValidationService;
   }
 
   /**
@@ -49,11 +74,33 @@ public class BundleController {
    * @return FHIR bundle if no error found
    * @throws ParseException while parsing the string into date
    */
-  @PostMapping(ControllerMappingConstants.IMMUNIZATION_PATH)
+  @PostMapping(path = ControllerMappingConstants.IMMUNIZATION_PATH)
   @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = SwaggerConstants.CREATE_IMMUNIZATION_SUMMARY,
+      description = SwaggerConstants.CREATE_IMMUNIZATION_DESCRIPTION)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_201,
+            description = SwaggerConstants.BUNDLE_SUCCESS_DESCRIPTION,
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = Bundle.class),
+                    examples =
+                        @ExampleObject(
+                            name = SwaggerConstants.IMMUNIZATION_BUNDLE_EXAMPLE_NAME,
+                            summary = SwaggerConstants.IMMUNIZATION_BUNDLE_EXAMPLE_SUMMARY,
+                            value = SwaggerConstants.IMMUNIZATION_BUNDLE_EXAMPLE))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
   public Bundle createImmunizationBundle(
       @Valid @RequestBody ImmunizationRequest immunizationRequest) throws ParseException {
-    return immunizationConverter.makeImmunizationBundle(immunizationRequest);
+    Bundle bundle = immunizationConverter.makeImmunizationBundle(immunizationRequest);
+    return validateAndReturnBundle(bundle);
   }
 
   /**
@@ -61,11 +108,32 @@ public class BundleController {
    * @return FHIR bundle if no error found
    * @throws ParseException while parsing the string into date
    */
-  @PostMapping(ControllerMappingConstants.PRESCRIPTION_PATH)
+  @PostMapping(path = ControllerMappingConstants.PRESCRIPTION_PATH)
   @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = SwaggerConstants.CREATE_PRESCRIPTION_SUMMARY,
+      description = SwaggerConstants.CREATE_PRESCRIPTION_DESCRIPTION)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_201,
+            description = SwaggerConstants.BUNDLE_SUCCESS_DESCRIPTION,
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = Bundle.class),
+                    examples =
+                        @ExampleObject(
+                            name = SwaggerConstants.PRESCRIPTION_BUNDLE_EXAMPLE_NAME,
+                            value = SwaggerConstants.PRESCRIPTION_BUNDLE_EXAMPLE))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
   public Bundle createPrescriptionBundle(
       @Valid @RequestBody PrescriptionRequest prescriptionRequest) throws ParseException {
-    return prescriptionConverter.convertToPrescriptionBundle(prescriptionRequest);
+    Bundle bundle = prescriptionConverter.convertToPrescriptionBundle(prescriptionRequest);
+    return validateAndReturnBundle(bundle);
   }
 
   /**
@@ -73,11 +141,32 @@ public class BundleController {
    * @return FHIR bundle if no error found
    * @throws ParseException while parsing the string into date
    */
-  @PostMapping(ControllerMappingConstants.OP_CONSULTATION_PATH)
+  @PostMapping(path = ControllerMappingConstants.OP_CONSULTATION_PATH)
   @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = SwaggerConstants.CREATE_OP_CONSULTATION_SUMMARY,
+      description = SwaggerConstants.CREATE_OP_CONSULTATION_DESCRIPTION)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_201,
+            description = SwaggerConstants.BUNDLE_SUCCESS_DESCRIPTION,
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = Bundle.class),
+                    examples =
+                        @ExampleObject(
+                            name = SwaggerConstants.OP_CONSULT_BUNDLE_EXAMPLE_NAME,
+                            value = SwaggerConstants.OP_CONSULTATION_BUNDLE_EXAMPLE))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
   public Bundle createOPConsultationBundle(
       @Valid @RequestBody OPConsultationRequest opConsultationRequest) throws ParseException {
-    return opConsultationConverter.convertToOPConsultationBundle(opConsultationRequest);
+    Bundle bundle = opConsultationConverter.convertToOPConsultationBundle(opConsultationRequest);
+    return validateAndReturnBundle(bundle);
   }
 
   /**
@@ -85,11 +174,32 @@ public class BundleController {
    * @return FHIR bundle if no error found
    * @throws ParseException while parsing the string into date
    */
-  @PostMapping(ControllerMappingConstants.HEALTH_DOCUMENT_PATH)
+  @PostMapping(path = ControllerMappingConstants.HEALTH_DOCUMENT_PATH)
   @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = SwaggerConstants.CREATE_HEALTH_DOCUMENT_SUMMARY,
+      description = SwaggerConstants.CREATE_HEALTH_DOCUMENT_DESCRIPTION)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_201,
+            description = SwaggerConstants.BUNDLE_SUCCESS_DESCRIPTION,
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = Bundle.class),
+                    examples =
+                        @ExampleObject(
+                            name = SwaggerConstants.HEALTH_DOCUMENT_BUNDLE_EXAMPLE_NAME,
+                            value = SwaggerConstants.HEALTH_DOCUMENT_BUNDLE_EXAMPLE))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
   public Bundle createHealthDocumentBundle(
       @Valid @RequestBody HealthDocumentRecord healthDocumentRecord) throws ParseException {
-    return healthDocumentConverter.convertToHealthDocumentBundle(healthDocumentRecord);
+    Bundle bundle = healthDocumentConverter.convertToHealthDocumentBundle(healthDocumentRecord);
+    return validateAndReturnBundle(bundle);
   }
 
   /**
@@ -98,11 +208,32 @@ public class BundleController {
    * @return FHIR bundle if no error found
    * @throws ParseException while parsing the string into date
    */
-  @PostMapping(value = ControllerMappingConstants.DIAGNOSTIC_REPORT_PATH)
+  @PostMapping(path = ControllerMappingConstants.DIAGNOSTIC_REPORT_PATH)
   @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = SwaggerConstants.CREATE_DIAGNOSTIC_REPORT_SUMMARY,
+      description = SwaggerConstants.CREATE_DIAGNOSTIC_REPORT_DESCRIPTION)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_201,
+            description = SwaggerConstants.BUNDLE_SUCCESS_DESCRIPTION,
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = Bundle.class),
+                    examples =
+                        @ExampleObject(
+                            name = SwaggerConstants.DIAGNOSTIC_REPORT_BUNDLE_EXAMPLE_NAME,
+                            value = SwaggerConstants.DIAGNOSTIC_REPORT_BUNDLE_EXAMPLE))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
   public Bundle createDiagnosticReportBundle(
       @Valid @RequestBody DiagnosticReportRequest diagnosticReportRequest) throws ParseException {
-    return diagnosticReportConverter.convertToDiagnosticBundle(diagnosticReportRequest);
+    Bundle bundle = diagnosticReportConverter.convertToDiagnosticBundle(diagnosticReportRequest);
+    return validateAndReturnBundle(bundle);
   }
 
   /**
@@ -110,22 +241,64 @@ public class BundleController {
    * @return FHIR bundle if no error found
    * @throws ParseException while parsing the string into date
    */
-  @PostMapping(ControllerMappingConstants.DISCHARGE_SUMMARY_PATH)
+  @PostMapping(path = ControllerMappingConstants.DISCHARGE_SUMMARY_PATH)
   @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = SwaggerConstants.CREATE_DISCHARGE_SUMMARY_SUMMARY,
+      description = SwaggerConstants.CREATE_DISCHARGE_SUMMARY_DESCRIPTION)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_201,
+            description = SwaggerConstants.BUNDLE_SUCCESS_DESCRIPTION,
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = Bundle.class),
+                    examples =
+                        @ExampleObject(
+                            name = SwaggerConstants.DISCHARGE_SUMMARY_BUNDLE_EXAMPLE_NAME,
+                            value = SwaggerConstants.DISCHARGE_SUMMARY_BUNDLE_EXAMPLE))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
   public Bundle createDischargeSummaryBundle(
       @Valid @RequestBody DischargeSummaryRequest dischargeSummaryRequest) throws ParseException {
-    return dischargeSummaryConverter.convertToDischargeSummary(dischargeSummaryRequest);
+    Bundle bundle = dischargeSummaryConverter.convertToDischargeSummary(dischargeSummaryRequest);
+    return validateAndReturnBundle(bundle);
   }
 
   /**
    * @param wellnessRecordRequest which has all the physical observations
    * @return FHIR bundle if no error found
    */
-  @PostMapping(ControllerMappingConstants.WELLNESS_RECORD_PATH)
+  @PostMapping(path = ControllerMappingConstants.WELLNESS_RECORD_PATH)
   @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = SwaggerConstants.CREATE_WELLNESS_RECORD_SUMMARY,
+      description = SwaggerConstants.CREATE_WELLNESS_RECORD_DESCRIPTION)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_201,
+            description = SwaggerConstants.BUNDLE_SUCCESS_DESCRIPTION,
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = Bundle.class),
+                    examples =
+                        @ExampleObject(
+                            name = SwaggerConstants.WELLNESS_RECORD_BUNDLE_EXAMPLE_NAME,
+                            value = SwaggerConstants.WELLNESS_RECORD_BUNDLE_EXAMPLE))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
   public Bundle createWellnessBundle(
       @Valid @RequestBody WellnessRecordRequest wellnessRecordRequest) throws ParseException {
-    return wellnessRecordConverter.getWellnessBundle(wellnessRecordRequest);
+    Bundle bundle = wellnessRecordConverter.getWellnessBundle(wellnessRecordRequest);
+    return validateAndReturnBundle(bundle);
   }
 
   /**
@@ -133,10 +306,47 @@ public class BundleController {
    *     tax, etc.
    * @return FHIR bundle if no error found
    */
-  @PostMapping(ControllerMappingConstants.INVOICE_PATH)
+  @PostMapping(path = ControllerMappingConstants.INVOICE_PATH)
   @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = SwaggerConstants.CREATE_INVOICE_SUMMARY,
+      description = SwaggerConstants.CREATE_INVOICE_DESCRIPTION)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_201,
+            description = SwaggerConstants.BUNDLE_SUCCESS_DESCRIPTION,
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = Bundle.class),
+                    examples =
+                        @ExampleObject(
+                            name = SwaggerConstants.INVOICE_BUNDLE_EXAMPLE_NAME,
+                            value = SwaggerConstants.INVOICE_BUNDLE_EXAMPLE))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
   public Bundle createInvoiceBundle(@Valid @RequestBody InvoiceBundleRequest invoiceBundleRequest)
       throws ParseException {
-    return invoiceRequestConverter.makeInvoiceBundle(invoiceBundleRequest);
+    Bundle bundle = invoiceRequestConverter.makeInvoiceBundle(invoiceBundleRequest);
+    return validateAndReturnBundle(bundle);
+  }
+
+  private Bundle validateAndReturnBundle(Bundle bundle) {
+    ValidationResult validationResult = fhirValidationService.validateBundle(bundle);
+
+    if (!validationResult.isValid()) {
+      if (failOnValidationError) {
+        throw new FhirValidationException(validationResult);
+      } else {
+        log.warn(
+            LogMessageConstants.VALIDATION_FAILED_CONTINUING,
+            validationResult.getErrorCount(),
+            validationResult.getWarningCount());
+      }
+    }
+    return bundle;
   }
 }

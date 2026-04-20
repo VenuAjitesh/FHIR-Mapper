@@ -1,6 +1,7 @@
 /* (C) 2024 */
 package com.nha.abdm.fhir.mapper.rest.requests.helpers;
 
+import com.nha.abdm.fhir.mapper.rest.common.constants.ValidationConstants;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class WellnessObservationResource {
-  @NotBlank(message = "observation is mandatory")
+  @NotBlank(message = ValidationConstants.OBSERVATION_MANDATORY)
   private String observation;
 
   //  @NotNull(message = "result is mandatory")

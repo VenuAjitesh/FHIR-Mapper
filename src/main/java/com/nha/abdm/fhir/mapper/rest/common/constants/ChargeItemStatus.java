@@ -3,7 +3,13 @@ package com.nha.abdm.fhir.mapper.rest.common.constants;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@AllArgsConstructor
+@Getter
+@Schema(description = SwaggerConstants.CHARGE_ITEM_STATUS_DESC)
 public enum ChargeItemStatus {
   PLANNED("planned"),
   BILLABLE("billable"),
@@ -14,10 +20,6 @@ public enum ChargeItemStatus {
   UNKNOWN("unknown");
 
   private final String value;
-
-  ChargeItemStatus(String value) {
-    this.value = value;
-  }
 
   @JsonValue
   public String getValue() {
@@ -31,6 +33,6 @@ public enum ChargeItemStatus {
         return status;
       }
     }
-    throw new IllegalArgumentException("Unknown enum value: " + value);
+    throw new IllegalArgumentException("Unknown value: " + value);
   }
 }

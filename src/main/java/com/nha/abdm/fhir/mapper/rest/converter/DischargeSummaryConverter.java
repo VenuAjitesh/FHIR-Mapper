@@ -3,9 +3,10 @@ package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.*;
+import com.nha.abdm.fhir.mapper.rest.common.helpers.BundleUtils;
 import com.nha.abdm.fhir.mapper.rest.dto.compositions.MakeDischargeComposition;
 import com.nha.abdm.fhir.mapper.rest.dto.resources.*;
-import com.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
+import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.DischargeSummaryRequest;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.*;
@@ -15,7 +16,6 @@ import java.util.stream.Collectors;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -73,15 +73,14 @@ public class DischargeSummaryConverter {
     this.makeCarePlanResource = makeCarePlanResource;
   }
 
-  public Bundle convertToDischargeSummary(DischargeSummaryRequest dischargeSummaryRequest)
-      throws ParseException {
+  public Bundle convertToDischargeSummary(DischargeSummaryRequest dischargeSummaryRequest) {
     try {
       Organization organization = createOrganization(dischargeSummaryRequest);
       Patient patient = createPatient(dischargeSummaryRequest);
       List<Practitioner> practitionerList = createPractitioners(dischargeSummaryRequest);
       Encounter encounter = createEncounter(patient, dischargeSummaryRequest);
 
-      List<Condition> chiefComplaintList = createChiefComplaints(dischargeSummaryRequest, patient);
+      List<Condition> conditionList = createConditions(dischargeSummaryRequest, patient);
       List<Observation> physicalObservationList =
           createPhysicalObservations(dischargeSummaryRequest, patient, practitionerList);
       List<AllergyIntolerance> allergieList =
@@ -110,7 +109,7 @@ public class DischargeSummaryConverter {
               encounter,
               practitionerList,
               organization,
-              chiefComplaintList,
+              conditionList,
               physicalObservationList,
               allergieList,
               medicationsResult.medicationList,
@@ -128,7 +127,7 @@ public class DischargeSummaryConverter {
           practitionerList,
           encounter,
           organization,
-          chiefComplaintList,
+          conditionList,
           physicalObservationList,
           allergieList,
           medicalHistoryList,
@@ -140,15 +139,7 @@ public class DischargeSummaryConverter {
           documentReferenceList);
 
     } catch (Exception e) {
-      if (e instanceof InvalidDataAccessResourceUsageException) {
-        log.error(e.getMessage());
-        throw new FhirMapperException(
-            ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE);
-      }
-      if (e instanceof FhirMapperException) {
-        throw e;
-      }
-      throw new FhirMapperException(ErrorCode.UNKNOWN_ERROR, e.getMessage());
+      throw ExceptionHandler.handle(e, log);
     }
   }
 
@@ -180,20 +171,20 @@ public class DischargeSummaryConverter {
         dischargeSummaryRequest.getAuthoredOn());
   }
 
-  private List<Condition> createChiefComplaints(
+  private List<Condition> createConditions(
       DischargeSummaryRequest dischargeSummaryRequest, Patient patient) {
-    return Optional.ofNullable(dischargeSummaryRequest.getChiefComplaints())
+    List<Condition> allConditions = new ArrayList<>();
+
+    Optional.ofNullable(dischargeSummaryRequest.getChiefComplaints())
         .orElse(Collections.emptyList())
         .stream()
         .map(
             StreamUtils.wrapException(
-                chiefComplaint ->
-                    makeConditionResource.getCondition(
-                        chiefComplaint.getComplaint(),
-                        patient,
-                        chiefComplaint.getRecordedDate(),
-                        chiefComplaint.getDateRange())))
-        .toList();
+                conditionResource ->
+                    makeConditionResource.getCondition(conditionResource, patient)))
+        .forEach(allConditions::add);
+
+    return allConditions;
   }
 
   private List<Observation> createPhysicalObservations(
@@ -238,12 +229,8 @@ public class DischargeSummaryConverter {
         .stream()
         .map(
             StreamUtils.wrapException(
-                chiefComplaintResource ->
-                    makeConditionResource.getCondition(
-                        chiefComplaintResource.getComplaint(),
-                        patient,
-                        chiefComplaintResource.getRecordedDate(),
-                        chiefComplaintResource.getDateRange())))
+                conditionResource ->
+                    makeConditionResource.getCondition(conditionResource, patient)))
         .toList();
   }
 
@@ -369,7 +356,7 @@ public class DischargeSummaryConverter {
       Encounter encounter,
       List<Practitioner> practitionerList,
       Organization organization,
-      List<Condition> chiefComplaintList,
+      List<Condition> conditionList,
       List<Observation> physicalObservationList,
       List<AllergyIntolerance> allergieList,
       List<MedicationRequest> medicationList,
@@ -386,7 +373,7 @@ public class DischargeSummaryConverter {
         encounter,
         practitionerList,
         organization,
-        chiefComplaintList,
+        conditionList,
         physicalObservationList,
         allergieList,
         medicationList,
@@ -395,9 +382,7 @@ public class DischargeSummaryConverter {
         familyMemberHistoryList,
         carePlan,
         procedureList,
-        documentReferenceList,
-        BundleCompositionIdentifier.DISCHARGE_SUMMARY_CODE,
-        BundleCompositionIdentifier.DISCHARGE_SUMMARY);
+        documentReferenceList);
   }
 
   private Bundle buildBundle(
@@ -407,7 +392,7 @@ public class DischargeSummaryConverter {
       List<Practitioner> practitionerList,
       Encounter encounter,
       Organization organization,
-      List<Condition> chiefComplaintList,
+      List<Condition> conditionList,
       List<Observation> physicalObservationList,
       List<AllergyIntolerance> allergieList,
       List<Condition> medicalHistoryList,
@@ -428,41 +413,25 @@ public class DischargeSummaryConverter {
             .setSystem(BundleUrlIdentifier.WRAPPER_URL)
             .setValue(dischargeSummaryRequest.getCareContextReference()));
 
-    List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
-    addBundleEntry(entries, composition);
-    addBundleEntry(entries, patient);
-    practitionerList.forEach(practitioner -> addBundleEntry(entries, practitioner));
-    addBundleEntry(entries, encounter);
-    addBundleEntry(entries, organization);
+    BundleUtils.addEntry(bundle, composition);
+    BundleUtils.addEntry(bundle, patient);
+    BundleUtils.addEntries(bundle, practitionerList);
+    BundleUtils.addEntry(bundle, encounter);
+    BundleUtils.addEntry(bundle, organization);
+    BundleUtils.addEntries(bundle, conditionList);
+    BundleUtils.addEntries(bundle, physicalObservationList);
+    BundleUtils.addEntries(bundle, allergieList);
+    BundleUtils.addEntries(bundle, medicalHistoryList);
+    BundleUtils.addEntries(bundle, medicationsResult.medicationConditionList);
+    BundleUtils.addEntries(bundle, familyMemberHistoryList);
+    BundleUtils.addEntry(bundle, carePlan);
+    BundleUtils.addEntries(bundle, medicationsResult.medicationList);
+    BundleUtils.addEntries(bundle, diagnosticsResult.diagnosticReportList);
+    BundleUtils.addEntries(bundle, procedureList);
+    BundleUtils.addEntries(bundle, diagnosticsResult.diagnosticObservationList);
+    BundleUtils.addEntries(bundle, documentReferenceList);
 
-    chiefComplaintList.forEach(complaint -> addBundleEntry(entries, complaint));
-    physicalObservationList.forEach(observation -> addBundleEntry(entries, observation));
-    allergieList.forEach(allergy -> addBundleEntry(entries, allergy));
-    medicalHistoryList.forEach(history -> addBundleEntry(entries, history));
-    medicationsResult.medicationConditionList.forEach(
-        condition -> addBundleEntry(entries, condition));
-    familyMemberHistoryList.forEach(history -> addBundleEntry(entries, history));
-    if (Objects.nonNull(carePlan)) {
-      addBundleEntry(entries, carePlan);
-    }
-    medicationsResult.medicationList.forEach(medication -> addBundleEntry(entries, medication));
-    diagnosticsResult.diagnosticReportList.forEach(report -> addBundleEntry(entries, report));
-    procedureList.forEach(procedure -> addBundleEntry(entries, procedure));
-    diagnosticsResult.diagnosticObservationList.forEach(
-        observation -> addBundleEntry(entries, observation));
-    documentReferenceList.forEach(document -> addBundleEntry(entries, document));
-
-    bundle.setEntry(entries);
     return bundle;
-  }
-
-  private void addBundleEntry(List<Bundle.BundleEntryComponent> entries, Resource resource) {
-    if (resource != null && resource.getId() != null) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + resource.getId())
-              .setResource(resource));
-    }
   }
 
   private static class MedicationsResult {

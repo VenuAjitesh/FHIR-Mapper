@@ -3,9 +3,10 @@ package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.*;
+import com.nha.abdm.fhir.mapper.rest.common.helpers.BundleUtils;
 import com.nha.abdm.fhir.mapper.rest.dto.compositions.MakeWellnessComposition;
 import com.nha.abdm.fhir.mapper.rest.dto.resources.*;
-import com.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
+import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.WellnessRecordRequest;
 import java.text.ParseException;
@@ -13,7 +14,6 @@ import java.util.*;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -82,15 +82,7 @@ public class WellnessRecordConverter {
           observationsResult,
           documentReferenceList);
     } catch (Exception e) {
-      if (e instanceof InvalidDataAccessResourceUsageException) {
-        log.error(e.getMessage());
-        throw new FhirMapperException(
-            ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE);
-      }
-      if (e instanceof FhirMapperException) {
-        throw e;
-      }
-      throw new FhirMapperException(ErrorCode.UNKNOWN_ERROR, e.getMessage());
+      throw ExceptionHandler.handle(e, log);
     }
   }
 
@@ -342,79 +334,21 @@ public class WellnessRecordConverter {
         new Identifier()
             .setSystem(BundleUrlIdentifier.WRAPPER_URL)
             .setValue(wellnessRecordRequest.getCareContextReference()));
-    List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
-    entries.add(
-        new Bundle.BundleEntryComponent()
-            .setFullUrl(MapperConstants.URN_UUID + composition.getId())
-            .setResource(composition));
-    entries.add(
-        new Bundle.BundleEntryComponent()
-            .setFullUrl(MapperConstants.URN_UUID + patient.getId())
-            .setResource(patient));
-    for (Practitioner practitioner : practitionerList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + practitioner.getId())
-              .setResource(practitioner));
-    }
-    entries.add(
-        new Bundle.BundleEntryComponent()
-            .setFullUrl(MapperConstants.URN_UUID + encounter.getId())
-            .setResource(encounter));
-    entries.add(
-        new Bundle.BundleEntryComponent()
-            .setFullUrl(MapperConstants.URN_UUID + organization.getId())
-            .setResource(organization));
 
-    for (Observation observation : observationsResult.vitalSignsList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + observation.getId())
-              .setResource(observation));
-    }
-    for (Observation observation : observationsResult.bodyMeasurementList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + observation.getId())
-              .setResource(observation));
-    }
-    for (Observation observation : observationsResult.physicalActivityList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + observation.getId())
-              .setResource(observation));
-    }
-    for (Observation observation : observationsResult.generalAssessmentList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + observation.getId())
-              .setResource(observation));
-    }
-    for (Observation observation : observationsResult.womanHealthList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + observation.getId())
-              .setResource(observation));
-    }
-    for (Observation observation : observationsResult.lifeStyleList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + observation.getId())
-              .setResource(observation));
-    }
-    for (Observation observation : observationsResult.otherObservationList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + observation.getId())
-              .setResource(observation));
-    }
-    for (DocumentReference documentReference : documentReferenceList) {
-      entries.add(
-          new Bundle.BundleEntryComponent()
-              .setFullUrl(MapperConstants.URN_UUID + documentReference.getId())
-              .setResource(documentReference));
-    }
-    bundle.setEntry(entries);
+    BundleUtils.addEntry(bundle, composition);
+    BundleUtils.addEntry(bundle, patient);
+    BundleUtils.addEntries(bundle, practitionerList);
+    BundleUtils.addEntry(bundle, encounter);
+    BundleUtils.addEntry(bundle, organization);
+    BundleUtils.addEntries(bundle, observationsResult.vitalSignsList);
+    BundleUtils.addEntries(bundle, observationsResult.bodyMeasurementList);
+    BundleUtils.addEntries(bundle, observationsResult.physicalActivityList);
+    BundleUtils.addEntries(bundle, observationsResult.generalAssessmentList);
+    BundleUtils.addEntries(bundle, observationsResult.womanHealthList);
+    BundleUtils.addEntries(bundle, observationsResult.lifeStyleList);
+    BundleUtils.addEntries(bundle, observationsResult.otherObservationList);
+    BundleUtils.addEntries(bundle, documentReferenceList);
+
     return bundle;
   }
 

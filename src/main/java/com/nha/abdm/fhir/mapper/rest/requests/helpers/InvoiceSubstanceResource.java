@@ -1,6 +1,7 @@
 /* (C) 2025 */
 package com.nha.abdm.fhir.mapper.rest.requests.helpers;
 
+import com.nha.abdm.fhir.mapper.rest.common.constants.ValidationConstants;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,9 +15,9 @@ import lombok.NoArgsConstructor;
 public class InvoiceSubstanceResource {
   private String id;
 
-  @NotNull(message = "code is mandatory and must not be empty, ex: LAB-REAGENT-001") private String code;
+  @NotNull(message = ValidationConstants.CODE_MANDATORY) private String code;
 
-  @NotNull(message = "category is mandatory and must not be empty, ex: Chemical") private String category;
+  @NotNull(message = ValidationConstants.CATEGORY_MANDATORY) private String category;
 
   private String description;
   private String expiry;

@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AllergyResource {
 
-  @NotBlank(message = "allergy" + ValidationConstants.MANDATORY_MESSAGE)
+  @NotBlank(message = ValidationConstants.ALLERGY_MANDATORY)
   private String allergy;
 
   @Pattern(

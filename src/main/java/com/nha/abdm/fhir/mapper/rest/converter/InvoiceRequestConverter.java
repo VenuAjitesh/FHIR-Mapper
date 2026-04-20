@@ -3,11 +3,12 @@ package com.nha.abdm.fhir.mapper.rest.converter;
 
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.*;
+import com.nha.abdm.fhir.mapper.rest.common.helpers.BundleUtils;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.OrganisationResource;
 import com.nha.abdm.fhir.mapper.rest.dto.compositions.MakeInvoiceComposition;
 import com.nha.abdm.fhir.mapper.rest.dto.resources.*;
 import com.nha.abdm.fhir.mapper.rest.dto.resources.invoice.*;
-import com.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
+import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.InvoiceBundleRequest;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.ChargeItemResource;
@@ -16,7 +17,6 @@ import java.util.*;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -94,15 +94,7 @@ public class InvoiceRequestConverter {
           invoice,
           paymentReconciliation);
     } catch (Exception e) {
-      if (e instanceof InvalidDataAccessResourceUsageException) {
-        log.error(e.getMessage());
-        throw new FhirMapperException(
-            ErrorCode.DB_ERROR, LogMessageConstants.JDBC_EXCEPTION_MESSAGE);
-      }
-      if (e instanceof FhirMapperException) {
-        throw e;
-      }
-      throw new FhirMapperException(ErrorCode.UNKNOWN_ERROR, e.getMessage());
+      throw ExceptionHandler.handle(e, log);
     }
   }
 
@@ -219,30 +211,20 @@ public class InvoiceRequestConverter {
         new Identifier()
             .setSystem(BundleUrlIdentifier.WRAPPER_URL)
             .setValue(invoiceBundleRequest.getCareContextReference()));
-    List<Bundle.BundleEntryComponent> entries = new ArrayList<>();
-    addEntry(entries, BundleResourceIdentifier.COMPOSITION, composition);
-    addEntry(entries, BundleResourceIdentifier.PATIENT, patient);
-    practitionerList.forEach(
-        practitioner -> addEntry(entries, BundleResourceIdentifier.PRACTITIONER, practitioner));
-    if (organization != null)
-      addEntry(entries, BundleResourceIdentifier.ORGANISATION, organization);
-    if (encounter != null) addEntry(entries, BundleResourceIdentifier.ENCOUNTER, encounter);
-    chargeItemsResult.manufactureList.forEach(
-        manufacturer -> addEntry(entries, BundleResourceIdentifier.MANUFACTURER, manufacturer));
-    addEntry(entries, BundleResourceIdentifier.INVOICE, invoice);
-    chargeItemsResult.chargeItemList.forEach(
-        chargeItem -> addEntry(entries, BundleResourceIdentifier.CHARGE_ITEM, chargeItem));
-    chargeItemsResult.deviceList.forEach(
-        device -> addEntry(entries, BundleResourceIdentifier.DEVICE, device));
-    chargeItemsResult.substanceList.forEach(
-        substance -> addEntry(entries, BundleResourceIdentifier.SUBSTANCE, substance));
-    chargeItemsResult.medicationList.forEach(
-        medication -> addEntry(entries, BundleResourceIdentifier.MEDICATION, medication));
-    if (paymentReconciliation != null) {
-      addEntry(
-          entries, BundleResourceIdentifier.INVOICE_PAYMENT_RECONCILIATION, paymentReconciliation);
-    }
-    bundle.setEntry(entries);
+
+    BundleUtils.addEntry(bundle, composition);
+    BundleUtils.addEntry(bundle, patient);
+    BundleUtils.addEntries(bundle, practitionerList);
+    BundleUtils.addEntry(bundle, organization);
+    BundleUtils.addEntry(bundle, encounter);
+    BundleUtils.addEntries(bundle, chargeItemsResult.manufactureList);
+    BundleUtils.addEntry(bundle, invoice);
+    BundleUtils.addEntries(bundle, chargeItemsResult.chargeItemList);
+    BundleUtils.addEntries(bundle, chargeItemsResult.deviceList);
+    BundleUtils.addEntries(bundle, chargeItemsResult.substanceList);
+    BundleUtils.addEntries(bundle, chargeItemsResult.medicationList);
+    BundleUtils.addEntry(bundle, paymentReconciliation);
+
     return bundle;
   }
 

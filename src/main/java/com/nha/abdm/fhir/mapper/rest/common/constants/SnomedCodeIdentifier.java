@@ -29,4 +29,8 @@ public class SnomedCodeIdentifier {
           SNOMED_OBSERVATIONS,
           SNOMED_SPECIMEN,
           SNOMED_VACCINES);
+
+  public static final String RETRIEVED = "Retrieved";
+  public static final String EMPTY_CODES = "Empty Codes";
+  public static final String INVALID_RESOURCE = "Invalid Resource";
 }

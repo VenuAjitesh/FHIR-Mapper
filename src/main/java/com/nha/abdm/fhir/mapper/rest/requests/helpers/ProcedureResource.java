@@ -1,6 +1,7 @@
 /* (C) 2024 */
 package com.nha.abdm.fhir.mapper.rest.requests.helpers;
 
+import com.nha.abdm.fhir.mapper.rest.common.constants.ValidationConstants;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -13,17 +14,17 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class ProcedureResource {
-  @NotBlank(message = "date of the procedure is mandatory")
+  @NotBlank(message = ValidationConstants.PROCEDURE_DATE_MANDATORY)
   private String date;
 
-  @Pattern(regexp = "COMPLETED|INPROGRESS")
+  @Pattern(regexp = ValidationConstants.PROCEDURE_STATUS_PATTERN)
   private String status;
 
-  @NotBlank(message = "procedureReason is mandatory")
+  @NotBlank(message = ValidationConstants.PROCEDURE_REASON_MANDATORY)
   private String procedureReason;
 
   private String outcome;
 
-  @NotBlank(message = "procedureName is mandatory")
+  @NotBlank(message = ValidationConstants.PROCEDURE_NAME_MANDATORY)
   private String procedureName;
 }

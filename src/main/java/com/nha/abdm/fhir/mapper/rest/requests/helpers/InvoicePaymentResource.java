@@ -2,6 +2,7 @@
 package com.nha.abdm.fhir.mapper.rest.requests.helpers;
 
 import com.nha.abdm.fhir.mapper.rest.common.constants.InvoicePaymentStatus;
+import com.nha.abdm.fhir.mapper.rest.common.constants.ValidationConstants;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -15,13 +16,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InvoicePaymentResource {
-  @NotBlank(message = "method is mandatory and must not be empty")
+  @NotBlank(message = ValidationConstants.METHOD_MANDATORY)
   private String method;
 
   private String paymentDate;
   private InvoicePaymentStatus status;
 
-  @NotNull(message = "paidAmount is mandatory and must not be empty") private BigDecimal paidAmount;
+  @NotNull(message = ValidationConstants.PAID_AMOUNT_MANDATORY) private BigDecimal paidAmount;
 
   private String transactionId;
 }

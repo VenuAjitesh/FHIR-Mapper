@@ -1,16 +1,21 @@
-/* (C) 2025 */
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources.invoice;
 
 import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
+import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.requests.InvoiceBundleRequest;
 import java.text.ParseException;
 import java.util.UUID;
 import org.hl7.fhir.r4.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MakeInvoicePaymentResource {
+  private static final Logger log = LoggerFactory.getLogger(MakeInvoicePaymentResource.class);
+
   public PaymentReconciliation buildInvoicePayment(InvoiceBundleRequest invoiceBundleRequest)
       throws ParseException {
 
@@ -25,9 +30,13 @@ public class MakeInvoicePaymentResource {
     paymentReconciliation.setId(UUID.randomUUID().toString());
 
     if (paymentReq.getStatus() != null) {
-      paymentReconciliation.setStatus(
-          PaymentReconciliation.PaymentReconciliationStatus.fromCode(
-              paymentReq.getStatus().getValue()));
+      try {
+        paymentReconciliation.setStatus(
+            PaymentReconciliation.PaymentReconciliationStatus.fromCode(
+                paymentReq.getStatus().getValue()));
+      } catch (Exception e) {
+        throw ExceptionHandler.handle(e, log);
+      }
     }
 
     if (paymentReq.getPaymentDate() != null) {
@@ -36,9 +45,7 @@ public class MakeInvoicePaymentResource {
 
     if (paymentReq.getPaidAmount() != null && paymentReq.getPaidAmount().doubleValue() > 0) {
       paymentReconciliation.setPaymentAmount(
-          new Money()
-              .setValue(paymentReq.getPaidAmount())
-              .setCurrency(invoiceReq != null ? invoiceReq.getCurrency() : "INR"));
+          new Money().setValue(paymentReq.getPaidAmount()).setCurrency("INR"));
     }
 
     if (paymentReq.getTransactionId() != null && !paymentReq.getTransactionId().isBlank()) {

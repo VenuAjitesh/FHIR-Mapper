@@ -1,6 +1,7 @@
 /* (C) 2024 */
 package com.nha.abdm.fhir.mapper.rest.requests.helpers;
 
+import com.nha.abdm.fhir.mapper.rest.common.constants.ValidationConstants;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.DateRange;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class CarePlanResource {
-  @Pattern(regexp = "^(proposal|plan|order|option)$")
+  @Pattern(regexp = ValidationConstants.INTENT_PATTERN)
   private String intent;
 
   private DateRange period;

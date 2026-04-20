@@ -46,6 +46,21 @@ Recommended RAM: Systems with more than 8 GB RAM
 | InvoiceRecord          | The billing artifact represents the invoice details such as pharmacy invoice, consultation invoice etc. along with the support for scanned documents attached for the patient which can be shared across the health ecosystem.                                                                                                                                                                                                                                                                                                             |
 
 ---
+### FHIR Validation & SNOMED APIs
+
+#### 1. FHIR Validation Endpoint
+You can validate any FHIR Bundle against the ABDM profiles (loaded via the bundled NPM package).
+- `POST` Request `/v1/bundle/validate`
+- **Body**: A valid FHIR R4 Bundle JSON.
+- **Response**: A validation result containing issues (errors, warnings) and overall status.
+
+#### 2. SNOMED Code Retrieval
+The system includes an embedded H2 database with SNOMED codes used in ABDM profiles.
+- `GET` Request `/v1/snomed/{resource}`
+- **Resource types**: `Condition`, `Procedure`, `Encounter`, `Medication-Route`, `Medications`, `Observations`, `Specimen`, `Vaccines`.
+- **Response**: List of codes and displays for that resource category.
+
+---
 ### APIs for generating the FHIR bundle
 - For Swagger-ui, check [here](https://venuajitesh.github.io/FHIR-Mapper/)
 
@@ -733,3 +748,18 @@ Recommended RAM: Systems with more than 8 GB RAM
 ### Things To Consider
 - If the FHIR bundle is generated the HttpStatus will be `201 created`
 - The authoredOn will accept date in the format of string in format : `yyyy-MM-dd` or `yyyy-MM-dd'T'HH:mm:ss.SSSX` - UTC iso time format
+
+---
+### Architecture & Development Guide
+
+#### Core Technologies
+- **HAPI FHIR**: Core library for FHIR resource generation and validation.
+- **Spring Boot**: Web framework for APIs.
+- **H2 Database**: Embedded database used to serve SNOMED terminology codes.
+- **ABDM Profiles**: Custom FHIR profiles loaded via the `package.tgz` NPM package in the classpath.
+
+#### Best Practices for Contributors
+- **Centralized Logic**: Always use `CompositionUtils` and `ObservationUtils` when building resources to ensure consistency and ABDM compliance.
+- **Constants**: Avoid hardcoded strings. Route paths should be added to `ControllerMappingConstants`, and log/error messages to `LogMessageConstants`.
+- **Validation**: All generated bundles are automatically validated against ABDM profiles before being returned. You can toggle this behavior in `application.properties`.
+- **Terminology**: Use `BundleUrlIdentifier` for standard URLs (SNOMED, LOINC) and `SnomedCodeIdentifier` for SNOMED specific codes.

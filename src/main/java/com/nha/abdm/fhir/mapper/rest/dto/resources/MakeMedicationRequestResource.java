@@ -1,3 +1,4 @@
+/* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import com.nha.abdm.fhir.mapper.Utils;
@@ -48,13 +49,15 @@ public class MakeMedicationRequestResource {
         .setLastUpdatedElement(Utils.getCurrentTimeStamp());
   }
 
-  private void setAuthoredOn(MedicationRequest medicationRequest, String authoredOn) throws ParseException {
+  private void setAuthoredOn(MedicationRequest medicationRequest, String authoredOn)
+      throws ParseException {
     if (authoredOn != null) {
       medicationRequest.setAuthoredOnElement(Utils.getFormattedDateTime(authoredOn));
     }
   }
 
-  private void setNote(MedicationRequest medicationRequest, PrescriptionResource prescriptionResource) {
+  private void setNote(
+      MedicationRequest medicationRequest, PrescriptionResource prescriptionResource) {
     if (Objects.nonNull(prescriptionResource.getNote())) {
       medicationRequest.addNote(new Annotation().setText(prescriptionResource.getNote()));
     }
