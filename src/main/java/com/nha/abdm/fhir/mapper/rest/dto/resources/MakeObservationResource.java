@@ -49,6 +49,9 @@ public class MakeObservationResource {
           ObservationUtils.createReferenceRange(observationResource.getReferenceRange()));
     }
 
+    if (observationResource.getBodySite() != null && !observationResource.getBodySite().isEmpty()) {
+      observation.setBodySite(new CodeableConcept().setText(observationResource.getBodySite()));
+    }
     buildComponents(observation, observationResource);
     Utils.setNarrative(observation, "Observation: " + observationResource.getObservation());
 

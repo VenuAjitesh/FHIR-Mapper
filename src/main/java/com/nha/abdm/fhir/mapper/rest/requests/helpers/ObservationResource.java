@@ -41,6 +41,8 @@ public class ObservationResource {
 
   private ObservationReferenceRange referenceRange;
 
+  private String bodySite;
+
   @Valid private ValueQuantityResource valueQuantity;
   @Valid private List<ObservationComponentResource> components;
 }
