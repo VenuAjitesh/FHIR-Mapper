@@ -12,6 +12,7 @@ import com.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.PrescriptionRequest;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.PrescriptionResource;
+import com.nha.abdm.fhir.mapper.rest.requests.helpers.VisitDetails;
 import java.text.ParseException;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
@@ -124,7 +125,7 @@ public class PrescriptionConverter {
     return makeEncounterResource.getEncounter(
         patient,
         prescriptionRequest.getEncounter() != null ? prescriptionRequest.getEncounter() : null,
-        prescriptionRequest.getAuthoredOn());
+        new VisitDetails(prescriptionRequest.getAuthoredOn(), null));
   }
 
   private List<Binary> createDocumentBinaries(PrescriptionRequest prescriptionRequest)

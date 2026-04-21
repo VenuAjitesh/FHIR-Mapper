@@ -129,7 +129,7 @@ public class OPConsultationConverter {
     return makeEncounterResource.getEncounter(
         patient,
         opConsultationRequest.getEncounter() != null ? opConsultationRequest.getEncounter() : null,
-        opConsultationRequest.getVisitDate());
+        new VisitDetails(opConsultationRequest.getVisitDate(), null));
   }
 
   private List<Condition> createChiefComplaints(
@@ -427,6 +427,8 @@ public class OPConsultationConverter {
                               .setActor(Utils.buildReference(patient.getId()))
                               .setStatus(Appointment.ParticipationStatus.ACCEPTED)));
                   appointment.setStart(
+                      Utils.getFormattedDateTime(item.getAppointmentTime()).getValue());
+                  appointment.setEnd(
                       Utils.getFormattedDateTime(item.getAppointmentTime()).getValue());
                   appointment.addReasonCode(new CodeableConcept().setText(item.getReason()));
                   appointment.setServiceType(

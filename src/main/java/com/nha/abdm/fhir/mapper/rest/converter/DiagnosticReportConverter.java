@@ -11,6 +11,7 @@ import com.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.DiagnosticReportRequest;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.DiagnosticResource;
+import com.nha.abdm.fhir.mapper.rest.requests.helpers.VisitDetails;
 import java.text.ParseException;
 import java.util.*;
 import org.hl7.fhir.r4.model.*;
@@ -118,7 +119,9 @@ public class DiagnosticReportConverter {
   private Encounter createEncounter(
       Patient patient, DiagnosticReportRequest diagnosticReportRequest) throws ParseException {
     return makeEncounterResource.getEncounter(
-        patient, diagnosticReportRequest.getEncounter(), diagnosticReportRequest.getVisitDate());
+        patient,
+        diagnosticReportRequest.getEncounter(),
+        new VisitDetails(diagnosticReportRequest.getVisitDate(), null));
   }
 
   private DiagnosticResources createDiagnosticReportsAndObservations(

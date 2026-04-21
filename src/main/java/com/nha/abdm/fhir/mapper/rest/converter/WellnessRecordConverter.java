@@ -9,6 +9,7 @@ import com.nha.abdm.fhir.mapper.rest.dto.resources.*;
 import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.WellnessRecordRequest;
+import com.nha.abdm.fhir.mapper.rest.requests.helpers.VisitDetails;
 import java.text.ParseException;
 import java.util.*;
 import org.hl7.fhir.r4.model.*;
@@ -108,7 +109,7 @@ public class WellnessRecordConverter {
     return makeEncounterResource.getEncounter(
         patient,
         wellnessRecordRequest.getEncounter() != null ? wellnessRecordRequest.getEncounter() : null,
-        wellnessRecordRequest.getAuthoredOn());
+        new VisitDetails(wellnessRecordRequest.getAuthoredOn(), null));
   }
 
   private WellnessObservationsResult createObservations(

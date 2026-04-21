@@ -29,7 +29,7 @@ public class MakeInvoiceDeviceResource {
 
     device.setId(
         StringUtils.isNotBlank(deviceResource.getUdiCarrier())
-            ? deviceResource.getUdiCarrier()
+            ? Utils.ensureUuid(deviceResource.getUdiCarrier())
             : UUID.randomUUID().toString());
 
     if (StringUtils.isNotBlank(deviceResource.getDeviceName())) {
@@ -88,6 +88,8 @@ public class MakeInvoiceDeviceResource {
     if (StringUtils.isNotBlank(deviceResource.getNote())) {
       device.setNote(List.of(new Annotation().setText(deviceResource.getNote())));
     }
+
+    Utils.setNarrative(device, "Device: " + deviceResource.getDeviceName());
 
     return device;
   }

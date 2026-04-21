@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class ChiefComplaintResource {
-  @NotBlank(message = ValidationConstants.COMPLAINT_MANDATORY)
+  @NotBlank(message = ValidationConstants.CONDITION_IS_MANDATORY)
   private String complaint;
 
   @NotBlank(message = ValidationConstants.RECORDED_DATE_MANDATORY)

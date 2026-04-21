@@ -22,7 +22,12 @@ public class MakeChargeItemResource {
   private static final Logger log = LoggerFactory.getLogger(MakeChargeItemResource.class);
   @Autowired private TypeChargeItemRepo typeChargeItemRepo;
 
-  public ChargeItem getChargeItems(ChargeItemResource resource, String baseUrl) {
+  public ChargeItem getChargeItems(
+      ChargeItemResource resource,
+      String baseUrl,
+      Patient patient,
+      Organization organization,
+      Encounter encounter) {
     if (resource == null) {
       return null;
     }
@@ -30,10 +35,21 @@ public class MakeChargeItemResource {
     ChargeItem chargeItem = new ChargeItem();
 
     if (StringUtils.isNotBlank(resource.getId())) {
-      chargeItem.setId(resource.getId());
+      chargeItem.setId(Utils.ensureUuid(resource.getId()));
     } else {
       chargeItem.setId(UUID.randomUUID().toString());
     }
+
+    if (patient != null && patient.hasId()) {
+      chargeItem.setSubject(
+          Utils.buildReference(patient.getId()).setDisplay(patient.getNameFirstRep().getText()));
+    }
+
+    if (encounter != null && encounter.hasId()) {
+      chargeItem.setContext(Utils.buildReference(encounter.getId()));
+    }
+
+    Utils.setNarrative(chargeItem, "Charge Item for " + resource.getChargeType());
 
     if (StringUtils.isNotBlank(resource.getStatus().getValue())) {
       try {

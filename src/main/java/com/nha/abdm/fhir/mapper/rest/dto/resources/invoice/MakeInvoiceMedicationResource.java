@@ -46,6 +46,8 @@ public class MakeInvoiceMedicationResource {
             .setLotNumber(medicationResource.getLotNumber())
             .setExpirationDate(Utils.getFormattedDate(medicationResource.getExpiryDate())));
 
+    Utils.setNarrative(medication, "Medication: " + medicationResource.getMedicineName());
+
     return medication;
   }
 

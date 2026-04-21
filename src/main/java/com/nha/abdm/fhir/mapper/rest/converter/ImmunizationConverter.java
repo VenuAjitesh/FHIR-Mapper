@@ -11,6 +11,7 @@ import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.ImmunizationRequest;
+import com.nha.abdm.fhir.mapper.rest.requests.helpers.VisitDetails;
 import java.text.ParseException;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
@@ -93,7 +94,7 @@ public class ImmunizationConverter {
     return makeEncounterResource.getEncounter(
         patient,
         immunizationRequest.getEncounter() != null ? immunizationRequest.getEncounter() : null,
-        immunizationRequest.getAuthoredOn());
+        new VisitDetails(immunizationRequest.getAuthoredOn(), null));
   }
 
   private ImmunizationsResult createImmunizationsAndManufacturers(

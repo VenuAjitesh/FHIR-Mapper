@@ -6,6 +6,7 @@ import com.nha.abdm.fhir.mapper.rest.common.constants.BundleCompositionIdentifie
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.helpers.CompositionUtils;
+import com.nha.abdm.fhir.mapper.rest.requests.DischargeSummaryRequest;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Service;
 public class MakeDischargeComposition {
   public Composition makeDischargeCompositionResource(
       Patient patient,
-      String authoredOn,
+      DischargeSummaryRequest dischargeSummaryRequest,
       Encounter encounter,
       List<Practitioner> practitionerList,
       Organization organization,
@@ -40,7 +41,8 @@ public class MakeDischargeComposition {
     composition.setEncounter(Utils.buildReference(encounter.getId()));
     composition.setCustodian(createCustodian(organization));
     composition.setSubject(createSubject(patient));
-    composition.setDateElement(Utils.getFormattedDateTime(authoredOn));
+    composition.setDateElement(
+        Utils.getFormattedDateTime(dischargeSummaryRequest.getVisitDetails().getVisitDate()));
     composition.setStatus(Composition.CompositionStatus.FINAL);
 
     List<Composition.SectionComponent> sections = new ArrayList<>();
@@ -61,7 +63,12 @@ public class MakeDischargeComposition {
 
     composition.setIdentifier(createIdentifier());
     composition.setId(UUID.randomUUID().toString());
-    Utils.setNarrative(composition, "Discharge Summary for " + patient.getName().get(0).getText());
+    Utils.setNarrative(
+        composition,
+        "Discharge Summary for "
+            + patient.getName().get(0).getText()
+            + " details: "
+            + dischargeSummaryRequest.getClinicalSummary());
     return composition;
   }
 

@@ -164,7 +164,7 @@ public class BundleController {
             description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
       })
   public Bundle createOPConsultationBundle(
-      @Valid @RequestBody OPConsultationRequest opConsultationRequest) throws ParseException {
+      @Valid @RequestBody OPConsultationRequest opConsultationRequest) {
     Bundle bundle = opConsultationConverter.convertToOPConsultationBundle(opConsultationRequest);
     return validateAndReturnBundle(bundle);
   }
@@ -231,7 +231,7 @@ public class BundleController {
             description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
       })
   public Bundle createDiagnosticReportBundle(
-      @Valid @RequestBody DiagnosticReportRequest diagnosticReportRequest) throws ParseException {
+      @Valid @RequestBody DiagnosticReportRequest diagnosticReportRequest) {
     Bundle bundle = diagnosticReportConverter.convertToDiagnosticBundle(diagnosticReportRequest);
     return validateAndReturnBundle(bundle);
   }
@@ -264,7 +264,7 @@ public class BundleController {
             description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
       })
   public Bundle createDischargeSummaryBundle(
-      @Valid @RequestBody DischargeSummaryRequest dischargeSummaryRequest) throws ParseException {
+      @Valid @RequestBody DischargeSummaryRequest dischargeSummaryRequest) {
     Bundle bundle = dischargeSummaryConverter.convertToDischargeSummary(dischargeSummaryRequest);
     return validateAndReturnBundle(bundle);
   }

@@ -9,6 +9,7 @@ import com.nha.abdm.fhir.mapper.rest.dto.resources.*;
 import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.HealthDocumentRecord;
+import com.nha.abdm.fhir.mapper.rest.requests.helpers.VisitDetails;
 import java.text.ParseException;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
@@ -100,7 +101,7 @@ public class HealthDocumentConverter {
     return makeEncounterResource.getEncounter(
         patient,
         healthDocumentRecord.getEncounter() != null ? healthDocumentRecord.getEncounter() : null,
-        healthDocumentRecord.getAuthoredOn());
+        new VisitDetails(healthDocumentRecord.getAuthoredOn(), null));
   }
 
   private Composition createComposition(

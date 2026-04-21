@@ -43,10 +43,7 @@ public class DischargeSummaryRequest {
   @Valid
   @NotNull(message = ValidationConstants.PATIENT_MANDATORY) private PatientResource patient;
 
-  @Schema(
-      description = SwaggerConstants.ENCOUNTER_DESC,
-      example = SwaggerConstants.ENCOUNTER_EXAMPLE)
-  private String encounter;
+  @NotNull @Valid private VisitDetails visitDetails;
 
   @Valid
   @NotNull(message = ValidationConstants.PRACTITIONER_MANDATORY) private List<PractitionerResource> practitioners;
@@ -67,14 +64,7 @@ public class DischargeSummaryRequest {
   @Valid private List<DiagnosticResource> diagnostics;
 
   @Valid private CarePlanResource carePlan;
-
-  @Schema(
-      description = SwaggerConstants.AUTHORED_ON_DESC,
-      example = SwaggerConstants.AUTHORED_ON_EXAMPLE)
-  @Pattern(
-      regexp = ValidationConstants.DATE_TIME_PATTERN,
-      message = ValidationConstants.DATE_TIME_FORMAT_MESSAGE)
-  @NotNull(message = ValidationConstants.AUTHORED_ON_MANDATORY) @NotNull private String authoredOn;
+  private String clinicalSummary;
 
   @Valid private List<PrescriptionResource> medications;
 

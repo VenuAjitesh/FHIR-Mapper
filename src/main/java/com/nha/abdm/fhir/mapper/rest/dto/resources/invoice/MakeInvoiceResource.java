@@ -42,7 +42,7 @@ public class MakeInvoiceResource {
 
     if (invoiceBundleRequest.getInvoice() != null
         && StringUtils.isNotBlank(invoiceBundleRequest.getInvoice().getId())) {
-      invoice.setId(invoiceBundleRequest.getInvoice().getId());
+      invoice.setId(Utils.ensureUuid(invoiceBundleRequest.getInvoice().getId()));
     } else {
       invoice.setId(UUID.randomUUID().toString());
     }
@@ -154,6 +154,8 @@ public class MakeInvoiceResource {
                 new Annotation().setText(invoiceBundleRequest.getInvoice().getNote())));
       }
     }
+
+    Utils.setNarrative(invoice, "Invoice for " + patient.getNameFirstRep().getText());
 
     return invoice;
   }

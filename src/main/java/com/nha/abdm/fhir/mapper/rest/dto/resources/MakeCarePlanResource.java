@@ -1,7 +1,6 @@
 /* (C) 2026 */
 package com.nha.abdm.fhir.mapper.rest.dto.resources;
 
-import com.nha.abdm.fhir.mapper.rest.common.constants.BundleResourceIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import com.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
@@ -37,7 +36,7 @@ public class MakeCarePlanResource {
 
   private Reference createSubject(Patient patient) {
     return new Reference()
-        .setReference(BundleResourceIdentifier.PATIENT + MapperConstants.SLASH + patient.getId())
+        .setReference(MapperConstants.URN_UUID + patient.getId())
         .setDisplay(
             patient.getName().stream().map(HumanName::getText).collect(Collectors.joining(" ")));
   }
@@ -50,6 +49,7 @@ public class MakeCarePlanResource {
     carePlanCoding.setSystem(BundleUrlIdentifier.SNOMED_URL);
     carePlanCoding.setCode(snomed.getCode());
     codeableConcept.addCoding(carePlanCoding);
+    codeableConcept.setText(carePlanResource.getType());
     return codeableConcept;
   }
 
@@ -58,6 +58,7 @@ public class MakeCarePlanResource {
       CarePlan.CarePlanActivityDetailComponent activityDetailComponent =
           new CarePlan.CarePlanActivityDetailComponent();
       activityDetailComponent.setDescription(carePlanResource.getNotes());
+      activityDetailComponent.setStatus(CarePlan.CarePlanActivityStatus.SCHEDULED);
       carePlan.setActivity(
           Collections.singletonList(
               new CarePlan.CarePlanActivityComponent().setDetail(activityDetailComponent)));
