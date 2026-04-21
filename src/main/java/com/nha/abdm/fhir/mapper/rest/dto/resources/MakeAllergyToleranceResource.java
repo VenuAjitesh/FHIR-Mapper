@@ -36,7 +36,7 @@ public class MakeAllergyToleranceResource {
         snomedService.getConditionProcedureCode(resource.getAllergy());
     allergy.setCode(
         new CodeableConcept()
-            .setText(snomed.getDisplay())
+            .setText(resource.getAllergy())
             .addCoding(
                 new Coding()
                     .setSystem(BundleUrlIdentifier.SNOMED_URL)
@@ -75,7 +75,7 @@ public class MakeAllergyToleranceResource {
           snomedService.getConditionProcedureCode(resource.getReaction().getManifestation());
       reaction.addManifestation(
           new CodeableConcept()
-              .setText(manifestationSnomed.getDisplay())
+              .setText(resource.getReaction().getManifestation())
               .addCoding(
                   new Coding()
                       .setSystem(BundleUrlIdentifier.SNOMED_URL)

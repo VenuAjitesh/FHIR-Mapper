@@ -68,7 +68,7 @@ public class MakeConditionResource {
                 .setDisplay(snomed.getDisplay())
                 .setCode(snomed.getCode())
                 .setSystem(BundleUrlIdentifier.SNOMED_URL))
-        .setText(snomed.getDisplay());
+        .setText(conditionDetails);
   }
 
   private Meta createMeta() throws ParseException {

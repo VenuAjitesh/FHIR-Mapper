@@ -7,6 +7,8 @@ import com.nha.abdm.fhir.mapper.rest.common.constants.LogMessageConstants;
 import com.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.utilities.xhtml.NodeType;
 import org.hl7.fhir.utilities.xhtml.XhtmlNode;
@@ -65,5 +67,17 @@ public class Utils {
     div.getChildNodes().add(p);
     narrative.setDiv(div);
     resource.setText(narrative);
+  }
+
+  public static String ensureUuid(String id) {
+    if (StringUtils.isBlank(id)) {
+      return UUID.randomUUID().toString();
+    }
+    try {
+      UUID.fromString(id);
+      return id.toLowerCase();
+    } catch (IllegalArgumentException e) {
+      return UUID.randomUUID().toString();
+    }
   }
 }

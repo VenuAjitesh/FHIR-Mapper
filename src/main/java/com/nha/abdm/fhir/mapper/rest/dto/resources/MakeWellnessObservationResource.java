@@ -50,7 +50,7 @@ public class MakeWellnessObservationResource {
       coding.setCode(snomed.getCode());
       coding.setDisplay(snomed.getDisplay());
       typeCode.addCoding(coding);
-      typeCode.setText(snomed.getDisplay());
+      typeCode.setText(observationResource.getObservation());
     } else {
       coding.setCode(
           coding.getSystem().equalsIgnoreCase(BundleUrlIdentifier.LOINC_URL)

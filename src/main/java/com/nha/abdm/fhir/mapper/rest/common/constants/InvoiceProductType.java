@@ -11,8 +11,9 @@ import lombok.Getter;
 @Getter
 @Schema(description = SwaggerConstants.INVOICE_PRODUCT_TYPE_DESC)
 public enum InvoiceProductType {
-  EXAMINATION("examination"),
-  DRUG("drug");
+  MEDICATION("medication"),
+  DEVICE("device"),
+  SUBSTANCE("substance");
 
   private final String value;
 
