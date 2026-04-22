@@ -57,7 +57,7 @@ public class ValidationConstants {
       "chargeItems are mandatory and must not be empty";
   public static final String IMMUNIZATIONS_MANDATORY = "Immunizations is mandatory";
 
-  public static final String COMPLAINT_MANDATORY = "complaint is mandatory";
+  public static final String CONDITION_IS_MANDATORY = "condition is mandatory";
   public static final String RECORDED_DATE_MANDATORY = "recordedDate is mandatory";
   public static final String OBSERVATION_MANDATORY = "observation is mandatory";
   public static final String STATUS_MANDATORY_MSG = "status is mandatory";
@@ -79,6 +79,8 @@ public class ValidationConstants {
   public static final String METHOD_MANDATORY = "method is mandatory and must not be empty";
   public static final String PAID_AMOUNT_MANDATORY =
       "paidAmount is mandatory and must not be empty";
+  public static final String PAID_DATE_MANDATORY = "paidDate is mandatory and must not be empty";
+  public static final String VISIT_DATE_MANDATORY = "visitDate is mandatory";
   public static final String PATIENT_NAME_MANDATORY = "name of the patient is mandatory";
   public static final String PATIENT_REF_MANDATORY = "patientReference of the patient is mandatory";
   public static final String PRACTITIONER_NAME_MANDATORY = "Name of the practitioner is mandatory";

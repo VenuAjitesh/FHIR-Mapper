@@ -9,6 +9,7 @@ import com.nha.abdm.fhir.mapper.rest.dto.resources.*;
 import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.HealthDocumentRecord;
+import com.nha.abdm.fhir.mapper.rest.requests.helpers.VisitDetails;
 import java.text.ParseException;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +30,7 @@ public class HealthDocumentConverter {
   private final MakeEncounterResource makeEncounterResource;
   private final MakeHealthDocumentComposition makeHealthDocumentComposition;
 
-  public Bundle convertToHealthDocumentBundle(HealthDocumentRecord healthDocumentRecord)
-      throws ParseException {
+  public Bundle convertToHealthDocumentBundle(HealthDocumentRecord healthDocumentRecord) {
     try {
       Organization organization = createOrganization(healthDocumentRecord);
       Patient patient = createPatient(healthDocumentRecord);
@@ -38,14 +38,13 @@ public class HealthDocumentConverter {
       List<DocumentReference> documentReferenceList =
           createDocumentReferences(healthDocumentRecord, patient, organization);
       Encounter encounter = createEncounter(healthDocumentRecord, patient);
+
       Composition composition =
           createComposition(
-              healthDocumentRecord,
-              patient,
-              practitionerList,
-              organization,
-              encounter,
-              documentReferenceList);
+              healthDocumentRecord, patient,
+              practitionerList, organization,
+              encounter, documentReferenceList);
+
       return buildBundle(
           healthDocumentRecord,
           composition,
@@ -100,7 +99,7 @@ public class HealthDocumentConverter {
     return makeEncounterResource.getEncounter(
         patient,
         healthDocumentRecord.getEncounter() != null ? healthDocumentRecord.getEncounter() : null,
-        healthDocumentRecord.getAuthoredOn());
+        new VisitDetails(healthDocumentRecord.getAuthoredOn(), null));
   }
 
   private Composition createComposition(

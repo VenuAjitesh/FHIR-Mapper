@@ -12,6 +12,7 @@ import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.InvoiceBundleRequest;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.ChargeItemResource;
+import com.nha.abdm.fhir.mapper.rest.requests.helpers.VisitDetails;
 import java.text.ParseException;
 import java.util.*;
 import org.hl7.fhir.r4.model.*;
@@ -62,13 +63,14 @@ public class InvoiceRequestConverter {
     this.makeInvoicePaymentResource = makeInvoicePaymentResource;
   }
 
-  public Bundle makeInvoiceBundle(InvoiceBundleRequest invoiceBundleRequest) throws ParseException {
+  public Bundle makeInvoiceBundle(InvoiceBundleRequest invoiceBundleRequest) {
     try {
       Patient patient = createPatient(invoiceBundleRequest);
       List<Practitioner> practitionerList = createPractitioners(invoiceBundleRequest);
       Organization organization = createOrganization(invoiceBundleRequest);
       Encounter encounter = createEncounter(invoiceBundleRequest, patient);
-      ChargeItemsResult chargeItemsResult = createChargeItemsAndProducts(invoiceBundleRequest);
+      ChargeItemsResult chargeItemsResult =
+          createChargeItemsAndProducts(invoiceBundleRequest, patient, organization, encounter);
       Invoice invoice =
           createInvoice(
               invoiceBundleRequest, chargeItemsResult.chargeItemList, patient, organization);
@@ -82,7 +84,9 @@ public class InvoiceRequestConverter {
               organization,
               invoice,
               chargeItemsResult,
-              paymentReconciliation);
+              paymentReconciliation,
+              encounter);
+
       return buildBundle(
           invoiceBundleRequest,
           composition,
@@ -93,6 +97,7 @@ public class InvoiceRequestConverter {
           chargeItemsResult,
           invoice,
           paymentReconciliation);
+
     } catch (Exception e) {
       throw ExceptionHandler.handle(e, log);
     }
@@ -120,11 +125,14 @@ public class InvoiceRequestConverter {
     return makeEncounterResource.getEncounter(
         patient,
         invoiceBundleRequest.getEncounter() != null ? invoiceBundleRequest.getEncounter() : null,
-        invoiceBundleRequest.getInvoiceDate());
+        new VisitDetails(invoiceBundleRequest.getInvoiceDate(), null));
   }
 
   private ChargeItemsResult createChargeItemsAndProducts(
-      InvoiceBundleRequest invoiceBundleRequest) {
+      InvoiceBundleRequest invoiceBundleRequest,
+      Patient patient,
+      Organization organization,
+      Encounter encounter) {
     List<Organization> manufactureList = new ArrayList<>();
     List<Device> deviceList = new ArrayList<>();
     List<Substance> substanceList = new ArrayList<>();
@@ -142,7 +150,10 @@ public class InvoiceRequestConverter {
                         substanceList,
                         medicationList,
                         manufactureList,
-                        invoiceBundleRequest);
+                        invoiceBundleRequest,
+                        patient,
+                        organization,
+                        encounter);
                   } catch (ParseException e) {
                     throw new RuntimeException(e);
                   }
@@ -163,7 +174,7 @@ public class InvoiceRequestConverter {
   }
 
   private PaymentReconciliation createPaymentReconciliation(
-      InvoiceBundleRequest invoiceBundleRequest) throws ParseException {
+      InvoiceBundleRequest invoiceBundleRequest) {
     if (Objects.nonNull(invoiceBundleRequest.getPayment())) {
       return makeInvoicePaymentResource.buildInvoicePayment(invoiceBundleRequest);
     }
@@ -177,7 +188,8 @@ public class InvoiceRequestConverter {
       Organization organization,
       Invoice invoice,
       ChargeItemsResult chargeItemsResult,
-      PaymentReconciliation paymentReconciliation)
+      PaymentReconciliation paymentReconciliation,
+      Encounter encounter)
       throws ParseException {
     return makeInvoiceComposition.makeCompositionResource(
         patient,
@@ -188,7 +200,8 @@ public class InvoiceRequestConverter {
         chargeItemsResult.deviceList,
         chargeItemsResult.substanceList,
         chargeItemsResult.medicationList,
-        paymentReconciliation);
+        paymentReconciliation,
+        encounter);
   }
 
   private Bundle buildBundle(
@@ -242,18 +255,23 @@ public class InvoiceRequestConverter {
       List<Substance> substanceList,
       List<Medication> medicationList,
       List<Organization> manufactureList,
-      InvoiceBundleRequest invoiceBundleRequest)
+      InvoiceBundleRequest invoiceBundleRequest,
+      Patient patient,
+      Organization organization,
+      Encounter encounter)
       throws ParseException {
     if (item.getProductType().getValue().equalsIgnoreCase(BundleResourceIdentifier.DEVICE)) {
       Device device = makeInvoiceDeviceResource.getDevice(item.getDevice());
       deviceList.add(device);
-      return makeChargeItemResource.getChargeItems(item, device.getId());
+      return makeChargeItemResource.getChargeItems(
+          item, device.getId(), patient, organization, encounter);
     } else if (item.getProductType()
         .getValue()
         .equalsIgnoreCase(BundleResourceIdentifier.SUBSTANCE)) {
       Substance substance = makeInvoiceSubstanceResource.getSubstance(item.getSubstance());
       substanceList.add(substance);
-      return makeChargeItemResource.getChargeItems(item, substance.getId());
+      return makeChargeItemResource.getChargeItems(
+          item, substance.getId(), patient, organization, encounter);
     } else if (item.getProductType()
         .getValue()
         .equalsIgnoreCase(BundleResourceIdentifier.MEDICATION)) {
@@ -269,7 +287,8 @@ public class InvoiceRequestConverter {
       Medication medication =
           makeInvoiceMedicationResource.getMedication(item.getMedication(), manufacturer);
       medicationList.add(medication);
-      return makeChargeItemResource.getChargeItems(item, medication.getId());
+      return makeChargeItemResource.getChargeItems(
+          item, medication.getId(), patient, organization, encounter);
     } else {
       throw new IllegalArgumentException(
           LogMessageConstants.UNKNOWN_PRODUCT_TYPE + item.getProductType());

@@ -12,6 +12,7 @@ import com.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.PrescriptionRequest;
 import com.nha.abdm.fhir.mapper.rest.requests.helpers.PrescriptionResource;
+import com.nha.abdm.fhir.mapper.rest.requests.helpers.VisitDetails;
 import java.text.ParseException;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +34,7 @@ public class PrescriptionConverter {
   private final MakePrescriptionComposition makePrescriptionComposition;
   private final MakeConditionResource makeConditionResource;
 
-  public Bundle convertToPrescriptionBundle(PrescriptionRequest prescriptionRequest)
-      throws ParseException {
+  public Bundle convertToPrescriptionBundle(PrescriptionRequest prescriptionRequest) {
     try {
       Organization organization = createOrganization(prescriptionRequest);
       Patient patient = createPatient(prescriptionRequest);
@@ -52,6 +52,7 @@ public class PrescriptionConverter {
               encounter,
               medicationsResult.medicationList,
               documentList);
+
       return buildBundle(
           prescriptionRequest,
           composition,
@@ -104,6 +105,7 @@ public class PrescriptionConverter {
               ? makeConditionResource.getCondition(
                   item.getReason(), patient, prescriptionRequest.getAuthoredOn(), null)
               : null;
+
       medicationRequestList.add(
           makeMedicationRequestResource.getMedicationResource(
               prescriptionRequest.getAuthoredOn(),
@@ -112,6 +114,7 @@ public class PrescriptionConverter {
               organization,
               practitionerList,
               patient));
+
       if (condition != null) {
         medicationConditionList.add(condition);
       }
@@ -124,11 +127,10 @@ public class PrescriptionConverter {
     return makeEncounterResource.getEncounter(
         patient,
         prescriptionRequest.getEncounter() != null ? prescriptionRequest.getEncounter() : null,
-        prescriptionRequest.getAuthoredOn());
+        new VisitDetails(prescriptionRequest.getAuthoredOn(), null));
   }
 
-  private List<Binary> createDocumentBinaries(PrescriptionRequest prescriptionRequest)
-      throws ParseException {
+  private List<Binary> createDocumentBinaries(PrescriptionRequest prescriptionRequest) {
     return Optional.ofNullable(prescriptionRequest.getDocuments())
         .orElse(Collections.emptyList())
         .stream()
@@ -164,6 +166,7 @@ public class PrescriptionConverter {
       List<MedicationRequest> medicationRequestList,
       List<Binary> documentList)
       throws ParseException {
+
     return makePrescriptionComposition.makeCompositionResource(
         patient,
         practitionerList,

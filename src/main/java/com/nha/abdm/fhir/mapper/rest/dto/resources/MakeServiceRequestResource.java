@@ -90,10 +90,7 @@ public class MakeServiceRequestResource {
 
   private void buildSpecimen(ServiceRequest serviceRequest, ServiceRequestResource resource) {
     if (resource.getSpecimen() != null) {
-      serviceRequest.addSpecimen(
-          new Reference()
-              .setDisplay(
-                  snomedService.getSnomedSpecimenCode(resource.getSpecimen()).getDisplay()));
+      serviceRequest.addSpecimen(new Reference().setDisplay(resource.getSpecimen()));
     }
   }
 }

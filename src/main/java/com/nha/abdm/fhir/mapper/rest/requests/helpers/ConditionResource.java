@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Condition resource with NDHM FHIR compliance")
 public class ConditionResource {
   @Schema(description = "Condition code or description", example = "Hypertension")
-  @NotBlank(message = ValidationConstants.COMPLAINT_MANDATORY)
+  @NotBlank(message = ValidationConstants.CONDITION_IS_MANDATORY)
   private String condition;
 
   @Schema(description = "Date when condition was recorded", example = "2024-11-23T21:34:38.989Z")

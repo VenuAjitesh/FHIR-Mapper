@@ -9,6 +9,7 @@ import com.nha.abdm.fhir.mapper.rest.dto.resources.*;
 import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.WellnessRecordRequest;
+import com.nha.abdm.fhir.mapper.rest.requests.helpers.VisitDetails;
 import java.text.ParseException;
 import java.util.*;
 import org.hl7.fhir.r4.model.*;
@@ -52,8 +53,7 @@ public class WellnessRecordConverter {
     this.makeWellnessComposition = makeWellnessComposition;
   }
 
-  public Bundle getWellnessBundle(WellnessRecordRequest wellnessRecordRequest)
-      throws ParseException {
+  public Bundle getWellnessBundle(WellnessRecordRequest wellnessRecordRequest) {
     try {
       Organization organization = createOrganization(wellnessRecordRequest);
       Patient patient = createPatient(wellnessRecordRequest);
@@ -108,7 +108,7 @@ public class WellnessRecordConverter {
     return makeEncounterResource.getEncounter(
         patient,
         wellnessRecordRequest.getEncounter() != null ? wellnessRecordRequest.getEncounter() : null,
-        wellnessRecordRequest.getAuthoredOn());
+        new VisitDetails(wellnessRecordRequest.getAuthoredOn(), null));
   }
 
   private WellnessObservationsResult createObservations(
@@ -163,7 +163,6 @@ public class WellnessRecordConverter {
       Patient patient,
       List<Practitioner> practitionerList) {
     return Optional.ofNullable(wellnessRecordRequest.getBodyMeasurements())
-        .filter(Objects::nonNull)
         .orElse(Collections.emptyList())
         .stream()
         .map(

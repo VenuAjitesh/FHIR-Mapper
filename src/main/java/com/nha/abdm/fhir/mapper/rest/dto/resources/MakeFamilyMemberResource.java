@@ -73,7 +73,7 @@ public class MakeFamilyMemberResource {
                               .setSystem(BundleUrlIdentifier.SNOMED_URL)
                               .setCode(snomedCondition.getCode())
                               .setDisplay(snomedCondition.getDisplay()))
-                      .setText(snomedCondition.getDisplay())));
+                      .setText(familyObservationResource.getObservation())));
     }
   }
 }

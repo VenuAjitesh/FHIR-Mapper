@@ -48,6 +48,9 @@ public class BundleController {
   @Value(ConfigurationConstants.FHIR_VALIDATION_FAIL_ON_ERROR)
   private boolean failOnValidationError;
 
+  @Value(ConfigurationConstants.FHIR_VALIDATION_ENABLED)
+  private boolean validationEnabled;
+
   public BundleController(
       ImmunizationConverter immunizationConverter,
       PrescriptionConverter prescriptionConverter,
@@ -106,7 +109,6 @@ public class BundleController {
   /**
    * @param prescriptionRequest which has prescription details like medicine and dosage
    * @return FHIR bundle if no error found
-   * @throws ParseException while parsing the string into date
    */
   @PostMapping(path = ControllerMappingConstants.PRESCRIPTION_PATH)
   @ResponseStatus(HttpStatus.CREATED)
@@ -131,7 +133,7 @@ public class BundleController {
             description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
       })
   public Bundle createPrescriptionBundle(
-      @Valid @RequestBody PrescriptionRequest prescriptionRequest) throws ParseException {
+      @Valid @RequestBody PrescriptionRequest prescriptionRequest) {
     Bundle bundle = prescriptionConverter.convertToPrescriptionBundle(prescriptionRequest);
     return validateAndReturnBundle(bundle);
   }
@@ -139,7 +141,6 @@ public class BundleController {
   /**
    * @param opConsultationRequest which has all basic details of the visit
    * @return FHIR bundle if no error found
-   * @throws ParseException while parsing the string into date
    */
   @PostMapping(path = ControllerMappingConstants.OP_CONSULTATION_PATH)
   @ResponseStatus(HttpStatus.CREATED)
@@ -164,7 +165,7 @@ public class BundleController {
             description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
       })
   public Bundle createOPConsultationBundle(
-      @Valid @RequestBody OPConsultationRequest opConsultationRequest) throws ParseException {
+      @Valid @RequestBody OPConsultationRequest opConsultationRequest) {
     Bundle bundle = opConsultationConverter.convertToOPConsultationBundle(opConsultationRequest);
     return validateAndReturnBundle(bundle);
   }
@@ -172,7 +173,6 @@ public class BundleController {
   /**
    * @param healthDocumentRecord which has document as an attachment
    * @return FHIR bundle if no error found
-   * @throws ParseException while parsing the string into date
    */
   @PostMapping(path = ControllerMappingConstants.HEALTH_DOCUMENT_PATH)
   @ResponseStatus(HttpStatus.CREATED)
@@ -197,7 +197,7 @@ public class BundleController {
             description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
       })
   public Bundle createHealthDocumentBundle(
-      @Valid @RequestBody HealthDocumentRecord healthDocumentRecord) throws ParseException {
+      @Valid @RequestBody HealthDocumentRecord healthDocumentRecord) {
     Bundle bundle = healthDocumentConverter.convertToHealthDocumentBundle(healthDocumentRecord);
     return validateAndReturnBundle(bundle);
   }
@@ -206,7 +206,6 @@ public class BundleController {
    * @param diagnosticReportRequest which has diagnostic details like the result and type of
    *     diagnosis
    * @return FHIR bundle if no error found
-   * @throws ParseException while parsing the string into date
    */
   @PostMapping(path = ControllerMappingConstants.DIAGNOSTIC_REPORT_PATH)
   @ResponseStatus(HttpStatus.CREATED)
@@ -231,7 +230,7 @@ public class BundleController {
             description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
       })
   public Bundle createDiagnosticReportBundle(
-      @Valid @RequestBody DiagnosticReportRequest diagnosticReportRequest) throws ParseException {
+      @Valid @RequestBody DiagnosticReportRequest diagnosticReportRequest) {
     Bundle bundle = diagnosticReportConverter.convertToDiagnosticBundle(diagnosticReportRequest);
     return validateAndReturnBundle(bundle);
   }
@@ -239,7 +238,6 @@ public class BundleController {
   /**
    * @param dischargeSummaryRequest which has discharge details like the findings and observations
    * @return FHIR bundle if no error found
-   * @throws ParseException while parsing the string into date
    */
   @PostMapping(path = ControllerMappingConstants.DISCHARGE_SUMMARY_PATH)
   @ResponseStatus(HttpStatus.CREATED)
@@ -264,7 +262,7 @@ public class BundleController {
             description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
       })
   public Bundle createDischargeSummaryBundle(
-      @Valid @RequestBody DischargeSummaryRequest dischargeSummaryRequest) throws ParseException {
+      @Valid @RequestBody DischargeSummaryRequest dischargeSummaryRequest) {
     Bundle bundle = dischargeSummaryConverter.convertToDischargeSummary(dischargeSummaryRequest);
     return validateAndReturnBundle(bundle);
   }
@@ -296,7 +294,7 @@ public class BundleController {
             description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
       })
   public Bundle createWellnessBundle(
-      @Valid @RequestBody WellnessRecordRequest wellnessRecordRequest) throws ParseException {
+      @Valid @RequestBody WellnessRecordRequest wellnessRecordRequest) {
     Bundle bundle = wellnessRecordConverter.getWellnessBundle(wellnessRecordRequest);
     return validateAndReturnBundle(bundle);
   }
@@ -328,23 +326,24 @@ public class BundleController {
             responseCode = SwaggerConstants.HTTP_400,
             description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
       })
-  public Bundle createInvoiceBundle(@Valid @RequestBody InvoiceBundleRequest invoiceBundleRequest)
-      throws ParseException {
+  public Bundle createInvoiceBundle(@Valid @RequestBody InvoiceBundleRequest invoiceBundleRequest) {
     Bundle bundle = invoiceRequestConverter.makeInvoiceBundle(invoiceBundleRequest);
     return validateAndReturnBundle(bundle);
   }
 
   private Bundle validateAndReturnBundle(Bundle bundle) {
-    ValidationResult validationResult = fhirValidationService.validateBundle(bundle);
+    if (validationEnabled) {
+      ValidationResult validationResult = fhirValidationService.validateBundle(bundle);
 
-    if (!validationResult.isValid()) {
-      if (failOnValidationError) {
-        throw new FhirValidationException(validationResult);
-      } else {
-        log.warn(
-            LogMessageConstants.VALIDATION_FAILED_CONTINUING,
-            validationResult.getErrorCount(),
-            validationResult.getWarningCount());
+      if (!validationResult.isValid()) {
+        if (failOnValidationError) {
+          throw new FhirValidationException(validationResult);
+        } else {
+          log.warn(
+              LogMessageConstants.VALIDATION_FAILED_CONTINUING,
+              validationResult.getErrorCount(),
+              validationResult.getWarningCount());
+        }
       }
     }
     return bundle;

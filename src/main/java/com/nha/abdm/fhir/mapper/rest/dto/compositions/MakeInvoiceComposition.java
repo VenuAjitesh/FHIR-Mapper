@@ -23,7 +23,8 @@ public class MakeInvoiceComposition {
       List<Device> deviceList,
       List<Substance> substanceList,
       List<Medication> medicationList,
-      PaymentReconciliation paymentReconciliation)
+      PaymentReconciliation paymentReconciliation,
+      Encounter encounter)
       throws ParseException {
 
     Composition composition = new Composition();
@@ -55,7 +56,8 @@ public class MakeInvoiceComposition {
             deviceList,
             substanceList,
             medicationList,
-            paymentReconciliation));
+            paymentReconciliation,
+            encounter));
 
     composition.setStatus(Composition.CompositionStatus.FINAL);
     composition.setIdentifier(createIdentifier());
@@ -98,7 +100,8 @@ public class MakeInvoiceComposition {
       List<Device> deviceList,
       List<Substance> substanceList,
       List<Medication> medicationList,
-      PaymentReconciliation paymentReconciliation) {
+      PaymentReconciliation paymentReconciliation,
+      Encounter encounter) {
     Composition.SectionComponent invoiceSection =
         new Composition.SectionComponent()
             .setTitle(BundleResourceIdentifier.INVOICE)
@@ -113,6 +116,10 @@ public class MakeInvoiceComposition {
 
     if (invoice != null) {
       invoiceSection.addEntry(Utils.buildReference(invoice.getId(), "Invoice"));
+    }
+
+    if (encounter != null) {
+      invoiceSection.addEntry(Utils.buildReference(encounter.getId(), "Encounter"));
     }
 
     if (chargeItemList != null && !chargeItemList.isEmpty()) {

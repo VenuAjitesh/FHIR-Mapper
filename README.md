@@ -1,4 +1,4 @@
-# ABDM FHIR Mapper - FHIR (HL7® FHIR® Standard) R4
+# ABDM FHIR Mapper - FHIR (NRCES® FHIR® Standard) R4
 - The purpose of this implementation guide is to provide essential and minimum health record artefacts that can be captured and created as per ABDM Health Data Interchange Specifications 1.0.
 - This module is built using **hapi fhir library** for generating the fhir resources. 
 - For better understanding of FHIR, check [here](https://nrces.in/ndhm/fhir/r4/index.html)
@@ -750,16 +750,112 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
 - The authoredOn will accept date in the format of string in format : `yyyy-MM-dd` or `yyyy-MM-dd'T'HH:mm:ss.SSSX` - UTC iso time format
 
 ---
-### Architecture & Development Guide
+### 🏗️ Architecture & Development Guide
 
-#### Core Technologies
-- **HAPI FHIR**: Core library for FHIR resource generation and validation.
-- **Spring Boot**: Web framework for APIs.
-- **H2 Database**: Embedded database used to serve SNOMED terminology codes.
-- **ABDM Profiles**: Custom FHIR profiles loaded via the `package.tgz` NPM package in the classpath.
+#### 🛠️ Core Technologies
+*   **HAPI FHIR**: The backbone library for FHIR R4 resource generation and validation.
+*   **Spring Boot 3.x**: High-performance web framework for the REST API layer.
+*   **H2 Database**: High-speed embedded database serving SNOMED-CT terminology.
+*   **ABDM Profiles**: Specialized FHIR profiles (IGs) loaded dynamically via the classpath.
 
-#### Best Practices for Contributors
-- **Centralized Logic**: Always use `CompositionUtils` and `ObservationUtils` when building resources to ensure consistency and ABDM compliance.
-- **Constants**: Avoid hardcoded strings. Route paths should be added to `ControllerMappingConstants`, and log/error messages to `LogMessageConstants`.
-- **Validation**: All generated bundles are automatically validated against ABDM profiles before being returned. You can toggle this behavior in `application.properties`.
-- **Terminology**: Use `BundleUrlIdentifier` for standard URLs (SNOMED, LOINC) and `SnomedCodeIdentifier` for SNOMED specific codes.
+#### Code Structure
+The codebase is organized into layers to ensure separation of concerns and maintainability.
+
+```mermaid
+flowchart LR
+%% Define reusable styling classes
+  classDef clientNode fill:#3498db,stroke:#2c3e50,stroke-width:2px,color:#fff;
+  classDef serviceNode fill:#9b59b6,stroke:#8e44ad,stroke-width:2px,color:#fff;
+  classDef logicNode fill:#2ecc71,stroke:#27ae60,stroke-width:2px,color:#fff;
+  classDef resultNode fill:#f1c40f,stroke:#f39c12,stroke-width:2px,color:#000;
+
+  subgraph Client ["🌐 Client Layer"]
+    direction TB
+    A[External System] -->|POST| B[BundleController]:::clientNode
+  end
+
+  subgraph Service ["⚙️ Service Layer"]
+    direction TB
+    B --> C{Orchestrator}:::serviceNode
+    C --> D[Prescription]
+    C --> E[OPConsultation]
+    C --> F[DiagnosticReport]
+    C --> G[...]
+  end
+
+  subgraph Logic ["🧪 Logic & Mapping"]
+    direction TB
+    H[Resource Makers]:::logicNode
+    I[BundleUtils]:::logicNode
+  end
+
+  D & E & F & G --> H
+  D & E & F & G --> I
+
+  subgraph Result ["📦 Result"]
+    J[FHIR Bundle JSON]:::resultNode
+  end
+
+  I --> J
+
+  style Client fill:none,stroke:#3498db,stroke-dasharray: 5 5,stroke-width:2px
+  style Service fill:none,stroke:#9b59b6,stroke-dasharray: 5 5,stroke-width:2px
+  style Logic fill:none,stroke:#2ecc71,stroke-dasharray: 5 5,stroke-width:2px
+  style Result fill:none,stroke:#f1c40f,stroke-dasharray: 5 5,stroke-width:2px
+```
+
+#### 📊 HI-Type to FHIR Mapping Logic
+This matrix illustrates how various ABDM Health Information (HI) types are transformed into their respective FHIR resource collections.
+
+```mermaid
+flowchart TB
+%% Define elegant, modern node styles (Pastel fill, bold borders, dark text)
+  classDef inputNode fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000,rx:8,ry:8;
+  classDef coreHub fill:#e1f5fe,stroke:#0288d1,stroke-width:2px,color:#000,rx:8,ry:8;
+  classDef medNode fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000,rx:5,ry:5;
+
+subgraph HI_Types ["📥 Input HI Types"]
+direction LR
+HI1([💊 Prescription]):::inputNode
+HI2([🩺 OPConsultation]):::inputNode
+HI3([🔬 DiagnosticReport]):::inputNode
+HI4([📄 DischargeSummary]):::inputNode
+HI5([💉 Immunization]):::inputNode
+end
+
+subgraph Shared_Resources ["📂 Core Resources (Shared Payload)"]
+direction LR
+CoreHub[["📦 Bundle<br/>━━━━━━━━━━━━━━<br/>📄 Composition<br/>👤 Patient<br/>⚕️ Practitioner<br/>🏥 Organization"]]:::coreHub
+end
+
+subgraph Specific_Resources ["⚙️ Specific Medical Resources"]
+direction LR
+S1[MedicationRequest]:::medNode
+S2[Encounter]:::medNode
+S3[Condition]:::medNode
+S4[Observation]:::medNode
+S5[DiagnosticReport]:::medNode
+S6[Procedure]:::medNode
+S7[Immunization]:::medNode
+end
+
+%% Routing logic
+HI1 & HI2 & HI3 & HI4 & HI5 --->|Always Includes| CoreHub
+
+%% Individual mapping for specific resources
+HI1 --> S1
+HI2 --> S2 & S3 & S4 & S1
+HI3 --> S5 & S4
+HI4 --> S2 & S6 & S3
+HI5 --> S7
+
+%% Subgraph Aesthetics (Transparent backgrounds, colored dashed borders, rounded corners)
+style HI_Types fill:none,stroke:#7b1fa2,stroke-dasharray: 5 5,stroke-width:2px,rx:10,ry:10
+style Shared_Resources fill:none,stroke:#0288d1,stroke-dasharray: 5 5,stroke-width:2px,rx:10,ry:10
+style Specific_Resources fill:none,stroke:#f57c00,stroke-dasharray: 5 5,stroke-width:2px,rx:10,ry:10
+```
+---
+
+### 📄 License
+
+This project is licensed under the **Apache License 2.0**. See the [LICENSE](LICENSE) file for the full text.

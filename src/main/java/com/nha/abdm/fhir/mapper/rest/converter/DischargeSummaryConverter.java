@@ -164,11 +164,7 @@ public class DischargeSummaryConverter {
   private Encounter createEncounter(
       Patient patient, DischargeSummaryRequest dischargeSummaryRequest) throws ParseException {
     return makeEncounterResource.getEncounter(
-        patient,
-        dischargeSummaryRequest.getEncounter() != null
-            ? dischargeSummaryRequest.getEncounter()
-            : null,
-        dischargeSummaryRequest.getAuthoredOn());
+        patient, null, dischargeSummaryRequest.getVisitDetails());
   }
 
   private List<Condition> createConditions(
@@ -201,7 +197,7 @@ public class DischargeSummaryConverter {
                         patient,
                         practitionerList,
                         observationResource,
-                        dischargeSummaryRequest.getAuthoredOn())))
+                        dischargeSummaryRequest.getVisitDetails().getVisitDate())))
         .toList();
   }
 
@@ -218,7 +214,7 @@ public class DischargeSummaryConverter {
                         patient,
                         practitionerList,
                         allergy,
-                        dischargeSummaryRequest.getAuthoredOn())))
+                        dischargeSummaryRequest.getVisitDetails().getVisitDate())))
         .toList();
   }
 
@@ -260,12 +256,12 @@ public class DischargeSummaryConverter {
               ? makeConditionResource.getCondition(
                   prescriptionResource.getReason(),
                   patient,
-                  dischargeSummaryRequest.getAuthoredOn(),
+                  dischargeSummaryRequest.getVisitDetails().getVisitDate(),
                   null)
               : null;
       medicationList.add(
           makeMedicationRequestResource.getMedicationResource(
-              dischargeSummaryRequest.getAuthoredOn(),
+              dischargeSummaryRequest.getVisitDetails().getVisitDate(),
               prescriptionResource,
               medicationCondition,
               organization,
@@ -295,13 +291,12 @@ public class DischargeSummaryConverter {
                       .stream()
                       .map(
                           StreamUtils.wrapException(
-                              observationResource -> {
-                                return makeObservationResource.getObservation(
-                                    patient,
-                                    practitionerList,
-                                    observationResource,
-                                    dischargeSummaryRequest.getAuthoredOn());
-                              }))
+                              observationResource ->
+                                  makeObservationResource.getObservation(
+                                      patient,
+                                      practitionerList,
+                                      observationResource,
+                                      dischargeSummaryRequest.getVisitDetails().getVisitDate())))
                       .peek(diagnosticObservationList::add)
                       .toList();
 
@@ -345,8 +340,8 @@ public class DischargeSummaryConverter {
         .toList();
   }
 
-  private CarePlan createCarePlan(DischargeSummaryRequest dischargeSummaryRequest, Patient patient)
-      throws ParseException {
+  private CarePlan createCarePlan(
+      DischargeSummaryRequest dischargeSummaryRequest, Patient patient) {
     return makeCarePlanResource.getCarePlan(dischargeSummaryRequest.getCarePlan(), patient);
   }
 
@@ -367,9 +362,10 @@ public class DischargeSummaryConverter {
       List<Procedure> procedureList,
       List<DocumentReference> documentReferenceList)
       throws ParseException {
+
     return makeDischargeComposition.makeDischargeCompositionResource(
         patient,
-        dischargeSummaryRequest.getAuthoredOn(),
+        dischargeSummaryRequest,
         encounter,
         practitionerList,
         organization,

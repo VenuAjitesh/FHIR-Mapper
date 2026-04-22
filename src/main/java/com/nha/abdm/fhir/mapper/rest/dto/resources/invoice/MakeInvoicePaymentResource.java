@@ -5,7 +5,7 @@ import com.nha.abdm.fhir.mapper.Utils;
 import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.requests.InvoiceBundleRequest;
-import java.text.ParseException;
+import java.util.Date;
 import java.util.UUID;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
@@ -16,8 +16,7 @@ import org.springframework.stereotype.Service;
 public class MakeInvoicePaymentResource {
   private static final Logger log = LoggerFactory.getLogger(MakeInvoicePaymentResource.class);
 
-  public PaymentReconciliation buildInvoicePayment(InvoiceBundleRequest invoiceBundleRequest)
-      throws ParseException {
+  public PaymentReconciliation buildInvoicePayment(InvoiceBundleRequest invoiceBundleRequest) {
 
     if (invoiceBundleRequest == null || invoiceBundleRequest.getPayment() == null) {
       return null;
@@ -28,6 +27,7 @@ public class MakeInvoicePaymentResource {
 
     PaymentReconciliation paymentReconciliation = new PaymentReconciliation();
     paymentReconciliation.setId(UUID.randomUUID().toString());
+    paymentReconciliation.setCreated(new Date());
 
     if (paymentReq.getStatus() != null) {
       try {
@@ -41,6 +41,8 @@ public class MakeInvoicePaymentResource {
 
     if (paymentReq.getPaymentDate() != null) {
       paymentReconciliation.setPaymentDate(Utils.getFormattedDate(paymentReq.getPaymentDate()));
+    } else {
+      paymentReconciliation.setPaymentDate(new Date());
     }
 
     if (paymentReq.getPaidAmount() != null && paymentReq.getPaidAmount().doubleValue() > 0) {
@@ -59,11 +61,12 @@ public class MakeInvoicePaymentResource {
               .addCoding(
                   new Coding()
                       .setSystem(ResourceProfileIdentifier.PROFILE_INVOICE_PAYMENT_TYPE)
-                      .setCode(paymentReq.getMethod())
+                      .setCode("payment")
                       .setDisplay(paymentReq.getMethod())));
 
       paymentReconciliation.addDetail(detail);
     }
+    Utils.setNarrative(paymentReconciliation, "Payment Reconciliation for Invoice");
 
     return paymentReconciliation;
   }

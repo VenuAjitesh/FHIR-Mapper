@@ -9,6 +9,7 @@ import com.nha.abdm.fhir.mapper.rest.requests.helpers.InvoicePrice;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,12 +55,16 @@ public class MakeInvoicePriceComponent {
     priceComponent.setType(type);
 
     if (price.getPriceType() != null && !price.getPriceType().getValue().isBlank()) {
+      String code = price.getPriceType().getCode();
+      if (StringUtils.isBlank(code) || code.equals("00")) {
+        code = type.toCode();
+      }
       CodeableConcept codeConcept =
           new CodeableConcept()
               .addCoding(
                   new Coding()
                       .setSystem(ResourceProfileIdentifier.PROFILE_PRICE_COMPONENT_TYPE)
-                      .setCode(price.getPriceType().getCode())
+                      .setCode(code)
                       .setDisplay(price.getPriceType().getDisplay()))
               .setText(price.getPriceType().getValue());
       priceComponent.setCode(codeConcept);

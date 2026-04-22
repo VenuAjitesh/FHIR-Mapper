@@ -7,6 +7,7 @@ import com.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import com.nha.abdm.fhir.mapper.rest.common.constants.SnomedCodeIdentifier;
 import com.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import com.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedEncounter;
+import com.nha.abdm.fhir.mapper.rest.requests.helpers.VisitDetails;
 import java.text.ParseException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class MakeEncounterResource {
 
   private final SnomedService snomedService;
 
-  public Encounter getEncounter(Patient patient, String encounterName, String visitDate)
+  public Encounter getEncounter(Patient patient, String encounterName, VisitDetails visitDetails)
       throws ParseException {
     Encounter encounter = new Encounter();
     encounter.setId(UUID.randomUUID().toString());
@@ -28,7 +29,7 @@ public class MakeEncounterResource {
     SnomedEncounter snomedEncounter = createSnomedEncounter(encounterName);
     encounter.setClass_(createClass(snomedEncounter, encounterName));
     encounter.setSubject(createSubject(patient));
-    setPeriod(encounter, visitDate);
+    setPeriod(encounter, visitDetails);
     Utils.setNarrative(
         encounter, "Encounter: " + (encounterName != null ? encounterName : "ambulatory"));
     return encounter;
@@ -67,9 +68,12 @@ public class MakeEncounterResource {
     return Utils.buildReference(patient.getId()).setDisplay(patient.getName().get(0).getText());
   }
 
-  private void setPeriod(Encounter encounter, String visitDate) throws ParseException {
-    if (visitDate != null) {
-      encounter.setPeriod(new Period().setStartElement(Utils.getFormattedDateTime(visitDate)));
+  private void setPeriod(Encounter encounter, VisitDetails visitDetails) throws ParseException {
+    if (visitDetails != null) {
+      encounter.setPeriod(
+          new Period()
+              .setStartElement(Utils.getFormattedDateTime(visitDetails.getVisitDate()))
+              .setEndElement(Utils.getFormattedDateTime(visitDetails.getDischargeDate())));
     }
   }
 }

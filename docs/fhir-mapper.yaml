@@ -4,13 +4,6 @@ info:
   description: |
     Conversion of simple json to ABDM compliant FHIR Format bundles
     
-    ## Recent Optimization (Apr 17, 2026)
-    The Observation resource now fully supports:
-    - **Components**: Multi-component observations (e.g., Blood Pressure with Systolic/Diastolic)
-    - **Reference Ranges**: Low/High values, age-based ranges, and type specifications
-    - **Performance**: 15-20% performance improvement through code optimization
-    - **Improved Code Quality**: 50+ methods extracted for better maintainability
-    
     ## Supported Features
     - All FHIR R4 observation types
     - SNOMED code integration
@@ -630,7 +623,7 @@ paths:
         - **Reference ranges** can be specified for all observation values
         - Age-based reference ranges for age-specific normal values
         
-        **Example:** Blood Pressure observation with Systolic and Diastolic components
+        **Example:** Multi-component observations for Blood Pressure (Systolic/Diastolic) and Eye Vision (Left/Right eye).
       requestBody:
         required: true
         content:
@@ -1187,6 +1180,50 @@ components:
     OPConsultRecord:
       type: object
       description: Request body for creating an ABDM compliant Outpatient Consultation Record bundle.
+      example:
+        bundleType: OPConsultRecord
+        careContextReference: visit 21-03-2025
+        visitDate: 2000-06-23
+        authoredOn: 2024-05-20T06:33:37Z
+        patient:
+          name: Venu Ajitesh
+          patientReference: ajitesh6x
+          gender: male
+          birthDate: 1940-04-27
+        practitioners:
+          - name: Dr.Venu Ajitesh
+            practitionerId: Predator
+        organisation:
+          facilityName: Predator_HIP
+          facilityId: Predator_HIP
+        chiefComplaints:
+          - complaint: Fever
+            recordedDate: 2024-05-20
+        physicalExaminations:
+          - observation: Blood Pressure
+            status: final
+            components:
+              - observation: Systolic
+                valueQuantity:
+                  value: 120
+                  unit: mmHg
+              - observation: Diastolic
+                valueQuantity:
+                  value: 80
+                  unit: mmHg
+        allergies:
+          - allergy: Peanuts
+            clinicalStatus: active
+            type: allergy
+            category: [food]
+            reaction:
+              manifestation: Skin rash
+              severity: moderate
+        otherObservations:
+          - observation: Weight
+            valueQuantity:
+              value: 75
+              unit: kg
       properties:
         bundleType:
           type: string
@@ -1217,11 +1254,11 @@ components:
         physicalExaminations:
           type: array
           items:
-            $ref: '#/components/schemas/PhysicalExamination'
+            $ref: '#/components/schemas/Observation'
         allergies:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/AllergyResource'
         medicalHistories:
           type: array
           items:
@@ -1464,11 +1501,18 @@ components:
           - serviceName: BloodTest
             serviceCategory: Hematography
             result:
-              - observation: Height
-                result: Normal
-                valueQuantity:
-                  unit: CM
-                  value: 170
+              - observation: Blood Pressure
+                status: final
+                interpretation: Normal
+                components:
+                  - observation: Systolic blood pressure
+                    valueQuantity:
+                      value: 120
+                      unit: mmHg
+                  - observation: Diastolic blood pressure
+                    valueQuantity:
+                      value: 80
+                      unit: mmHg
             conclusion: Normal
             presentedForm:
               contentType: application/pdf
@@ -1545,16 +1589,15 @@ components:
           type: string
           description: Type of the record bundle (must be discharge-summary)
           enum:
-            - discharge-summary
+            - DischargeSummaryRecord
         careContextReference:
           type: string
           description: Reference to the care context
           example: visit 21-03-2024
-        authoredOn:
-          type: string
-          format: date
         patient:
           $ref: '#/components/schemas/Patient'
+        visitDetails:
+          $ref: '#/components/schemas/VisitDetails'
         practitioners:
           type: array
           items:
@@ -1564,35 +1607,35 @@ components:
         chiefComplaints:
           type: array
           items:
-            $ref: '#/components/schemas/ChiefComplaint'
-        carePlan:
-          type: array
-          items:
-            $ref: '#/components/schemas/CarePlan'
+            $ref: '#/components/schemas/ConditionResource'
         physicalExaminations:
           type: array
           items:
-            $ref: '#/components/schemas/PhysicalExamination'
+            $ref: '#/components/schemas/Observation'
         allergies:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/AllergyResource'
         medicalHistories:
           type: array
           items:
-            $ref: '#/components/schemas/ChiefComplaint'
+            $ref: '#/components/schemas/ConditionResource'
         familyHistories:
           type: array
           items:
             $ref: '#/components/schemas/FamilyHistory'
-        medications:
-          type: array
-          items:
-            $ref: '#/components/schemas/Medication'
         diagnostics:
           type: array
           items:
             $ref: '#/components/schemas/Diagnostic'
+        carePlan:
+          $ref: '#/components/schemas/CarePlan'
+        clinicalSummary:
+          type: string
+        medications:
+          type: array
+          items:
+            $ref: '#/components/schemas/Medication'
         procedures:
           type: array
           items:
@@ -1604,17 +1647,20 @@ components:
       required:
         - bundleType
         - patient
+        - visitDetails
         - practitioners
         - careContextReference
-        - authoredOn
       example:
-        bundleType: discharge-summary
+        bundleType: DischargeSummaryRecord
         careContextReference: visist 21-03-2024
         patient:
           name: Venu Ajitesh
           patientReference: ajitesh6x
           gender: male
           birthDate: 2001-04-27
+        visitDetails:
+          visitDate: 2024-05-07T06:33:37.361Z
+          dischargeDate: 2024-05-20T06:33:37.361Z
         practitioners:
           - name: Dr.Venu Ajitesh
             practitionerId: Predator
@@ -1622,17 +1668,18 @@ components:
           facilityName: Predator_HIP
           facilityId: Predator_HIP
         chiefComplaints:
-          - complaint: Sugar
+          - condition: Sugar
             recordedDate: 2024-05-20
             dateRange:
               from: 2018-04-27
               to: 2018-05-26
         carePlan:
-          - intent: plan
-            type: Regular check up
-            goal: Reduce BP
-            description: Normal
-            notes: The patient has an HIGH BP, recommended to revisit on 29-10-2024
+          intent: plan
+          type: Regular check up
+          goal: Reduce BP
+          description: Normal
+          notes: The patient has an HIGH BP, recommended to revisit on 29-10-2024
+        clinicalSummary: Patient admitted with high sugar levels, stabilized with insulin.
         medications:
           - medicine: Dolo
             dosage: 1-0-1
@@ -1646,9 +1693,14 @@ components:
               unit: CM
               value: 170
         allergies:
-          - Walnuts
+          - allergy: Walnuts
+            clinicalStatus: active
+            category: [food]
+            reaction:
+              manifestation: Breathlessness
+              severity: severe
         medicalHistories:
-          - complaint: Sugar
+          - condition: Sugar
             recordedDate: 2024-05-20
             dateRange:
               from: 2018-04-27
@@ -1660,11 +1712,17 @@ components:
           - serviceName: BloodTest
             serviceCategory: Hematography
             result:
-              - observation: Height
-                result: Normal
-                valueQuantity:
-                  unit: CM
-                  value: 170
+              - observation: Blood Pressure
+                status: final
+                components:
+                  - observation: Systolic
+                    valueQuantity:
+                      value: 120
+                      unit: mmHg
+                  - observation: Diastolic
+                    valueQuantity:
+                      value: 80
+                      unit: mmHg
             conclusion: Normal
             presentedForm:
               contentType: application/pdf
@@ -1787,11 +1845,13 @@ components:
               unit: CM
               value: 170
         otherObservations:
-          - observation: Height
-            result: Normal
-            valueQuantity:
-              unit: CM
-              value: 170
+          - observation: Vision Examination
+            status: final
+            components:
+              - observation: Left Eye Vision
+                result: 6/6
+              - observation: Right Eye Vision
+                result: 6/9
         documents:
           - type: Prescription
             contentType: application/pdf
@@ -1860,6 +1920,15 @@ components:
           type: string
           description: Category of the service
           example: Hematography
+        category:
+          type: string
+          description: Additional category information
+          example: Laboratory
+        authoredOn:
+          type: string
+          format: date-time
+          description: Date and time when the report was authored
+          example: 2024-11-23T21:34:38.989Z
         result:
           type: array
           description: List of observations that make up the result
@@ -1869,23 +1938,31 @@ components:
           type: string
           description: Final conclusion of the report
           example: Normal
+        specimen:
+          type: string
+          description: Specimen details
+          example: Venous blood
         presentedForm:
           $ref: '#/components/schemas/Document'
           description: Attached document form of the report
       required:
         - serviceName
         - serviceCategory
+        - authoredOn
         - result
       example:
-        serviceName: BloodTest
-        serviceCategory: Hematography
+        serviceName: Blood Glucose Test
+        serviceCategory: Laboratory
+        category: Laboratory
+        authoredOn: 2024-11-23T21:34:38.989Z
+        specimen: Venous blood
         result:
-          - observation: Height
+          - observation: Blood Glucose
             result: Normal
             valueQuantity:
-              unit: CM
-              value: 170
-        conclusion: Normal
+              unit: mg/dL
+              value: 95
+        conclusion: Negative for disease
         presentedForm:
           contentType: application/pdf
           data: skciybewydcugueducuyeduychidhyuchyedyhcb
@@ -1933,6 +2010,10 @@ components:
           type: string
         valueQuantity:
           $ref: '#/components/schemas/ValueQuantity'
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObservationComponent'
       required:
         - observation
       example:
@@ -1942,27 +2023,51 @@ components:
           unit: CM
           value: 170
 
-    ChiefComplaint:
+    ConditionResource:
       type: object
-      description: Details of a patient's chief complaint or reason for visit
+      description: Condition resource with NDHM FHIR compliance
       properties:
-        complaint:
+        condition:
           type: string
-          description: Description of the complaint
-          example: Sugar
+          description: Condition code or description
+          example: Hypertension
         recordedDate:
           type: string
-          format: date
-          description: Date when the complaint was recorded
-          example: 2024-05-20
+          description: Date when condition was recorded
+          example: 2024-11-23T21:34:38.989Z
+        clinicalStatus:
+          type: string
+          description: Clinical status of the condition
+          enum: [active, recurrence, remission, resolved, inactive]
+        verificationStatus:
+          type: string
+          description: Verification status
+          enum: [unconfirmed, provisional, differential, confirmed, refuted, entered-in-error]
+        category:
+          type: string
+          description: Condition category
+          enum: [problem-list-item, encounter-diagnosis, health-concern]
+        severity:
+          type: string
+          description: Severity of condition
+          enum: [mild, moderate, severe]
         dateRange:
           $ref: '#/components/schemas/DateRange'
-          description: Optional duration/range of the complaint
+        abatementDate:
+          type: string
+          description: Abatement (when condition resolved) date
+        note:
+          type: string
+          description: Notes or comments about the condition
+        stage:
+          type: string
+        bodySite:
+          type: string
       required:
-        - complaint
+        - condition
         - recordedDate
       example:
-        complaint: Sugar
+        condition: Sugar
         recordedDate: 2024-05-20
         dateRange:
           from: 2018-04-27
@@ -2013,6 +2118,12 @@ components:
           type: string
         valueQuantity:
           $ref: '#/components/schemas/ValueQuantity'
+        referenceRange:
+          $ref: '#/components/schemas/ObservationReferenceRange'
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObservationComponent'
       required:
         - observation
       example:
@@ -2035,6 +2146,18 @@ components:
       example:
         unit: KG
         value: 90
+ 
+    VisitDetails:
+      type: object
+      properties:
+        visitDate:
+          type: string
+          example: 2024-05-07T06:33:37.361Z
+        dischargeDate:
+          type: string
+          example: 2024-05-20T06:33:37.361Z
+      required:
+        - visitDate
 
     FamilyHistory:
       type: object
@@ -2079,11 +2202,30 @@ components:
           type: string
           description: Dosage instructions (e.g., 1-0-1)
           example: 1-0-1
-        timing:
-          description: frequency-period-periodUnit (e.g., 1-1-D for once a day)
+        form:
           type: string
-          enum: [S, MIN, H, D, WK, MO]
-          example: D
+          description: Form of the medication (e.g., tablet, syrup)
+          example: tablet
+        duration:
+          type: string
+          description: Duration of the medication course
+          example: 5 days
+        additionalInstructions:
+          type: string
+          description: Extra instructions for the patient
+          example: Take after food
+        doseQuantity:
+          type: number
+          description: Quantity of the dose
+          example: 1
+        doseUnit:
+          type: string
+          description: Unit of the dose
+          example: tablet
+        timing:
+          type: string
+          description: frequency-period-periodUnit (e.g., 1-1-D for once a day)
+          example: 1-1-D
         route:
           type: string
           description: Route of administration (e.g., Oral)
@@ -2092,25 +2234,28 @@ components:
           type: string
           description: Method of administration (e.g., swallow)
           example: swallow
-        additionalInstructions:
-          type: string
-          description: Extra instructions for the patient
-          example: Take after food
         reason:
           type: string
           description: Reason for prescribing the medication
           example: Fever
+        note:
+          type: string
+          description: Additional notes
+          example: Patient tolerated well
       required:
         - medicine
         - dosage
       example:
         medicine: Dolo
         dosage: 1-0-1
-        timing: D
+        form: tablet
+        duration: 5 days
+        timing: 1-1-D
         route: Oral
         method: swallow
-        additionalInstructions: Take them after food
+        additionalInstructions: Take after food
         reason: Fever
+        note: Patient tolerated well
 
 
     FollowUp:
@@ -2183,6 +2328,15 @@ components:
         result:
           type: string
           description: Coded result of the observation
+        status:
+          type: string
+          description: Status of the observation (e.g., final, preliminary)
+        interpretation:
+          type: string
+          description: Clinical interpretation of the observation
+        bodySite:
+          type: string
+          description: Anatomical location where the observation was made
         valueQuantity:
           $ref: '#/components/schemas/ValueQuantity'
           description: Quantitative value of the observation
@@ -2332,6 +2486,52 @@ components:
       example:
         low: "18"
         high: "65"
+
+    AllergyResource:
+      type: object
+      description: Details of a patient's allergy or intolerance
+      properties:
+        allergy:
+          type: string
+          description: Description of the allergen
+          example: Peanuts
+        clinicalStatus:
+          type: string
+          enum: [active, inactive, resolved]
+          example: active
+        type:
+          type: string
+          enum: [allergy, intolerance]
+          example: allergy
+        category:
+          type: array
+          items:
+            type: string
+            enum: [food, medication, environment, biologic]
+          example: [food]
+        note:
+          type: string
+          description: Additional notes about the allergy
+          example: Causes severe skin rash
+        reaction:
+          $ref: '#/components/schemas/AllergyReactionResource'
+      required:
+        - allergy
+        
+    AllergyReactionResource:
+      type: object
+      description: Details of the reaction to an allergen
+      properties:
+        manifestation:
+          type: string
+          description: Clinical symptoms of the reaction
+          example: Skin rash
+        severity:
+          type: string
+          enum: [mild, moderate, severe]
+          example: moderate
+      required:
+        - manifestation
 
     OtherObservation:
       type: object

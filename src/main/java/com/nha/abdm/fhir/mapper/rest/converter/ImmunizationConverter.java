@@ -11,6 +11,7 @@ import com.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import com.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
 import com.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import com.nha.abdm.fhir.mapper.rest.requests.ImmunizationRequest;
+import com.nha.abdm.fhir.mapper.rest.requests.helpers.VisitDetails;
 import java.text.ParseException;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +33,7 @@ public class ImmunizationConverter {
   private final MakeEncounterResource makeEncounterResource;
   private final MakeImmunizationComposition makeImmunizationComposition;
 
-  public Bundle makeImmunizationBundle(ImmunizationRequest immunizationRequest)
-      throws ParseException {
+  public Bundle makeImmunizationBundle(ImmunizationRequest immunizationRequest) {
     try {
       Patient patient = createPatient(immunizationRequest);
       List<Practitioner> practitionerList = createPractitioners(immunizationRequest);
@@ -52,15 +52,12 @@ public class ImmunizationConverter {
               encounter,
               immunizationsResult.immunizationList,
               documentList);
+
       return buildBundle(
-          immunizationRequest,
-          composition,
-          patient,
-          practitionerList,
-          organization,
-          encounter,
-          immunizationsResult,
-          documentList);
+          immunizationRequest, composition,
+          patient, practitionerList,
+          organization, encounter,
+          immunizationsResult, documentList);
     } catch (Exception e) {
       handleException(e);
       return null;
@@ -93,7 +90,7 @@ public class ImmunizationConverter {
     return makeEncounterResource.getEncounter(
         patient,
         immunizationRequest.getEncounter() != null ? immunizationRequest.getEncounter() : null,
-        immunizationRequest.getAuthoredOn());
+        new VisitDetails(immunizationRequest.getAuthoredOn(), null));
   }
 
   private ImmunizationsResult createImmunizationsAndManufacturers(
@@ -149,6 +146,7 @@ public class ImmunizationConverter {
       List<Immunization> immunizationList,
       List<DocumentReference> documentList)
       throws ParseException {
+
     return makeImmunizationComposition.makeCompositionResource(
         patient,
         practitionerList,
