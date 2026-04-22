@@ -1,0 +1,12 @@
+.gradle
+build
+.git
+.idea
+*.log
+bin
+out
+Dockerfile
+docker-compose*
+README.md
+LICENSE
+.gitignore
