@@ -53,8 +53,7 @@ public class WellnessRecordConverter {
     this.makeWellnessComposition = makeWellnessComposition;
   }
 
-  public Bundle getWellnessBundle(WellnessRecordRequest wellnessRecordRequest)
-      throws ParseException {
+  public Bundle getWellnessBundle(WellnessRecordRequest wellnessRecordRequest) {
     try {
       Organization organization = createOrganization(wellnessRecordRequest);
       Patient patient = createPatient(wellnessRecordRequest);
@@ -164,7 +163,6 @@ public class WellnessRecordConverter {
       Patient patient,
       List<Practitioner> practitionerList) {
     return Optional.ofNullable(wellnessRecordRequest.getBodyMeasurements())
-        .filter(Objects::nonNull)
         .orElse(Collections.emptyList())
         .stream()
         .map(

@@ -30,8 +30,7 @@ public class HealthDocumentConverter {
   private final MakeEncounterResource makeEncounterResource;
   private final MakeHealthDocumentComposition makeHealthDocumentComposition;
 
-  public Bundle convertToHealthDocumentBundle(HealthDocumentRecord healthDocumentRecord)
-      throws ParseException {
+  public Bundle convertToHealthDocumentBundle(HealthDocumentRecord healthDocumentRecord) {
     try {
       Organization organization = createOrganization(healthDocumentRecord);
       Patient patient = createPatient(healthDocumentRecord);
@@ -39,14 +38,13 @@ public class HealthDocumentConverter {
       List<DocumentReference> documentReferenceList =
           createDocumentReferences(healthDocumentRecord, patient, organization);
       Encounter encounter = createEncounter(healthDocumentRecord, patient);
+
       Composition composition =
           createComposition(
-              healthDocumentRecord,
-              patient,
-              practitionerList,
-              organization,
-              encounter,
-              documentReferenceList);
+              healthDocumentRecord, patient,
+              practitionerList, organization,
+              encounter, documentReferenceList);
+
       return buildBundle(
           healthDocumentRecord,
           composition,

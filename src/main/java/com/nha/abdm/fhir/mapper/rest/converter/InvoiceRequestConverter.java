@@ -63,7 +63,7 @@ public class InvoiceRequestConverter {
     this.makeInvoicePaymentResource = makeInvoicePaymentResource;
   }
 
-  public Bundle makeInvoiceBundle(InvoiceBundleRequest invoiceBundleRequest) throws ParseException {
+  public Bundle makeInvoiceBundle(InvoiceBundleRequest invoiceBundleRequest) {
     try {
       Patient patient = createPatient(invoiceBundleRequest);
       List<Practitioner> practitionerList = createPractitioners(invoiceBundleRequest);
@@ -86,6 +86,7 @@ public class InvoiceRequestConverter {
               chargeItemsResult,
               paymentReconciliation,
               encounter);
+
       return buildBundle(
           invoiceBundleRequest,
           composition,
@@ -96,6 +97,7 @@ public class InvoiceRequestConverter {
           chargeItemsResult,
           invoice,
           paymentReconciliation);
+
     } catch (Exception e) {
       throw ExceptionHandler.handle(e, log);
     }
@@ -172,7 +174,7 @@ public class InvoiceRequestConverter {
   }
 
   private PaymentReconciliation createPaymentReconciliation(
-      InvoiceBundleRequest invoiceBundleRequest) throws ParseException {
+      InvoiceBundleRequest invoiceBundleRequest) {
     if (Objects.nonNull(invoiceBundleRequest.getPayment())) {
       return makeInvoicePaymentResource.buildInvoicePayment(invoiceBundleRequest);
     }

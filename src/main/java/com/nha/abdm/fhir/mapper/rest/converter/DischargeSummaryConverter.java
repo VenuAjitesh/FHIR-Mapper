@@ -362,6 +362,7 @@ public class DischargeSummaryConverter {
       List<Procedure> procedureList,
       List<DocumentReference> documentReferenceList)
       throws ParseException {
+
     return makeDischargeComposition.makeDischargeCompositionResource(
         patient,
         dischargeSummaryRequest,

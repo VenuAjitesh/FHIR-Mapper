@@ -64,6 +64,7 @@ public class OPConsultationConverter {
           createOtherObservations(patient, practitionerList, opConsultationRequest);
       List<DocumentReference> documentReferenceList =
           createDocumentReferences(patient, organization, opConsultationRequest);
+
       Composition composition =
           createComposition(
               opConsultationRequest,
@@ -83,6 +84,7 @@ public class OPConsultationConverter {
               referralList,
               otherObservationList,
               documentReferenceList);
+
       return buildBundle(
           opConsultationRequest,
           composition,
@@ -281,6 +283,7 @@ public class OPConsultationConverter {
       List<Observation> otherObservationList,
       List<DocumentReference> documentReferenceList)
       throws ParseException {
+
     return makeOpComposition.makeOPCompositionResource(
         patient,
         opConsultationRequest.getVisitDate(),
@@ -321,6 +324,7 @@ public class OPConsultationConverter {
       List<Observation> otherObservationList,
       List<DocumentReference> documentReferenceList)
       throws ParseException {
+
     Bundle bundle = new Bundle();
     bundle.setId(UUID.randomUUID().toString());
     bundle.setType(Bundle.BundleType.DOCUMENT);
@@ -386,8 +390,7 @@ public class OPConsultationConverter {
   private List<ServiceRequest> makeReferralList(
       OPConsultationRequest opConsultationRequest,
       Patient patient,
-      List<Practitioner> practitionerList)
-      throws ParseException {
+      List<Practitioner> practitionerList) {
     return Optional.ofNullable(opConsultationRequest.getReferrals())
         .orElse(Collections.emptyList())
         .stream()
@@ -400,7 +403,7 @@ public class OPConsultationConverter {
   }
 
   private List<Procedure> makeProcedureList(
-      OPConsultationRequest opConsultationRequest, Patient patient) throws ParseException {
+      OPConsultationRequest opConsultationRequest, Patient patient) {
     return Optional.ofNullable(opConsultationRequest.getProcedures())
         .orElse(Collections.emptyList())
         .stream()
@@ -411,7 +414,7 @@ public class OPConsultationConverter {
   }
 
   private List<Appointment> makeFollowupList(
-      Patient patient, OPConsultationRequest opConsultationRequest) throws ParseException {
+      Patient patient, OPConsultationRequest opConsultationRequest) {
     return Optional.ofNullable(opConsultationRequest.getFollowups())
         .orElse(Collections.emptyList())
         .stream()
@@ -444,8 +447,7 @@ public class OPConsultationConverter {
   private List<ServiceRequest> makeInvestigationAdviceList(
       OPConsultationRequest opConsultationRequest,
       Patient patient,
-      List<Practitioner> practitionerList)
-      throws ParseException {
+      List<Practitioner> practitionerList) {
     return Optional.ofNullable(opConsultationRequest.getServiceRequests())
         .orElse(Collections.emptyList())
         .stream()
@@ -461,7 +463,7 @@ public class OPConsultationConverter {
   }
 
   private List<FamilyMemberHistory> makeFamilyMemberHistory(
-      Patient patient, OPConsultationRequest opConsultationRequest) throws ParseException {
+      Patient patient, OPConsultationRequest opConsultationRequest) {
     return Optional.ofNullable(opConsultationRequest.getFamilyHistories())
         .orElse(Collections.emptyList())
         .stream()
@@ -472,7 +474,7 @@ public class OPConsultationConverter {
   }
 
   private List<Condition> makeMedicalHistoryList(
-      OPConsultationRequest opConsultationRequest, Patient patient) throws ParseException {
+      OPConsultationRequest opConsultationRequest, Patient patient) {
     return Optional.ofNullable(opConsultationRequest.getMedicalHistories())
         .orElse(Collections.emptyList())
         .stream()
@@ -501,8 +503,7 @@ public class OPConsultationConverter {
   private List<Observation> makePhysicalObservations(
       OPConsultationRequest opConsultationRequest,
       Patient patient,
-      List<Practitioner> practitionerList)
-      throws ParseException {
+      List<Practitioner> practitionerList) {
     return Optional.ofNullable(opConsultationRequest.getPhysicalExaminations())
         .orElse(Collections.emptyList())
         .stream()

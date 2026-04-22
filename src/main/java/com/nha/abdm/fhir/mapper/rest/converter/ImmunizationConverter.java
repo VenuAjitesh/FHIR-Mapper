@@ -33,8 +33,7 @@ public class ImmunizationConverter {
   private final MakeEncounterResource makeEncounterResource;
   private final MakeImmunizationComposition makeImmunizationComposition;
 
-  public Bundle makeImmunizationBundle(ImmunizationRequest immunizationRequest)
-      throws ParseException {
+  public Bundle makeImmunizationBundle(ImmunizationRequest immunizationRequest) {
     try {
       Patient patient = createPatient(immunizationRequest);
       List<Practitioner> practitionerList = createPractitioners(immunizationRequest);
@@ -53,15 +52,12 @@ public class ImmunizationConverter {
               encounter,
               immunizationsResult.immunizationList,
               documentList);
+
       return buildBundle(
-          immunizationRequest,
-          composition,
-          patient,
-          practitionerList,
-          organization,
-          encounter,
-          immunizationsResult,
-          documentList);
+          immunizationRequest, composition,
+          patient, practitionerList,
+          organization, encounter,
+          immunizationsResult, documentList);
     } catch (Exception e) {
       handleException(e);
       return null;
@@ -150,6 +146,7 @@ public class ImmunizationConverter {
       List<Immunization> immunizationList,
       List<DocumentReference> documentList)
       throws ParseException {
+
     return makeImmunizationComposition.makeCompositionResource(
         patient,
         practitionerList,
