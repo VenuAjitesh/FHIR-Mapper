@@ -1,0 +1,65 @@
+/* (C) 2026 */
+package in.nha.abdm.fhir.mapper.rest.dto.resources.invoice;
+
+import in.nha.abdm.fhir.mapper.Utils;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.InvoiceSubstanceResource;
+import java.text.ParseException;
+import java.util.Collections;
+import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Quantity;
+import org.hl7.fhir.r4.model.Substance;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+@Service
+public class MakeInvoiceSubstanceResource {
+  private static final Logger log = LoggerFactory.getLogger(MakeInvoiceSubstanceResource.class);
+
+  public Substance getSubstance(InvoiceSubstanceResource substanceResource) throws ParseException {
+    Substance substance = new Substance();
+
+    String id = Utils.ensureUuid(substanceResource.getId());
+    substance.setId(id);
+
+    if (StringUtils.isNotBlank(substanceResource.getCode())) {
+      substance.setCode(new CodeableConcept().setText(substanceResource.getCode()));
+    }
+
+    if (StringUtils.isNotBlank(substanceResource.getDescription())) {
+      substance.setDescription(substanceResource.getDescription());
+    }
+
+    if (StringUtils.isNotBlank(substanceResource.getCategory())) {
+      substance.setCategory(
+          Collections.singletonList(
+              new CodeableConcept()
+                  .addCoding(
+                      new Coding()
+                          .setSystem("http://hl7.org/fhir/substance-category")
+                          .setCode("chemical")
+                          .setDisplay(substanceResource.getCategory()))
+                  .setText(substanceResource.getCategory())));
+    }
+
+    Substance.SubstanceInstanceComponent instance = new Substance.SubstanceInstanceComponent();
+
+    if (substanceResource.getQuantity() > 0) {
+      instance.setQuantity(new Quantity().setValue(substanceResource.getQuantity()));
+    }
+
+    if (StringUtils.isNotBlank(substanceResource.getExpiry())) {
+      instance.setExpiry(Utils.getFormattedDate(substanceResource.getExpiry()));
+    }
+
+    if (instance.hasQuantity() || instance.hasExpiry()) {
+      substance.setInstance(Collections.singletonList(instance));
+    }
+
+    Utils.setNarrative(substance, "Substance: " + substanceResource.getCode());
+
+    return substance;
+  }
+}

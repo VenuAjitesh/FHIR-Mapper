@@ -1,0 +1,20 @@
+/* (C) 2026 */
+package in.nha.abdm.fhir.mapper.rest.common.constants;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
+public class BundleUrlIdentifier {
+  public static String WRAPPER_URL = "https://ABDM_WRAPPER/bundle";
+  public static final String SNOMED_URL = "http://snomed.info/sct";
+  public static final String LOINC_URL = "http://loinc.org";
+  public static final String FACILITY_URL = "https://facility.abdm.gov.in";
+  public static final String HEALTH_ID_URL = "https://healthid.abdm.gov.in";
+  public static final String DOCTOR_ID_URL = "https://doctor.abdm.gov.in";
+
+  @Value("${abdm.wrapper.url:https://ABDM_WRAPPER/bundle}")
+  public void setWrapperUrl(String wrapperUrl) {
+    BundleUrlIdentifier.WRAPPER_URL = wrapperUrl;
+  }
+}
