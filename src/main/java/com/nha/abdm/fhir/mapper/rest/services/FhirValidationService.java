@@ -24,17 +24,11 @@ public class FhirValidationService {
   private final FhirContext fhirContext;
   private final FhirValidator fhirValidator;
 
-  @Value(ConfigurationConstants.FHIR_VALIDATION_ENABLED)
-  private boolean validationEnabled;
-
   @Value(ConfigurationConstants.FHIR_VALIDATION_LOG_DETAILS)
   private boolean logDetails;
 
   public com.nha.abdm.fhir.mapper.rest.dto.validation.ValidationResult validateBundle(
       Bundle bundle) {
-    if (!validationEnabled) {
-      return createValidResult();
-    }
 
     try {
       ValidationResult hapiValidationResult = fhirValidator.validateWithResult(bundle);

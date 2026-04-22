@@ -48,6 +48,9 @@ public class BundleController {
   @Value(ConfigurationConstants.FHIR_VALIDATION_FAIL_ON_ERROR)
   private boolean failOnValidationError;
 
+  @Value(ConfigurationConstants.FHIR_VALIDATION_ENABLED)
+  private boolean validationEnabled;
+
   public BundleController(
       ImmunizationConverter immunizationConverter,
       PrescriptionConverter prescriptionConverter,
@@ -335,16 +338,18 @@ public class BundleController {
   }
 
   private Bundle validateAndReturnBundle(Bundle bundle) {
-    ValidationResult validationResult = fhirValidationService.validateBundle(bundle);
+    if (validationEnabled) {
+      ValidationResult validationResult = fhirValidationService.validateBundle(bundle);
 
-    if (!validationResult.isValid()) {
-      if (failOnValidationError) {
-        throw new FhirValidationException(validationResult);
-      } else {
-        log.warn(
-            LogMessageConstants.VALIDATION_FAILED_CONTINUING,
-            validationResult.getErrorCount(),
-            validationResult.getWarningCount());
+      if (!validationResult.isValid()) {
+        if (failOnValidationError) {
+          throw new FhirValidationException(validationResult);
+        } else {
+          log.warn(
+              LogMessageConstants.VALIDATION_FAILED_CONTINUING,
+              validationResult.getErrorCount(),
+              validationResult.getWarningCount());
+        }
       }
     }
     return bundle;
