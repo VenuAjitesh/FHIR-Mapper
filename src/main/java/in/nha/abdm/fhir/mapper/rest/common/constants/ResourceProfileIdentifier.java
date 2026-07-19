@@ -57,4 +57,13 @@ public class ResourceProfileIdentifier {
       "http://hl7.org/fhir/invoice-priceComponentType";
   public static final String PROFILE_INVOICE_PAYMENT_TYPE =
       "http://terminology.hl7.org/CodeSystem/payment-type";
+  public static final String PROFILE_COVERAGE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Coverage";
+  public static final String PROFILE_COVERAGE_ELIGIBILITY_REQUEST =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/CoverageEligibilityRequest";
+  public static final String PROFILE_COVERAGE_ELIGIBILITY_REQUEST_BUNDLE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/CoverageEligibilityRequestBundle";
+  public static final String PROCESS_PRIORITY_SYSTEM =
+      "http://terminology.hl7.org/CodeSystem/processpriority";
+  public static final String COVERAGE_POLICY_SYSTEM = "https://irdai.gov.in/policy";
 }

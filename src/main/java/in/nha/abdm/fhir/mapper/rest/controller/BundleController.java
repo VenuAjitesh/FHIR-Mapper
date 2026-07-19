@@ -43,6 +43,7 @@ public class BundleController {
   private final DischargeSummaryConverter dischargeSummaryConverter;
   private final WellnessRecordConverter wellnessRecordConverter;
   private final InvoiceRequestConverter invoiceRequestConverter;
+  private final CoverageEligibilityRequestConverter coverageEligibilityRequestConverter;
   private final FhirValidationService fhirValidationService;
 
   @Value(ConfigurationConstants.FHIR_VALIDATION_FAIL_ON_ERROR)
@@ -60,6 +61,7 @@ public class BundleController {
       DischargeSummaryConverter dischargeSummaryConverter,
       WellnessRecordConverter wellnessRecordConverter,
       InvoiceRequestConverter invoiceRequestConverter,
+      CoverageEligibilityRequestConverter coverageEligibilityRequestConverter,
       FhirValidationService fhirValidationService) {
     this.immunizationConverter = immunizationConverter;
     this.prescriptionConverter = prescriptionConverter;
@@ -69,6 +71,7 @@ public class BundleController {
     this.dischargeSummaryConverter = dischargeSummaryConverter;
     this.wellnessRecordConverter = wellnessRecordConverter;
     this.invoiceRequestConverter = invoiceRequestConverter;
+    this.coverageEligibilityRequestConverter = coverageEligibilityRequestConverter;
     this.fhirValidationService = fhirValidationService;
   }
 
@@ -328,6 +331,37 @@ public class BundleController {
       })
   public Bundle createInvoiceBundle(@Valid @RequestBody InvoiceBundleRequest invoiceBundleRequest) {
     Bundle bundle = invoiceRequestConverter.makeInvoiceBundle(invoiceBundleRequest);
+    return validateAndReturnBundle(bundle);
+  }
+
+  /**
+   * @param request NHCX coverage eligibility request details (patient, insurer, coverage/policy)
+   * @return FHIR CoverageEligibilityRequest collection bundle if no error found
+   */
+  @PostMapping(path = ControllerMappingConstants.COVERAGE_ELIGIBILITY_REQUEST_PATH)
+  @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = "Create NHCX CoverageEligibilityRequest bundle",
+      description =
+          "Builds an NHCX CoverageEligibilityRequest (collection) bundle for cashless"
+              + " eligibility checks against an insurer.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_201,
+            description = SwaggerConstants.BUNDLE_SUCCESS_DESCRIPTION,
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = Bundle.class))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
+  public Bundle createCoverageEligibilityRequestBundle(
+      @Valid @RequestBody CoverageEligibilityRequestBundleRequest request) {
+    Bundle bundle =
+        coverageEligibilityRequestConverter.makeCoverageEligibilityRequestBundle(request);
     return validateAndReturnBundle(bundle);
   }
 
