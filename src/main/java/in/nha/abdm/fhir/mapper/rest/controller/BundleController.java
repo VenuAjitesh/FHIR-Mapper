@@ -46,6 +46,7 @@ public class BundleController {
   private final CoverageEligibilityRequestConverter coverageEligibilityRequestConverter;
   private final CoverageEligibilityResponseConverter coverageEligibilityResponseConverter;
   private final ClaimConverter claimConverter;
+  private final ClaimResponseConverter claimResponseConverter;
   private final FhirValidationService fhirValidationService;
 
   @Value(ConfigurationConstants.FHIR_VALIDATION_FAIL_ON_ERROR)
@@ -66,6 +67,7 @@ public class BundleController {
       CoverageEligibilityRequestConverter coverageEligibilityRequestConverter,
       CoverageEligibilityResponseConverter coverageEligibilityResponseConverter,
       ClaimConverter claimConverter,
+      ClaimResponseConverter claimResponseConverter,
       FhirValidationService fhirValidationService) {
     this.immunizationConverter = immunizationConverter;
     this.prescriptionConverter = prescriptionConverter;
@@ -78,6 +80,7 @@ public class BundleController {
     this.coverageEligibilityRequestConverter = coverageEligibilityRequestConverter;
     this.coverageEligibilityResponseConverter = coverageEligibilityResponseConverter;
     this.claimConverter = claimConverter;
+    this.claimResponseConverter = claimResponseConverter;
     this.fhirValidationService = fhirValidationService;
   }
 
@@ -428,6 +431,35 @@ public class BundleController {
       })
   public Bundle createClaimBundle(@Valid @RequestBody ClaimBundleRequest request) {
     Bundle bundle = claimConverter.makeClaimBundle(request);
+    return validateAndReturnBundle(bundle);
+  }
+
+  /**
+   * @param request NHCX claim adjudication details (outcome, approved amount, payment)
+   * @return FHIR ClaimResponse collection bundle if no error found
+   */
+  @PostMapping(path = ControllerMappingConstants.CLAIM_RESPONSE_PATH)
+  @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = "Create NHCX ClaimResponse bundle",
+      description =
+          "Builds an NHCX ClaimResponse (collection) bundle conveying the insurer's adjudication"
+              + " outcome and payment details.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_201,
+            description = SwaggerConstants.BUNDLE_SUCCESS_DESCRIPTION,
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = Bundle.class))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
+  public Bundle createClaimResponseBundle(@Valid @RequestBody ClaimResponseBundleRequest request) {
+    Bundle bundle = claimResponseConverter.makeClaimResponseBundle(request);
     return validateAndReturnBundle(bundle);
   }
 

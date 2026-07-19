@@ -77,4 +77,12 @@ public class ResourceProfileIdentifier {
   public static final String CLAIM_TYPE_SYSTEM =
       "http://terminology.hl7.org/CodeSystem/claim-type";
   public static final String CURRENCY_INR = "INR";
+  public static final String PROFILE_CLAIM_RESPONSE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ClaimResponse";
+  public static final String PROFILE_CLAIM_RESPONSE_BUNDLE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ClaimResponseBundle";
+  public static final String ADJUDICATION_SYSTEM =
+      "http://terminology.hl7.org/CodeSystem/adjudication";
+  public static final String EX_PAYMENT_TYPE_SYSTEM =
+      "http://terminology.hl7.org/CodeSystem/ex-paymenttype";
 }
