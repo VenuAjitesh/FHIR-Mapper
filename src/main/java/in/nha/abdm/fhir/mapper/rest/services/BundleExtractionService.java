@@ -15,6 +15,7 @@ import in.nha.abdm.fhir.mapper.rest.requests.DiagnosticReportRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.DischargeSummaryRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.HealthDocumentRecord;
 import in.nha.abdm.fhir.mapper.rest.requests.ImmunizationRequest;
+import in.nha.abdm.fhir.mapper.rest.requests.InsurancePlanBundleRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.InvoiceBundleRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.OPConsultationRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.PrescriptionRequest;
@@ -31,6 +32,7 @@ import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.CoverageEligibilityRequest;
 import org.hl7.fhir.r4.model.CoverageEligibilityResponse;
+import org.hl7.fhir.r4.model.InsurancePlan;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.springframework.stereotype.Service;
@@ -51,6 +53,7 @@ public class BundleExtractionService {
   private final CoverageEligibilityResponseBundleExtractor coverageEligibilityResponseBundleExtractor;
   private final ClaimBundleExtractor claimBundleExtractor;
   private final ClaimResponseBundleExtractor claimResponseBundleExtractor;
+  private final InsurancePlanBundleExtractor insurancePlanBundleExtractor;
 
   public ExtractedBundleResponse extract(Bundle bundle) {
     NhcxExtractorDefinition nhcxDefinition = identifyNhcxExtractor(bundle);
@@ -109,6 +112,15 @@ public class BundleExtractionService {
             bundle -> {
               ClaimResponseBundleRequest request = claimResponseBundleExtractor.extract(bundle);
               request.setBundleType(ValidationConstants.CLAIM_RESPONSE_RECORD);
+              return request;
+            }),
+        new NhcxExtractorDefinition(
+            ValidationConstants.INSURANCE_PLAN_RECORD,
+            ResourceProfileIdentifier.PROFILE_INSURANCE_PLAN_BUNDLE,
+            InsurancePlan.class,
+            bundle -> {
+              InsurancePlanBundleRequest request = insurancePlanBundleExtractor.extract(bundle);
+              request.setBundleType(ValidationConstants.INSURANCE_PLAN_RECORD);
               return request;
             }));
   }
