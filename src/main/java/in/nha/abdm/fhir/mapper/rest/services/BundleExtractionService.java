@@ -8,6 +8,7 @@ import in.nha.abdm.fhir.mapper.rest.common.constants.ValidationConstants;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.ExtractedBundleResponse;
 import in.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
 import in.nha.abdm.fhir.mapper.rest.requests.CoverageEligibilityRequestBundleRequest;
+import in.nha.abdm.fhir.mapper.rest.requests.CoverageEligibilityResponseBundleRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.DiagnosticReportRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.DischargeSummaryRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.HealthDocumentRecord;
@@ -25,6 +26,7 @@ import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.CoverageEligibilityRequest;
+import org.hl7.fhir.r4.model.CoverageEligibilityResponse;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.springframework.stereotype.Service;
@@ -42,6 +44,7 @@ public class BundleExtractionService {
   private final DischargeSummaryBundleExtractor dischargeSummaryBundleExtractor;
   private final OPConsultationBundleExtractor opConsultationBundleExtractor;
   private final CoverageEligibilityRequestBundleExtractor coverageEligibilityRequestBundleExtractor;
+  private final CoverageEligibilityResponseBundleExtractor coverageEligibilityResponseBundleExtractor;
 
   public ExtractedBundleResponse extract(Bundle bundle) {
     NhcxExtractorDefinition nhcxDefinition = identifyNhcxExtractor(bundle);
@@ -72,6 +75,16 @@ public class BundleExtractionService {
               CoverageEligibilityRequestBundleRequest request =
                   coverageEligibilityRequestBundleExtractor.extract(bundle);
               request.setBundleType(ValidationConstants.COVERAGE_ELIGIBILITY_REQUEST);
+              return request;
+            }),
+        new NhcxExtractorDefinition(
+            ValidationConstants.COVERAGE_ELIGIBILITY_RESPONSE,
+            ResourceProfileIdentifier.PROFILE_COVERAGE_ELIGIBILITY_RESPONSE_BUNDLE,
+            CoverageEligibilityResponse.class,
+            bundle -> {
+              CoverageEligibilityResponseBundleRequest request =
+                  coverageEligibilityResponseBundleExtractor.extract(bundle);
+              request.setBundleType(ValidationConstants.COVERAGE_ELIGIBILITY_RESPONSE);
               return request;
             }));
   }
