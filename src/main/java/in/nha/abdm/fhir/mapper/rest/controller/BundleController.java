@@ -5,10 +5,12 @@ import in.nha.abdm.fhir.mapper.rest.common.constants.ConfigurationConstants;
 import in.nha.abdm.fhir.mapper.rest.common.constants.ControllerMappingConstants;
 import in.nha.abdm.fhir.mapper.rest.common.constants.LogMessageConstants;
 import in.nha.abdm.fhir.mapper.rest.common.constants.SwaggerConstants;
+import in.nha.abdm.fhir.mapper.rest.common.helpers.ExtractedBundleResponse;
 import in.nha.abdm.fhir.mapper.rest.converter.*;
 import in.nha.abdm.fhir.mapper.rest.dto.validation.ValidationResult;
 import in.nha.abdm.fhir.mapper.rest.exceptions.FhirValidationException;
 import in.nha.abdm.fhir.mapper.rest.requests.*;
+import in.nha.abdm.fhir.mapper.rest.services.BundleExtractionService;
 import in.nha.abdm.fhir.mapper.rest.services.FhirValidationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -50,6 +52,7 @@ public class BundleController {
   private final InsurancePlanConverter insurancePlanConverter;
   private final PaymentNoticeConverter paymentNoticeConverter;
   private final FhirValidationService fhirValidationService;
+  private final BundleExtractionService bundleExtractionService;
 
   @Value(ConfigurationConstants.FHIR_VALIDATION_FAIL_ON_ERROR)
   private boolean failOnValidationError;
@@ -72,7 +75,8 @@ public class BundleController {
       ClaimResponseConverter claimResponseConverter,
       InsurancePlanConverter insurancePlanConverter,
       PaymentNoticeConverter paymentNoticeConverter,
-      FhirValidationService fhirValidationService) {
+      FhirValidationService fhirValidationService,
+      BundleExtractionService bundleExtractionService) {
     this.immunizationConverter = immunizationConverter;
     this.prescriptionConverter = prescriptionConverter;
     this.healthDocumentConverter = healthDocumentConverter;
@@ -88,6 +92,7 @@ public class BundleController {
     this.insurancePlanConverter = insurancePlanConverter;
     this.paymentNoticeConverter = paymentNoticeConverter;
     this.fhirValidationService = fhirValidationService;
+    this.bundleExtractionService = bundleExtractionService;
   }
 
   /**
@@ -529,6 +534,26 @@ public class BundleController {
     return validateAndReturnBundle(bundle);
   }
 
+  @PostMapping(path = ControllerMappingConstants.EXTRACT_PATH)
+  @Operation(summary = "Extract DTO from FHIR Bundle", description = "Reverse maps a FHIR Bundle")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_200,
+            description = "DTO extracted successfully",
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = ExtractedBundleResponse.class))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
+  public ExtractedBundleResponse extractBundle(@RequestBody Bundle bundle) {
+    validateIncomingBundle(bundle);
+    return bundleExtractionService.extract(bundle);
+  }
+
   private Bundle validateAndReturnBundle(Bundle bundle) {
     if (validationEnabled) {
       ValidationResult validationResult = fhirValidationService.validateBundle(bundle);
@@ -545,5 +570,13 @@ public class BundleController {
       }
     }
     return bundle;
+  }
+
+  private void validateIncomingBundle(Bundle bundle) {
+    ValidationResult validationResult = fhirValidationService.validateBundle(bundle);
+
+    if (!validationResult.isValid()) {
+      throw new FhirValidationException(validationResult);
+    }
   }
 }
