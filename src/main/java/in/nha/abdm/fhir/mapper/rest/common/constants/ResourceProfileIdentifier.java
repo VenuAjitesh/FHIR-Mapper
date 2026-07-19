@@ -66,4 +66,8 @@ public class ResourceProfileIdentifier {
   public static final String PROCESS_PRIORITY_SYSTEM =
       "http://terminology.hl7.org/CodeSystem/processpriority";
   public static final String COVERAGE_POLICY_SYSTEM = "https://irdai.gov.in/policy";
+  public static final String PROFILE_COVERAGE_ELIGIBILITY_RESPONSE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/CoverageEligibilityResponse";
+  public static final String PROFILE_COVERAGE_ELIGIBILITY_RESPONSE_BUNDLE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/CoverageEligibilityResponseBundle";
 }
