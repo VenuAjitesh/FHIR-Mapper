@@ -51,6 +51,12 @@ public class ValidationConstants {
   public static final String DISCHARGE_SUMMARY_RECORD = "DischargeSummaryRecord";
   public static final String ORGANISATION_MANDATORY = "organisation is mandatory";
   public static final String INVOICE_RECORD = "Invoice";
+  public static final String COVERAGE_ELIGIBILITY_REQUEST = "CoverageEligibilityRequest";
+  public static final String COVERAGE_ELIGIBILITY_RESPONSE = "CoverageEligibilityResponse";
+  public static final String CLAIM_RECORD = "Claim";
+  public static final String CLAIM_RESPONSE_RECORD = "ClaimResponse";
+  public static final String INSURANCE_PLAN_RECORD = "InsurancePlan";
+  public static final String PAYMENT_NOTICE_RECORD = "PaymentNotice";
   public static final String INVOICE_MANDATORY = "invoice is mandatory";
   public static final String STATUS_MANDATORY = "status is mandatory";
   public static final String CHARGE_ITEMS_MANDATORY =

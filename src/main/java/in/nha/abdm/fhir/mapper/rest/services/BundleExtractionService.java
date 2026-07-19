@@ -3,9 +3,11 @@ package in.nha.abdm.fhir.mapper.rest.services;
 
 import in.nha.abdm.fhir.mapper.rest.common.constants.BundleCompositionIdentifier;
 import in.nha.abdm.fhir.mapper.rest.common.constants.ErrorCode;
+import in.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import in.nha.abdm.fhir.mapper.rest.common.constants.ValidationConstants;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.ExtractedBundleResponse;
 import in.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
+import in.nha.abdm.fhir.mapper.rest.requests.CoverageEligibilityRequestBundleRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.DiagnosticReportRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.DischargeSummaryRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.HealthDocumentRecord;
@@ -16,12 +18,15 @@ import in.nha.abdm.fhir.mapper.rest.requests.PrescriptionRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.WellnessRecordRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
+import org.hl7.fhir.r4.model.CoverageEligibilityRequest;
 import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Resource;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -36,8 +41,17 @@ public class BundleExtractionService {
   private final InvoiceBundleExtractor invoiceBundleExtractor;
   private final DischargeSummaryBundleExtractor dischargeSummaryBundleExtractor;
   private final OPConsultationBundleExtractor opConsultationBundleExtractor;
+  private final CoverageEligibilityRequestBundleExtractor coverageEligibilityRequestBundleExtractor;
 
   public ExtractedBundleResponse extract(Bundle bundle) {
+    NhcxExtractorDefinition nhcxDefinition = identifyNhcxExtractor(bundle);
+    if (nhcxDefinition != null) {
+      return new ExtractedBundleResponse(
+          nhcxDefinition.hiType(),
+          nhcxDefinition.extractor().apply(bundle),
+          new ArrayList<>());
+    }
+
     Composition composition = findComposition(bundle);
     ExtractorDefinition extractorDefinition = identifyExtractor(composition);
     List<String> warnings = collectWarnings(bundle, composition);
@@ -46,6 +60,32 @@ public class BundleExtractionService {
         extractorDefinition.hiType(),
         extractorDefinition.extractor().extract(bundle, composition),
         warnings);
+  }
+
+  private List<NhcxExtractorDefinition> nhcxExtractorDefinitions() {
+    return List.of(
+        new NhcxExtractorDefinition(
+            ValidationConstants.COVERAGE_ELIGIBILITY_REQUEST,
+            ResourceProfileIdentifier.PROFILE_COVERAGE_ELIGIBILITY_REQUEST_BUNDLE,
+            CoverageEligibilityRequest.class,
+            bundle -> {
+              CoverageEligibilityRequestBundleRequest request =
+                  coverageEligibilityRequestBundleExtractor.extract(bundle);
+              request.setBundleType(ValidationConstants.COVERAGE_ELIGIBILITY_REQUEST);
+              return request;
+            }));
+  }
+
+  private NhcxExtractorDefinition identifyNhcxExtractor(Bundle bundle) {
+    if (bundle == null || bundle.getType() != Bundle.BundleType.COLLECTION) {
+      return null;
+    }
+    for (NhcxExtractorDefinition definition : nhcxExtractorDefinitions()) {
+      if (definition.matches(bundle)) {
+        return definition;
+      }
+    }
+    return null;
   }
 
   private List<ExtractorDefinition> extractorDefinitions() {
@@ -238,6 +278,29 @@ public class BundleExtractionService {
 
     boolean matches(Composition composition) {
       return hiTypeDefinition.matches(composition);
+    }
+  }
+
+  private record NhcxExtractorDefinition(
+      String hiType,
+      String bundleProfile,
+      Class<? extends Resource> keyResourceType,
+      Function<Bundle, Object> extractor) {
+
+    boolean matches(Bundle bundle) {
+      return matchesProfile(bundle) || containsKeyResource(bundle);
+    }
+
+    private boolean matchesProfile(Bundle bundle) {
+      return bundle.hasMeta()
+          && bundle.getMeta().getProfile().stream()
+              .anyMatch(profile -> bundleProfile.equals(profile.getValue()));
+    }
+
+    private boolean containsKeyResource(Bundle bundle) {
+      return bundle.getEntry().stream()
+          .map(Bundle.BundleEntryComponent::getResource)
+          .anyMatch(keyResourceType::isInstance);
     }
   }
 
