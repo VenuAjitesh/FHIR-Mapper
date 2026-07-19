@@ -47,6 +47,7 @@ public class BundleController {
   private final CoverageEligibilityResponseConverter coverageEligibilityResponseConverter;
   private final ClaimConverter claimConverter;
   private final ClaimResponseConverter claimResponseConverter;
+  private final InsurancePlanConverter insurancePlanConverter;
   private final FhirValidationService fhirValidationService;
 
   @Value(ConfigurationConstants.FHIR_VALIDATION_FAIL_ON_ERROR)
@@ -68,6 +69,7 @@ public class BundleController {
       CoverageEligibilityResponseConverter coverageEligibilityResponseConverter,
       ClaimConverter claimConverter,
       ClaimResponseConverter claimResponseConverter,
+      InsurancePlanConverter insurancePlanConverter,
       FhirValidationService fhirValidationService) {
     this.immunizationConverter = immunizationConverter;
     this.prescriptionConverter = prescriptionConverter;
@@ -81,6 +83,7 @@ public class BundleController {
     this.coverageEligibilityResponseConverter = coverageEligibilityResponseConverter;
     this.claimConverter = claimConverter;
     this.claimResponseConverter = claimResponseConverter;
+    this.insurancePlanConverter = insurancePlanConverter;
     this.fhirValidationService = fhirValidationService;
   }
 
@@ -460,6 +463,36 @@ public class BundleController {
       })
   public Bundle createClaimResponseBundle(@Valid @RequestBody ClaimResponseBundleRequest request) {
     Bundle bundle = claimResponseConverter.makeClaimResponseBundle(request);
+    return validateAndReturnBundle(bundle);
+  }
+
+  /**
+   * @param request NHCX insurance plan details (plan name, benefits, insurer)
+   * @return FHIR InsurancePlan collection bundle if no error found
+   */
+  @PostMapping(path = ControllerMappingConstants.INSURANCE_PLAN_PATH)
+  @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = "Create NHCX InsurancePlan bundle",
+      description =
+          "Builds an NHCX InsurancePlan (collection) bundle describing a health insurance package"
+              + " and its covered benefits.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_201,
+            description = SwaggerConstants.BUNDLE_SUCCESS_DESCRIPTION,
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = Bundle.class))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
+  public Bundle createInsurancePlanBundle(
+      @Valid @RequestBody InsurancePlanBundleRequest request) {
+    Bundle bundle = insurancePlanConverter.makeInsurancePlanBundle(request);
     return validateAndReturnBundle(bundle);
   }
 

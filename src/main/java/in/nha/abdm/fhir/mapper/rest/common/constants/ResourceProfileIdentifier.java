@@ -85,4 +85,8 @@ public class ResourceProfileIdentifier {
       "http://terminology.hl7.org/CodeSystem/adjudication";
   public static final String EX_PAYMENT_TYPE_SYSTEM =
       "http://terminology.hl7.org/CodeSystem/ex-paymenttype";
+  public static final String PROFILE_INSURANCE_PLAN =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/InsurancePlan";
+  public static final String PROFILE_INSURANCE_PLAN_BUNDLE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/InsurancePlanBundle";
 }
