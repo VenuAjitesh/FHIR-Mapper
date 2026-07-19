@@ -8,6 +8,7 @@ import in.nha.abdm.fhir.mapper.rest.common.constants.ValidationConstants;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.ExtractedBundleResponse;
 import in.nha.abdm.fhir.mapper.rest.exceptions.FhirMapperException;
 import in.nha.abdm.fhir.mapper.rest.requests.ClaimBundleRequest;
+import in.nha.abdm.fhir.mapper.rest.requests.ClaimResponseBundleRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.CoverageEligibilityRequestBundleRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.CoverageEligibilityResponseBundleRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.DiagnosticReportRequest;
@@ -24,6 +25,7 @@ import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Claim;
+import org.hl7.fhir.r4.model.ClaimResponse;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Composition;
@@ -48,6 +50,7 @@ public class BundleExtractionService {
   private final CoverageEligibilityRequestBundleExtractor coverageEligibilityRequestBundleExtractor;
   private final CoverageEligibilityResponseBundleExtractor coverageEligibilityResponseBundleExtractor;
   private final ClaimBundleExtractor claimBundleExtractor;
+  private final ClaimResponseBundleExtractor claimResponseBundleExtractor;
 
   public ExtractedBundleResponse extract(Bundle bundle) {
     NhcxExtractorDefinition nhcxDefinition = identifyNhcxExtractor(bundle);
@@ -97,6 +100,15 @@ public class BundleExtractionService {
             bundle -> {
               ClaimBundleRequest request = claimBundleExtractor.extract(bundle);
               request.setBundleType(ValidationConstants.CLAIM_RECORD);
+              return request;
+            }),
+        new NhcxExtractorDefinition(
+            ValidationConstants.CLAIM_RESPONSE_RECORD,
+            ResourceProfileIdentifier.PROFILE_CLAIM_RESPONSE_BUNDLE,
+            ClaimResponse.class,
+            bundle -> {
+              ClaimResponseBundleRequest request = claimResponseBundleExtractor.extract(bundle);
+              request.setBundleType(ValidationConstants.CLAIM_RESPONSE_RECORD);
               return request;
             }));
   }
