@@ -39,4 +39,31 @@ public class TerminologyController {
           int limit) {
     return ResponseEntity.ok(terminologyService.search(query, category, limit));
   }
+
+  @GetMapping(ControllerMappingConstants.TERMINOLOGY_TRANSLATE_PATH)
+  @Operation(
+      summary = "Translate a term into a target category",
+      description =
+          "Cross-walks a source term into a target category. Supply either a free-text display, or"
+              + " a code plus its sourceCategory; returns ranked candidate codes in the target"
+              + " category.")
+  public ResponseEntity<List<TerminologyMatch>> translate(
+      @Parameter(description = "Free-text term to translate (optional if code+sourceCategory given)")
+          @RequestParam(value = "display", required = false)
+          String display,
+      @Parameter(description = "Source code to resolve into a display (optional)")
+          @RequestParam(value = "code", required = false)
+          String code,
+      @Parameter(description = "Category the source code belongs to (required with code)")
+          @RequestParam(value = "sourceCategory", required = false)
+          String sourceCategory,
+      @Parameter(description = "Target category to translate into")
+          @RequestParam("targetCategory")
+          String targetCategory,
+      @Parameter(description = "Maximum number of candidates to return")
+          @RequestParam(value = "limit", required = false, defaultValue = "10")
+          int limit) {
+    return ResponseEntity.ok(
+        terminologyService.translate(display, code, sourceCategory, targetCategory, limit));
+  }
 }

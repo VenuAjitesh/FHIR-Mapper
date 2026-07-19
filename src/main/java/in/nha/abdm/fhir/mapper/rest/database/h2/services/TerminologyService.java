@@ -107,6 +107,43 @@ public class TerminologyService {
     return matches.size() > limit ? matches.subList(0, limit) : matches;
   }
 
+  /**
+   * Translate a source term into a target category. The source may be free text ({@code display})
+   * or an existing {@code code} within {@code sourceCategory}; the resolved term is matched against
+   * the target category and the ranked candidates are returned.
+   *
+   * @param display free-text term to translate (optional if code+sourceCategory given)
+   * @param code source code to resolve into a display (optional)
+   * @param sourceCategory category the source code belongs to (required with code)
+   * @param targetCategory category to translate into (required)
+   * @param limit maximum candidates to return
+   */
+  public List<TerminologyMatch> translate(
+      String display, String code, String sourceCategory, String targetCategory, int limit) {
+    String sourceTerm = display;
+    if ((sourceTerm == null || sourceTerm.isBlank()) && code != null && sourceCategory != null) {
+      sourceTerm = resolveDisplay(code, sourceCategory);
+    }
+    if (sourceTerm == null || sourceTerm.isBlank() || targetCategory == null) {
+      return List.of();
+    }
+    return search(sourceTerm, targetCategory, limit);
+  }
+
+  private String resolveDisplay(String code, String category) {
+    for (TerminologySource source : sources()) {
+      if (!source.category().equalsIgnoreCase(category)) {
+        continue;
+      }
+      for (Displayable displayable : source.supplier().get()) {
+        if (code.equalsIgnoreCase(displayable.getCode())) {
+          return displayable.getDisplay();
+        }
+      }
+    }
+    return null;
+  }
+
   private double score(String query, Map<CharSequence, Integer> queryVector, String display) {
     if (display == null || display.isBlank()) {
       return 0;
