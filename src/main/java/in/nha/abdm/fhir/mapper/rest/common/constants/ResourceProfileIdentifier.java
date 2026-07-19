@@ -70,4 +70,11 @@ public class ResourceProfileIdentifier {
       "https://nrces.in/ndhm/fhir/r4/StructureDefinition/CoverageEligibilityResponse";
   public static final String PROFILE_COVERAGE_ELIGIBILITY_RESPONSE_BUNDLE =
       "https://nrces.in/ndhm/fhir/r4/StructureDefinition/CoverageEligibilityResponseBundle";
+  public static final String PROFILE_CLAIM =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Claim";
+  public static final String PROFILE_CLAIM_BUNDLE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ClaimBundle";
+  public static final String CLAIM_TYPE_SYSTEM =
+      "http://terminology.hl7.org/CodeSystem/claim-type";
+  public static final String CURRENCY_INR = "INR";
 }

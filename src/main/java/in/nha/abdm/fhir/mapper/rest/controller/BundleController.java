@@ -45,6 +45,7 @@ public class BundleController {
   private final InvoiceRequestConverter invoiceRequestConverter;
   private final CoverageEligibilityRequestConverter coverageEligibilityRequestConverter;
   private final CoverageEligibilityResponseConverter coverageEligibilityResponseConverter;
+  private final ClaimConverter claimConverter;
   private final FhirValidationService fhirValidationService;
 
   @Value(ConfigurationConstants.FHIR_VALIDATION_FAIL_ON_ERROR)
@@ -64,6 +65,7 @@ public class BundleController {
       InvoiceRequestConverter invoiceRequestConverter,
       CoverageEligibilityRequestConverter coverageEligibilityRequestConverter,
       CoverageEligibilityResponseConverter coverageEligibilityResponseConverter,
+      ClaimConverter claimConverter,
       FhirValidationService fhirValidationService) {
     this.immunizationConverter = immunizationConverter;
     this.prescriptionConverter = prescriptionConverter;
@@ -75,6 +77,7 @@ public class BundleController {
     this.invoiceRequestConverter = invoiceRequestConverter;
     this.coverageEligibilityRequestConverter = coverageEligibilityRequestConverter;
     this.coverageEligibilityResponseConverter = coverageEligibilityResponseConverter;
+    this.claimConverter = claimConverter;
     this.fhirValidationService = fhirValidationService;
   }
 
@@ -396,6 +399,35 @@ public class BundleController {
       @Valid @RequestBody CoverageEligibilityResponseBundleRequest request) {
     Bundle bundle =
         coverageEligibilityResponseConverter.makeCoverageEligibilityResponseBundle(request);
+    return validateAndReturnBundle(bundle);
+  }
+
+  /**
+   * @param request NHCX claim/pre-authorization details (items, coverage, insurer)
+   * @return FHIR Claim collection bundle if no error found
+   */
+  @PostMapping(path = ControllerMappingConstants.CLAIM_PATH)
+  @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = "Create NHCX Claim bundle",
+      description =
+          "Builds an NHCX Claim (collection) bundle for claim submission or pre-authorization"
+              + " (use=preauthorization) against an insurer.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_201,
+            description = SwaggerConstants.BUNDLE_SUCCESS_DESCRIPTION,
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = Bundle.class))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
+  public Bundle createClaimBundle(@Valid @RequestBody ClaimBundleRequest request) {
+    Bundle bundle = claimConverter.makeClaimBundle(request);
     return validateAndReturnBundle(bundle);
   }
 
