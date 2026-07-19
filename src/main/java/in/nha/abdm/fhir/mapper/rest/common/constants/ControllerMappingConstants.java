@@ -19,5 +19,6 @@ public class ControllerMappingConstants {
   public static final String PAYMENT_NOTICE_PATH = "/payment-notice";
   public static final String EXTRACT_PATH = "/extract";
   public static final String VALIDATE_PATH = "/validate";
+  public static final String LINT_PATH = "/lint";
   public static final String SNOMED_BASE_PATH = "/v1/snomed";
 }
