@@ -16,6 +16,7 @@ public class ControllerMappingConstants {
   public static final String CLAIM_PATH = "/claim";
   public static final String CLAIM_RESPONSE_PATH = "/claim-response";
   public static final String INSURANCE_PLAN_PATH = "/insurance-plan";
+  public static final String PAYMENT_NOTICE_PATH = "/payment-notice";
   public static final String VALIDATE_PATH = "/validate";
   public static final String SNOMED_BASE_PATH = "/v1/snomed";
 }

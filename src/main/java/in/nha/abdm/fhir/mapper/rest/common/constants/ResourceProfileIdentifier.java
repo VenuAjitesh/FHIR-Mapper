@@ -89,4 +89,10 @@ public class ResourceProfileIdentifier {
       "https://nrces.in/ndhm/fhir/r4/StructureDefinition/InsurancePlan";
   public static final String PROFILE_INSURANCE_PLAN_BUNDLE =
       "https://nrces.in/ndhm/fhir/r4/StructureDefinition/InsurancePlanBundle";
+  public static final String PROFILE_PAYMENT_NOTICE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PaymentNotice";
+  public static final String PROFILE_PAYMENT_NOTICE_BUNDLE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PaymentNoticeBundle";
+  public static final String PAYMENT_STATUS_SYSTEM =
+      "http://terminology.hl7.org/CodeSystem/paymentstatus";
 }

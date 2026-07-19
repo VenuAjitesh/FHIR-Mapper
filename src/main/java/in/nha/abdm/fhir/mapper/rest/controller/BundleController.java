@@ -48,6 +48,7 @@ public class BundleController {
   private final ClaimConverter claimConverter;
   private final ClaimResponseConverter claimResponseConverter;
   private final InsurancePlanConverter insurancePlanConverter;
+  private final PaymentNoticeConverter paymentNoticeConverter;
   private final FhirValidationService fhirValidationService;
 
   @Value(ConfigurationConstants.FHIR_VALIDATION_FAIL_ON_ERROR)
@@ -70,6 +71,7 @@ public class BundleController {
       ClaimConverter claimConverter,
       ClaimResponseConverter claimResponseConverter,
       InsurancePlanConverter insurancePlanConverter,
+      PaymentNoticeConverter paymentNoticeConverter,
       FhirValidationService fhirValidationService) {
     this.immunizationConverter = immunizationConverter;
     this.prescriptionConverter = prescriptionConverter;
@@ -84,6 +86,7 @@ public class BundleController {
     this.claimConverter = claimConverter;
     this.claimResponseConverter = claimResponseConverter;
     this.insurancePlanConverter = insurancePlanConverter;
+    this.paymentNoticeConverter = paymentNoticeConverter;
     this.fhirValidationService = fhirValidationService;
   }
 
@@ -493,6 +496,36 @@ public class BundleController {
   public Bundle createInsurancePlanBundle(
       @Valid @RequestBody InsurancePlanBundleRequest request) {
     Bundle bundle = insurancePlanConverter.makeInsurancePlanBundle(request);
+    return validateAndReturnBundle(bundle);
+  }
+
+  /**
+   * @param request NHCX payment notice details (amount, payment status, payee)
+   * @return FHIR PaymentNotice collection bundle if no error found
+   */
+  @PostMapping(path = ControllerMappingConstants.PAYMENT_NOTICE_PATH)
+  @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = "Create NHCX PaymentNotice bundle",
+      description =
+          "Builds an NHCX PaymentNotice (collection) bundle conveying the status of a payment for"
+              + " an adjudicated claim.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_201,
+            description = SwaggerConstants.BUNDLE_SUCCESS_DESCRIPTION,
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = Bundle.class))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
+  public Bundle createPaymentNoticeBundle(
+      @Valid @RequestBody PaymentNoticeBundleRequest request) {
+    Bundle bundle = paymentNoticeConverter.makePaymentNoticeBundle(request);
     return validateAndReturnBundle(bundle);
   }
 
