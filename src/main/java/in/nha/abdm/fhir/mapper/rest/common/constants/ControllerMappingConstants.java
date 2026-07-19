@@ -21,4 +21,7 @@ public class ControllerMappingConstants {
   public static final String VALIDATE_PATH = "/validate";
   public static final String LINT_PATH = "/lint";
   public static final String SNOMED_BASE_PATH = "/v1/snomed";
+  public static final String TERMINOLOGY_BASE_PATH = "/v1/terminology";
+  public static final String TERMINOLOGY_SEARCH_PATH = "/search";
+  public static final String TERMINOLOGY_TRANSLATE_PATH = "/translate";
 }

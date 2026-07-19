@@ -3,4 +3,8 @@ package in.nha.abdm.fhir.mapper.rest.database.h2.services;
 
 public interface Displayable {
   String getDisplay();
+
+  String getCode();
+
+  String getType();
 }
