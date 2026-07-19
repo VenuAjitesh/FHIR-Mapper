@@ -18,6 +18,7 @@ import in.nha.abdm.fhir.mapper.rest.requests.ImmunizationRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.InsurancePlanBundleRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.InvoiceBundleRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.OPConsultationRequest;
+import in.nha.abdm.fhir.mapper.rest.requests.PaymentNoticeBundleRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.PrescriptionRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.WellnessRecordRequest;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.CoverageEligibilityRequest;
 import org.hl7.fhir.r4.model.CoverageEligibilityResponse;
 import org.hl7.fhir.r4.model.InsurancePlan;
+import org.hl7.fhir.r4.model.PaymentNotice;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.springframework.stereotype.Service;
@@ -54,6 +56,7 @@ public class BundleExtractionService {
   private final ClaimBundleExtractor claimBundleExtractor;
   private final ClaimResponseBundleExtractor claimResponseBundleExtractor;
   private final InsurancePlanBundleExtractor insurancePlanBundleExtractor;
+  private final PaymentNoticeBundleExtractor paymentNoticeBundleExtractor;
 
   public ExtractedBundleResponse extract(Bundle bundle) {
     NhcxExtractorDefinition nhcxDefinition = identifyNhcxExtractor(bundle);
@@ -121,6 +124,15 @@ public class BundleExtractionService {
             bundle -> {
               InsurancePlanBundleRequest request = insurancePlanBundleExtractor.extract(bundle);
               request.setBundleType(ValidationConstants.INSURANCE_PLAN_RECORD);
+              return request;
+            }),
+        new NhcxExtractorDefinition(
+            ValidationConstants.PAYMENT_NOTICE_RECORD,
+            ResourceProfileIdentifier.PROFILE_PAYMENT_NOTICE_BUNDLE,
+            PaymentNotice.class,
+            bundle -> {
+              PaymentNoticeBundleRequest request = paymentNoticeBundleExtractor.extract(bundle);
+              request.setBundleType(ValidationConstants.PAYMENT_NOTICE_RECORD);
               return request;
             }));
   }
