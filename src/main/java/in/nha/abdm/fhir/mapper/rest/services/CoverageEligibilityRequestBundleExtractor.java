@@ -25,8 +25,7 @@ public class CoverageEligibilityRequestBundleExtractor extends NhcxExtractionSup
           .build();
     }
 
-    List<String> purposes =
-        request.getPurpose().stream().map(p -> p.getValue().toCode()).toList();
+    List<String> purposes = request.getPurpose().stream().map(p -> p.getValue().toCode()).toList();
 
     return CoverageEligibilityRequestBundleRequest.builder()
         .careContextReference(bundleIdentifier(bundle))
@@ -34,10 +33,9 @@ public class CoverageEligibilityRequestBundleExtractor extends NhcxExtractionSup
         .priority(request.hasPriority() ? conceptText(request.getPriority()) : null)
         .purpose(purposes)
         .servicedDate(
-            request.hasServicedDateType()
-                ? request.getServicedDateType().getValueAsString()
-                : null)
-        .created(request.hasCreatedElement() ? request.getCreatedElement().getValueAsString() : null)
+            request.hasServicedDateType() ? request.getServicedDateType().getValueAsString() : null)
+        .created(
+            request.hasCreatedElement() ? request.getCreatedElement().getValueAsString() : null)
         .patient(patient(index.resolve(request.getPatient(), Patient.class)))
         .enterer(practitionerOrNull(index.resolve(request.getEnterer(), Practitioner.class)))
         .provider(organization(index.resolve(request.getProvider(), Organization.class)))

@@ -26,17 +26,15 @@ public class PaymentNoticeBundleRequest {
   @NotBlank(message = ValidationConstants.CARE_CONTEXT_MANDATORY)
   private String careContextReference;
 
-  @Schema(
-      description = "Status: active | cancelled | draft | entered-in-error",
-      example = "active")
+  @Schema(description = "Status: active | cancelled | draft | entered-in-error", example = "active")
   private String status;
 
-  @Schema(
-      description = "Payment status: paid | cleared",
-      example = "paid")
+  @Schema(description = "Payment status: paid | cleared", example = "paid")
   private String paymentStatus;
 
-  @Schema(description = "Business identifier of the ClaimResponse/request being paid", example = "claim-visit-2026-01")
+  @Schema(
+      description = "Business identifier of the ClaimResponse/request being paid",
+      example = "claim-visit-2026-01")
   private String responseReference;
 
   @Schema(description = "Amount of the payment", example = "9000.00")
@@ -53,5 +51,6 @@ public class PaymentNoticeBundleRequest {
   @NotNull(message = "payee is mandatory") private OrganisationResource payee;
 
   @Schema(description = "Organisation reporting the payment notice (optional)")
-  @Valid private OrganisationResource reporter;
+  @Valid
+  private OrganisationResource reporter;
 }

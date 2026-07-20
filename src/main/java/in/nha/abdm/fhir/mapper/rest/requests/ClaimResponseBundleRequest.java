@@ -27,9 +27,7 @@ public class ClaimResponseBundleRequest {
   @NotBlank(message = ValidationConstants.CARE_CONTEXT_MANDATORY)
   private String careContextReference;
 
-  @Schema(
-      description = "Status: active | cancelled | draft | entered-in-error",
-      example = "active")
+  @Schema(description = "Status: active | cancelled | draft | entered-in-error", example = "active")
   private String status;
 
   @Schema(
@@ -40,13 +38,17 @@ public class ClaimResponseBundleRequest {
   @Schema(description = "Use: claim | preauthorization | predetermination", example = "claim")
   private String use;
 
-  @Schema(description = "Adjudication outcome: queued | complete | error | partial", example = "complete")
+  @Schema(
+      description = "Adjudication outcome: queued | complete | error | partial",
+      example = "complete")
   private String outcome;
 
   @Schema(description = "Human readable disposition", example = "Claim approved")
   private String disposition;
 
-  @Schema(description = "Business identifier of the Claim being adjudicated", example = "claim-visit-2026-01")
+  @Schema(
+      description = "Business identifier of the Claim being adjudicated",
+      example = "claim-visit-2026-01")
   private String claimReference;
 
   @Schema(description = "Date the response was created (yyyy-MM-dd); defaults to now")
@@ -69,5 +71,6 @@ public class ClaimResponseBundleRequest {
   @NotNull(message = "insurer is mandatory") private OrganisationResource insurer;
 
   @Schema(description = "Provider organisation that requested the claim (optional)")
-  @Valid private OrganisationResource provider;
+  @Valid
+  private OrganisationResource provider;
 }

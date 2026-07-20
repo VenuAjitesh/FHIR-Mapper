@@ -16,8 +16,7 @@ class NhcxExtractionSupport extends FhirExtractionSupport {
       return null;
     }
     return CoverageResource.builder()
-        .policyNumber(
-            coverage.hasIdentifier() ? coverage.getIdentifierFirstRep().getValue() : null)
+        .policyNumber(coverage.hasIdentifier() ? coverage.getIdentifierFirstRep().getValue() : null)
         .subscriberId(coverage.hasSubscriberId() ? coverage.getSubscriberId() : null)
         .status(coverage.hasStatus() ? coverage.getStatus().toCode() : null)
         .build();

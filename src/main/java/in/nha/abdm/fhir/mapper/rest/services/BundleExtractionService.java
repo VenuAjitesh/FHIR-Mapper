@@ -52,7 +52,8 @@ public class BundleExtractionService {
   private final DischargeSummaryBundleExtractor dischargeSummaryBundleExtractor;
   private final OPConsultationBundleExtractor opConsultationBundleExtractor;
   private final CoverageEligibilityRequestBundleExtractor coverageEligibilityRequestBundleExtractor;
-  private final CoverageEligibilityResponseBundleExtractor coverageEligibilityResponseBundleExtractor;
+  private final CoverageEligibilityResponseBundleExtractor
+      coverageEligibilityResponseBundleExtractor;
   private final ClaimBundleExtractor claimBundleExtractor;
   private final ClaimResponseBundleExtractor claimResponseBundleExtractor;
   private final InsurancePlanBundleExtractor insurancePlanBundleExtractor;
@@ -62,9 +63,7 @@ public class BundleExtractionService {
     NhcxExtractorDefinition nhcxDefinition = identifyNhcxExtractor(bundle);
     if (nhcxDefinition != null) {
       return new ExtractedBundleResponse(
-          nhcxDefinition.hiType(),
-          nhcxDefinition.extractor().apply(bundle),
-          new ArrayList<>());
+          nhcxDefinition.hiType(), nhcxDefinition.extractor().apply(bundle), new ArrayList<>());
     }
 
     Composition composition = findComposition(bundle);

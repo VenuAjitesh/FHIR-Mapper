@@ -67,7 +67,8 @@ public class BundleDoctorService {
           Map.entry(
               FamilyMemberHistory.class, ResourceProfileIdentifier.PROFILE_FAMILY_MEMBER_HISTORY),
           Map.entry(ServiceRequest.class, ResourceProfileIdentifier.PROFILE_SERVICE_REQUEST),
-          Map.entry(DiagnosticReport.class, ResourceProfileIdentifier.PROFILE_DIAGNOSTIC_REPORT_LAB),
+          Map.entry(
+              DiagnosticReport.class, ResourceProfileIdentifier.PROFILE_DIAGNOSTIC_REPORT_LAB),
           Map.entry(Coverage.class, ResourceProfileIdentifier.PROFILE_COVERAGE),
           Map.entry(
               CoverageEligibilityRequest.class,
@@ -212,8 +213,7 @@ public class BundleDoctorService {
       return;
     }
     Utils.setNarrative(
-        domainResource,
-        resource.fhirType() + " " + resource.getIdElement().getIdPart());
+        domainResource, resource.fhirType() + " " + resource.getIdElement().getIdPart());
     record(
         fixes,
         "narrative",
@@ -267,7 +267,6 @@ public class BundleDoctorService {
   }
 
   private void record(List<AppliedFix> fixes, String code, String description, String location) {
-    fixes.add(
-        AppliedFix.builder().code(code).description(description).location(location).build());
+    fixes.add(AppliedFix.builder().code(code).description(description).location(location).build());
   }
 }

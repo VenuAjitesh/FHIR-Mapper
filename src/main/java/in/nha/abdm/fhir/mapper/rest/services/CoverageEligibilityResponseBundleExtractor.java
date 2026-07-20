@@ -23,8 +23,7 @@ public class CoverageEligibilityResponseBundleExtractor extends NhcxExtractionSu
           .build();
     }
 
-    List<String> purposes =
-        response.getPurpose().stream().map(p -> p.getValue().toCode()).toList();
+    List<String> purposes = response.getPurpose().stream().map(p -> p.getValue().toCode()).toList();
     boolean hasInsurance = response.hasInsurance();
 
     return CoverageEligibilityResponseBundleRequest.builder()

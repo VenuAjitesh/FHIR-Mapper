@@ -40,7 +40,9 @@ public class InsurancePlanBundleRequest {
   @Schema(description = "Coverage type", example = "medical")
   private String coverageType;
 
-  @Schema(description = "Benefit descriptions covered by the plan", example = "[\"Hospitalization\", \"Day care\"]")
+  @Schema(
+      description = "Benefit descriptions covered by the plan",
+      example = "[\"Hospitalization\", \"Day care\"]")
   private List<String> benefits;
 
   @Schema(description = "Insurer organisation that owns the plan")

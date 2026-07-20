@@ -40,9 +40,7 @@ public class ClaimBundleRequest {
       example = "institutional")
   private String claimType;
 
-  @Schema(
-      description = "Status: active | cancelled | draft | entered-in-error",
-      example = "active")
+  @Schema(description = "Status: active | cancelled | draft | entered-in-error", example = "active")
   private String status;
 
   @Schema(description = "Processing priority: normal | stat | deferred", example = "normal")
@@ -70,6 +68,8 @@ public class ClaimBundleRequest {
   @Valid
   @NotNull(message = "at least one claim item is mandatory") private List<ClaimItemResource> items;
 
-  @Schema(description = "Total claimed amount; computed from items when omitted", example = "10000.00")
+  @Schema(
+      description = "Total claimed amount; computed from items when omitted",
+      example = "10000.00")
   private Double total;
 }

@@ -44,7 +44,9 @@ public class MakePaymentNoticeResource {
       paymentNotice.setPaymentDate(Utils.getFormattedDate(request.getPaymentDate()));
     }
     paymentNotice.setAmount(
-        new Money().setValue(request.getAmount()).setCurrency(ResourceProfileIdentifier.CURRENCY_INR));
+        new Money()
+            .setValue(request.getAmount())
+            .setCurrency(ResourceProfileIdentifier.CURRENCY_INR));
     paymentNotice.setPaymentStatus(resolvePaymentStatus(request.getPaymentStatus()));
     Utils.setNarrative(paymentNotice, "PaymentNotice issued by " + payee.getName());
     return paymentNotice;
@@ -61,7 +63,8 @@ public class MakePaymentNoticeResource {
   }
 
   private CodeableConcept resolvePaymentStatus(String paymentStatus) {
-    String code = (Objects.isNull(paymentStatus) || paymentStatus.isBlank()) ? "paid" : paymentStatus;
+    String code =
+        (Objects.isNull(paymentStatus) || paymentStatus.isBlank()) ? "paid" : paymentStatus;
     return new CodeableConcept()
         .addCoding(
             new Coding().setSystem(ResourceProfileIdentifier.PAYMENT_STATUS_SYSTEM).setCode(code));

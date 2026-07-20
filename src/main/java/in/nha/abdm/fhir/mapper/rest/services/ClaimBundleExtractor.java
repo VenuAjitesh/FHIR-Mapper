@@ -34,7 +34,10 @@ public class ClaimBundleExtractor extends NhcxExtractionSupport {
         .insurer(organization(index.resolve(claim.getInsurer(), Organization.class)))
         .coverage(coverage(resolveCoverage(claim, index)))
         .items(extractItems(claim))
-        .total(claim.hasTotal() && claim.getTotal().hasValue() ? claim.getTotal().getValue().doubleValue() : null)
+        .total(
+            claim.hasTotal() && claim.getTotal().hasValue()
+                ? claim.getTotal().getValue().doubleValue()
+                : null)
         .build();
   }
 

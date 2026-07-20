@@ -54,7 +54,8 @@ public class MakeCoverageEligibilityRequestResource {
     eligibilityRequest.setInsurer(Utils.buildReference(insurer.getId()));
     eligibilityRequest.setFacility(Utils.buildReference(facility.getId()));
     if (Objects.nonNull(request.getServicedDate())) {
-      eligibilityRequest.setServiced(new DateType(Utils.getFormattedDate(request.getServicedDate())));
+      eligibilityRequest.setServiced(
+          new DateType(Utils.getFormattedDate(request.getServicedDate())));
     }
     eligibilityRequest
         .addInsurance()
@@ -77,7 +78,9 @@ public class MakeCoverageEligibilityRequestResource {
     String code = (Objects.isNull(priority) || priority.isBlank()) ? "normal" : priority;
     return new CodeableConcept()
         .addCoding(
-            new Coding().setSystem(ResourceProfileIdentifier.PROCESS_PRIORITY_SYSTEM).setCode(code));
+            new Coding()
+                .setSystem(ResourceProfileIdentifier.PROCESS_PRIORITY_SYSTEM)
+                .setCode(code));
   }
 
   private List<EligibilityRequestPurpose> resolvePurpose(List<String> purposes) {

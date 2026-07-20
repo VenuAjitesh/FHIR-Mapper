@@ -498,8 +498,7 @@ public class BundleController {
             responseCode = SwaggerConstants.HTTP_400,
             description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
       })
-  public Bundle createInsurancePlanBundle(
-      @Valid @RequestBody InsurancePlanBundleRequest request) {
+  public Bundle createInsurancePlanBundle(@Valid @RequestBody InsurancePlanBundleRequest request) {
     Bundle bundle = insurancePlanConverter.makeInsurancePlanBundle(request);
     return validateAndReturnBundle(bundle);
   }
@@ -528,8 +527,7 @@ public class BundleController {
             responseCode = SwaggerConstants.HTTP_400,
             description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
       })
-  public Bundle createPaymentNoticeBundle(
-      @Valid @RequestBody PaymentNoticeBundleRequest request) {
+  public Bundle createPaymentNoticeBundle(@Valid @RequestBody PaymentNoticeBundleRequest request) {
     Bundle bundle = paymentNoticeConverter.makePaymentNoticeBundle(request);
     return validateAndReturnBundle(bundle);
   }

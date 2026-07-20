@@ -53,8 +53,7 @@ public class MakeCoverageEligibilityResponseResource {
     if (Objects.nonNull(request.getInforce())) {
       insurance.setInforce(request.getInforce());
     }
-    Utils.setNarrative(
-        response, "CoverageEligibilityResponse issued by " + insurer.getName());
+    Utils.setNarrative(response, "CoverageEligibilityResponse issued by " + insurer.getName());
     return response;
   }
 
@@ -64,9 +63,7 @@ public class MakeCoverageEligibilityResponseResource {
     }
     return new Reference()
         .setIdentifier(
-            new Identifier()
-                .setSystem(BundleUrlIdentifier.WRAPPER_URL)
-                .setValue(requestReference))
+            new Identifier().setSystem(BundleUrlIdentifier.WRAPPER_URL).setValue(requestReference))
         .setDisplay("CoverageEligibilityRequest " + requestReference);
   }
 

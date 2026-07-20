@@ -24,9 +24,7 @@ public class PaymentNoticeBundleExtractor extends NhcxExtractionSupport {
         .careContextReference(bundleIdentifier(bundle))
         .status(paymentNotice.hasStatus() ? paymentNotice.getStatus().toCode() : null)
         .paymentStatus(
-            paymentNotice.hasPaymentStatus()
-                ? conceptText(paymentNotice.getPaymentStatus())
-                : null)
+            paymentNotice.hasPaymentStatus() ? conceptText(paymentNotice.getPaymentStatus()) : null)
         .responseReference(identifierValue(paymentNotice.getResponse()))
         .amount(
             paymentNotice.hasAmount() && paymentNotice.getAmount().hasValue()

@@ -11,10 +11,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import org.hl7.fhir.r4.model.Claim;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Coverage;
-import org.hl7.fhir.r4.model.Claim;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Money;
@@ -67,8 +67,7 @@ public class MakeClaimResource {
     int sequence = 1;
     for (ClaimItemResource item : items) {
       int quantity = Objects.nonNull(item.getQuantity()) ? item.getQuantity() : 1;
-      double net =
-          Objects.nonNull(item.getNet()) ? item.getNet() : item.getUnitPrice() * quantity;
+      double net = Objects.nonNull(item.getNet()) ? item.getNet() : item.getUnitPrice() * quantity;
       runningTotal += net;
       claim
           .addItem()
@@ -102,14 +101,17 @@ public class MakeClaimResource {
   private CodeableConcept resolveType(String claimType) {
     String code = (Objects.isNull(claimType) || claimType.isBlank()) ? "institutional" : claimType;
     return new CodeableConcept()
-        .addCoding(new Coding().setSystem(ResourceProfileIdentifier.CLAIM_TYPE_SYSTEM).setCode(code));
+        .addCoding(
+            new Coding().setSystem(ResourceProfileIdentifier.CLAIM_TYPE_SYSTEM).setCode(code));
   }
 
   private CodeableConcept resolvePriority(String priority) {
     String code = (Objects.isNull(priority) || priority.isBlank()) ? "normal" : priority;
     return new CodeableConcept()
         .addCoding(
-            new Coding().setSystem(ResourceProfileIdentifier.PROCESS_PRIORITY_SYSTEM).setCode(code));
+            new Coding()
+                .setSystem(ResourceProfileIdentifier.PROCESS_PRIORITY_SYSTEM)
+                .setCode(code));
   }
 
   private Date resolveCreated(String created) {

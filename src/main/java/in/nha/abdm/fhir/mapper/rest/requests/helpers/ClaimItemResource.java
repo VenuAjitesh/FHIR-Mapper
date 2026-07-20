@@ -25,6 +25,8 @@ public class ClaimItemResource {
   @Schema(description = "Unit price", example = "5000.00")
   @NotNull(message = "Claim item unitPrice is mandatory") private Double unitPrice;
 
-  @Schema(description = "Net amount for the line; defaults to unitPrice * quantity", example = "10000.00")
+  @Schema(
+      description = "Net amount for the line; defaults to unitPrice * quantity",
+      example = "10000.00")
   private Double net;
 }

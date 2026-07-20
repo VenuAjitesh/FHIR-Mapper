@@ -39,7 +39,9 @@ public class CoverageEligibilityResponseBundleRequest {
       example = "[\"validation\"]")
   private List<String> purpose;
 
-  @Schema(description = "Adjudication outcome: queued | complete | error | partial", example = "complete")
+  @Schema(
+      description = "Adjudication outcome: queued | complete | error | partial",
+      example = "complete")
   private String outcome;
 
   @Schema(description = "Human readable disposition", example = "Policy is active and in-force")
