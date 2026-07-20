@@ -40,6 +40,12 @@ public class InsurancePlanBundleRequest {
   @Schema(description = "Coverage type", example = "medical")
   private String coverageType;
 
+  @Schema(description = "Plan validity start (yyyy-MM-dd); defaults to now", example = "2026-01-01")
+  private String validFrom;
+
+  @Schema(description = "Plan validity end (yyyy-MM-dd)", example = "2026-12-31")
+  private String validTo;
+
   @Schema(
       description = "Benefit descriptions covered by the plan",
       example = "[\"Hospitalization\", \"Day care\"]")
