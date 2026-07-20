@@ -13,10 +13,13 @@ import java.text.ParseException;
 import java.util.Objects;
 import java.util.UUID;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Money;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.PaymentNotice;
+import org.hl7.fhir.r4.model.PaymentReconciliation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -42,20 +45,44 @@ public class PaymentNoticeConverter {
           Objects.nonNull(request.getReporter())
               ? makeOrganisationResource.getOrganization(request.getReporter())
               : null;
+      PaymentReconciliation paymentReconciliation = buildPaymentReconciliation(request);
       PaymentNotice paymentNotice =
-          makePaymentNoticeResource.getPaymentNotice(request, payee, reporter);
+          makePaymentNoticeResource.getPaymentNotice(
+              request, payee, reporter, paymentReconciliation);
 
-      return buildBundle(request, paymentNotice, payee, reporter);
+      return buildBundle(request, paymentNotice, payee, reporter, paymentReconciliation);
     } catch (Exception e) {
       throw ExceptionHandler.handle(e, log);
     }
+  }
+
+  private PaymentReconciliation buildPaymentReconciliation(PaymentNoticeBundleRequest request)
+      throws ParseException {
+    PaymentReconciliation reconciliation = new PaymentReconciliation();
+    reconciliation.setId(UUID.randomUUID().toString());
+    reconciliation.setStatus(PaymentReconciliation.PaymentReconciliationStatus.ACTIVE);
+    reconciliation.setCreated(
+        Objects.nonNull(request.getCreated())
+            ? Utils.getFormattedDate(request.getCreated())
+            : new java.util.Date());
+    reconciliation.setOutcome(Enumerations.RemittanceOutcome.COMPLETE);
+    reconciliation.setPaymentAmount(
+        new Money()
+            .setValue(request.getAmount())
+            .setCurrency(ResourceProfileIdentifier.CURRENCY_INR));
+    if (Objects.nonNull(request.getPaymentDate())) {
+      reconciliation.setPaymentDate(Utils.getFormattedDate(request.getPaymentDate()));
+    }
+    Utils.setNarrative(reconciliation, "PaymentReconciliation for payment notice");
+    return reconciliation;
   }
 
   private Bundle buildBundle(
       PaymentNoticeBundleRequest request,
       PaymentNotice paymentNotice,
       Organization payee,
-      Organization reporter)
+      Organization reporter,
+      PaymentReconciliation paymentReconciliation)
       throws ParseException {
     Bundle bundle = new Bundle();
     bundle.setId(UUID.randomUUID().toString());
@@ -68,6 +95,7 @@ public class PaymentNoticeConverter {
             .setValue(request.getCareContextReference()));
 
     BundleUtils.addEntry(bundle, paymentNotice);
+    BundleUtils.addEntry(bundle, paymentReconciliation);
     BundleUtils.addEntry(bundle, payee);
     BundleUtils.addEntry(bundle, reporter);
 
@@ -75,9 +103,6 @@ public class PaymentNoticeConverter {
   }
 
   private Meta buildBundleMeta() throws ParseException {
-    return new Meta()
-        .setVersionId("1")
-        .setLastUpdatedElement(Utils.getCurrentTimeStamp())
-        .addProfile(ResourceProfileIdentifier.PROFILE_PAYMENT_NOTICE_BUNDLE);
+    return new Meta().setVersionId("1").setLastUpdatedElement(Utils.getCurrentTimeStamp());
   }
 }

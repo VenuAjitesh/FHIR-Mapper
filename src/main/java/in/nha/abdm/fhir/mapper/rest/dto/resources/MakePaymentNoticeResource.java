@@ -16,6 +16,7 @@ import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Money;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.PaymentNotice;
+import org.hl7.fhir.r4.model.PaymentReconciliation;
 import org.hl7.fhir.r4.model.Reference;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,10 @@ import org.springframework.stereotype.Component;
 public class MakePaymentNoticeResource {
 
   public PaymentNotice getPaymentNotice(
-      PaymentNoticeBundleRequest request, Organization payee, Organization reporter)
+      PaymentNoticeBundleRequest request,
+      Organization payee,
+      Organization reporter,
+      PaymentReconciliation paymentReconciliation)
       throws ParseException {
     PaymentNotice paymentNotice = new PaymentNotice();
     paymentNotice.setId(UUID.randomUUID().toString());
@@ -40,6 +44,7 @@ public class MakePaymentNoticeResource {
       paymentNotice.setProvider(Utils.buildReference(reporter.getId()));
     }
     paymentNotice.setResponse(buildResponseReference(request.getResponseReference()));
+    paymentNotice.setPayment(Utils.buildReference(paymentReconciliation.getId()));
     if (Objects.nonNull(request.getPaymentDate())) {
       paymentNotice.setPaymentDate(Utils.getFormattedDate(request.getPaymentDate()));
     }
