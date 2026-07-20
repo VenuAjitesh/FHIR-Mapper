@@ -33,12 +33,26 @@ public class ClaimBundleExtractor extends NhcxExtractionSupport {
         .provider(organization(index.resolve(claim.getProvider(), Organization.class)))
         .insurer(organization(index.resolve(claim.getInsurer(), Organization.class)))
         .coverage(coverage(resolveCoverage(claim, index)))
+        .diagnoses(extractDiagnoses(claim))
         .items(extractItems(claim))
         .total(
             claim.hasTotal() && claim.getTotal().hasValue()
                 ? claim.getTotal().getValue().doubleValue()
                 : null)
         .build();
+  }
+
+  private List<String> extractDiagnoses(Claim claim) {
+    List<String> diagnoses = new ArrayList<>();
+    for (Claim.DiagnosisComponent diagnosis : claim.getDiagnosis()) {
+      if (diagnosis.hasDiagnosisCodeableConcept()) {
+        String text = conceptText(diagnosis.getDiagnosisCodeableConcept());
+        if (text != null) {
+          diagnoses.add(text);
+        }
+      }
+    }
+    return diagnoses;
   }
 
   private List<ClaimItemResource> extractItems(Claim claim) {

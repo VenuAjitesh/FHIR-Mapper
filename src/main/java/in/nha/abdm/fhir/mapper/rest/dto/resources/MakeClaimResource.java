@@ -54,12 +54,29 @@ public class MakeClaimResource {
         .setFocal(true)
         .setCoverage(Utils.buildReference(coverage.getId()));
 
+    addDiagnoses(claim, request.getDiagnoses());
     double computedTotal = addItems(claim, request.getItems());
     double total = Objects.nonNull(request.getTotal()) ? request.getTotal() : computedTotal;
     claim.setTotal(money(total));
 
     Utils.setNarrative(claim, "Claim (" + claim.getUse().toCode() + ") to " + insurer.getName());
     return claim;
+  }
+
+  private void addDiagnoses(Claim claim, List<String> diagnoses) {
+    if (Objects.isNull(diagnoses)) {
+      return;
+    }
+    int sequence = 1;
+    for (String diagnosis : diagnoses) {
+      if (diagnosis == null || diagnosis.isBlank()) {
+        continue;
+      }
+      claim
+          .addDiagnosis()
+          .setSequence(sequence++)
+          .setDiagnosis(new CodeableConcept().setText(diagnosis));
+    }
   }
 
   private double addItems(Claim claim, List<ClaimItemResource> items) {

@@ -64,6 +64,11 @@ public class ClaimBundleRequest {
   @Valid
   @NotNull(message = "coverage is mandatory") private CoverageResource coverage;
 
+  @Schema(
+      description = "Diagnoses for the claim (required by NRCES); free-text or coded display terms",
+      example = "[\"Type 2 diabetes mellitus\"]")
+  private List<String> diagnoses;
+
   @Schema(description = "Billable line items")
   @Valid
   @NotNull(message = "at least one claim item is mandatory") private List<ClaimItemResource> items;
