@@ -75,7 +75,13 @@ public class MakeClaimResource {
       claim
           .addDiagnosis()
           .setSequence(sequence++)
-          .setDiagnosis(new CodeableConcept().setText(diagnosis));
+          .setDiagnosis(new CodeableConcept().setText(diagnosis))
+          .addType(
+              new CodeableConcept()
+                  .addCoding(
+                      new Coding()
+                          .setSystem(ResourceProfileIdentifier.DIAGNOSIS_TYPE_SYSTEM)
+                          .setCode("principal")));
     }
   }
 

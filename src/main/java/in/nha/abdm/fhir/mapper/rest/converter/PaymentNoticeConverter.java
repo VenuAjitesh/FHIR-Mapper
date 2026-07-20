@@ -60,6 +60,11 @@ public class PaymentNoticeConverter {
       throws ParseException {
     PaymentReconciliation reconciliation = new PaymentReconciliation();
     reconciliation.setId(UUID.randomUUID().toString());
+    reconciliation.setMeta(
+        new Meta()
+            .setVersionId("1")
+            .setLastUpdatedElement(Utils.getCurrentTimeStamp())
+            .addProfile(ResourceProfileIdentifier.PROFILE_PAYMENT_RECONCILIATION));
     reconciliation.setStatus(PaymentReconciliation.PaymentReconciliationStatus.ACTIVE);
     reconciliation.setCreated(
         Objects.nonNull(request.getCreated())
@@ -70,9 +75,10 @@ public class PaymentNoticeConverter {
         new Money()
             .setValue(request.getAmount())
             .setCurrency(ResourceProfileIdentifier.CURRENCY_INR));
-    if (Objects.nonNull(request.getPaymentDate())) {
-      reconciliation.setPaymentDate(Utils.getFormattedDate(request.getPaymentDate()));
-    }
+    reconciliation.setPaymentDate(
+        Objects.nonNull(request.getPaymentDate())
+            ? Utils.getFormattedDate(request.getPaymentDate())
+            : new java.util.Date());
     Utils.setNarrative(reconciliation, "PaymentReconciliation for payment notice");
     return reconciliation;
   }

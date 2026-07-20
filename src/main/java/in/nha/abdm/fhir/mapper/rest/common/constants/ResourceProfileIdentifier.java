@@ -94,4 +94,8 @@ public class ResourceProfileIdentifier {
       "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PaymentNoticeBundle";
   public static final String PAYMENT_STATUS_SYSTEM =
       "http://terminology.hl7.org/CodeSystem/paymentstatus";
+  public static final String DIAGNOSIS_TYPE_SYSTEM =
+      "http://terminology.hl7.org/CodeSystem/ex-diagnosistype";
+  public static final String PROFILE_PAYMENT_RECONCILIATION =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PaymentReconciliation";
 }
