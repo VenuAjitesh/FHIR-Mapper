@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.InsurancePlan;
 import org.hl7.fhir.r4.model.Meta;
@@ -19,8 +20,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class MakeInsurancePlanResource {
 
-  public InsurancePlan getInsurancePlan(
-      InsurancePlanBundleRequest request, Organization insurer) throws ParseException {
+  public InsurancePlan getInsurancePlan(InsurancePlanBundleRequest request, Organization insurer)
+      throws ParseException {
     InsurancePlan insurancePlan = new InsurancePlan();
     insurancePlan.setId(UUID.randomUUID().toString());
     insurancePlan.setMeta(buildMeta());
@@ -54,11 +55,11 @@ public class MakeInsurancePlanResource {
     }
   }
 
-  private InsurancePlan.InsurancePlanStatus resolveStatus(String status) {
+  private Enumerations.PublicationStatus resolveStatus(String status) {
     if (Objects.isNull(status) || status.isBlank()) {
-      return InsurancePlan.InsurancePlanStatus.ACTIVE;
+      return Enumerations.PublicationStatus.ACTIVE;
     }
-    return InsurancePlan.InsurancePlanStatus.fromCode(status);
+    return Enumerations.PublicationStatus.fromCode(status);
   }
 
   private Meta buildMeta() throws ParseException {

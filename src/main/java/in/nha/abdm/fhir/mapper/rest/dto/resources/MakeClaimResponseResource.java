@@ -10,9 +10,9 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 import org.hl7.fhir.r4.model.ClaimResponse;
+import org.hl7.fhir.r4.model.ClaimResponse.RemittanceOutcome;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Enumerations.RemittanceOutcome;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.Money;
@@ -25,7 +25,10 @@ import org.springframework.stereotype.Component;
 public class MakeClaimResponseResource {
 
   public ClaimResponse getClaimResponse(
-      ClaimResponseBundleRequest request, Patient patient, Organization insurer, Organization provider)
+      ClaimResponseBundleRequest request,
+      Patient patient,
+      Organization insurer,
+      Organization provider)
       throws ParseException {
     ClaimResponse claimResponse = new ClaimResponse();
     claimResponse.setId(UUID.randomUUID().toString());
@@ -75,7 +78,8 @@ public class MakeClaimResponseResource {
       }
     }
     Utils.setNarrative(
-        claimResponse, "ClaimResponse (" + claimResponse.getOutcome().toCode() + ") by " + insurer.getName());
+        claimResponse,
+        "ClaimResponse (" + claimResponse.getOutcome().toCode() + ") by " + insurer.getName());
     return claimResponse;
   }
 
@@ -117,7 +121,8 @@ public class MakeClaimResponseResource {
   private CodeableConcept resolveType(String claimType) {
     String code = (Objects.isNull(claimType) || claimType.isBlank()) ? "institutional" : claimType;
     return new CodeableConcept()
-        .addCoding(new Coding().setSystem(ResourceProfileIdentifier.CLAIM_TYPE_SYSTEM).setCode(code));
+        .addCoding(
+            new Coding().setSystem(ResourceProfileIdentifier.CLAIM_TYPE_SYSTEM).setCode(code));
   }
 
   private Date resolveCreated(String created) {
