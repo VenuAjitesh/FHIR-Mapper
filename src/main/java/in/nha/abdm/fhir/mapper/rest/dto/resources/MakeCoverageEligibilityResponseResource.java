@@ -29,6 +29,7 @@ public class MakeCoverageEligibilityResponseResource {
       CoverageEligibilityResponseBundleRequest request,
       Patient patient,
       Organization insurer,
+      Organization requestor,
       Coverage coverage)
       throws ParseException {
     CoverageEligibilityResponse response = new CoverageEligibilityResponse();
@@ -48,6 +49,7 @@ public class MakeCoverageEligibilityResponseResource {
       response.setDisposition(request.getDisposition());
     }
     response.setInsurer(Utils.buildReference(insurer.getId()));
+    response.setRequestor(Utils.buildReference(requestor.getId()));
     CoverageEligibilityResponse.InsuranceComponent insurance =
         response.addInsurance().setCoverage(Utils.buildReference(coverage.getId()));
     if (Objects.nonNull(request.getInforce())) {

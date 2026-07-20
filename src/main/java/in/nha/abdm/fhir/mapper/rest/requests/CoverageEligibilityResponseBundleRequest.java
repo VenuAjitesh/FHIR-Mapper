@@ -65,6 +65,10 @@ public class CoverageEligibilityResponseBundleRequest {
   @Valid
   @NotNull(message = "insurer is mandatory") private OrganisationResource insurer;
 
+  @Schema(description = "Provider organisation that requested eligibility (defaults to insurer)")
+  @Valid
+  private OrganisationResource provider;
+
   @Schema(description = "Insurance coverage/policy evaluated")
   @Valid
   @NotNull(message = "coverage is mandatory") private CoverageResource coverage;

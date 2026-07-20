@@ -12,6 +12,7 @@ import in.nha.abdm.fhir.mapper.rest.dto.resources.MakePatientResource;
 import in.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import in.nha.abdm.fhir.mapper.rest.requests.CoverageEligibilityResponseBundleRequest;
 import java.text.ParseException;
+import java.util.Objects;
 import java.util.UUID;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Coverage;
@@ -50,11 +51,16 @@ public class CoverageEligibilityResponseConverter {
     try {
       Patient patient = makePatientResource.getPatient(request.getPatient());
       Organization insurer = makeOrganisationResource.getOrganization(request.getInsurer());
+      Organization requestor =
+          Objects.nonNull(request.getProvider())
+              ? makeOrganisationResource.getOrganization(request.getProvider())
+              : insurer;
       Coverage coverage = makeCoverageResource.getCoverage(request.getCoverage(), patient, insurer);
       CoverageEligibilityResponse response =
-          makeCoverageEligibilityResponseResource.getResponse(request, patient, insurer, coverage);
+          makeCoverageEligibilityResponseResource.getResponse(
+              request, patient, insurer, requestor, coverage);
 
-      return buildBundle(request, response, patient, insurer, coverage);
+      return buildBundle(request, response, patient, insurer, requestor, coverage);
     } catch (Exception e) {
       throw ExceptionHandler.handle(e, log);
     }
@@ -65,6 +71,7 @@ public class CoverageEligibilityResponseConverter {
       CoverageEligibilityResponse response,
       Patient patient,
       Organization insurer,
+      Organization requestor,
       Coverage coverage)
       throws ParseException {
     Bundle bundle = new Bundle();
@@ -80,6 +87,9 @@ public class CoverageEligibilityResponseConverter {
     BundleUtils.addEntry(bundle, response);
     BundleUtils.addEntry(bundle, patient);
     BundleUtils.addEntry(bundle, insurer);
+    if (requestor != insurer) {
+      BundleUtils.addEntry(bundle, requestor);
+    }
     BundleUtils.addEntry(bundle, coverage);
 
     return bundle;
