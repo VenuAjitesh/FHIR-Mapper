@@ -81,7 +81,8 @@ public class MakeClaimResource {
                   .addCoding(
                       new Coding()
                           .setSystem(ResourceProfileIdentifier.DIAGNOSIS_TYPE_SYSTEM)
-                          .setCode("principal")));
+                          .setCode("principal")
+                          .setDisplay("Principal Diagnosis")));
     }
   }
 
