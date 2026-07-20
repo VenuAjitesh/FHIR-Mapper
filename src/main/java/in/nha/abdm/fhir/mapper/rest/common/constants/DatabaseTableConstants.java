@@ -12,4 +12,7 @@ public class DatabaseTableConstants {
   public static final String SNOMED_MEDICINE_ROUTE = "snomed_medicine_route";
   public static final String TYPE_CHARGE_ITEM = "type_charge_item";
   public static final String TYPE_INVOICE = "type_invoice";
+  public static final String LOINC_CODE = "loinc_code";
+  public static final String ICD11_CODE = "icd11code";
+  public static final String NAMASTE_CODE = "namaste_code";
 }

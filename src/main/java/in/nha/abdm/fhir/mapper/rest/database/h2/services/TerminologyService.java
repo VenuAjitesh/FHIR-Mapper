@@ -4,6 +4,9 @@ package in.nha.abdm.fhir.mapper.rest.database.h2.services;
 import in.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
 import in.nha.abdm.fhir.mapper.rest.common.constants.SnomedCodeIdentifier;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.TerminologyMatch;
+import in.nha.abdm.fhir.mapper.rest.database.h2.repositories.Icd11CodeRepo;
+import in.nha.abdm.fhir.mapper.rest.database.h2.repositories.LoincCodeRepo;
+import in.nha.abdm.fhir.mapper.rest.database.h2.repositories.NamasteCodeRepo;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -21,9 +24,19 @@ import org.springframework.stereotype.Service;
 public class TerminologyService {
 
   private final SnomedService snomedService;
+  private final LoincCodeRepo loincCodeRepo;
+  private final Icd11CodeRepo icd11CodeRepo;
+  private final NamasteCodeRepo namasteCodeRepo;
 
-  public TerminologyService(SnomedService snomedService) {
+  public TerminologyService(
+      SnomedService snomedService,
+      LoincCodeRepo loincCodeRepo,
+      Icd11CodeRepo icd11CodeRepo,
+      NamasteCodeRepo namasteCodeRepo) {
     this.snomedService = snomedService;
+    this.loincCodeRepo = loincCodeRepo;
+    this.icd11CodeRepo = icd11CodeRepo;
+    this.namasteCodeRepo = namasteCodeRepo;
   }
 
   /** Registered searchable code-set sources. New systems (LOINC/ICD/NAMASTE) plug in here. */
@@ -42,7 +55,9 @@ public class TerminologyService {
             snomedService::getAllSnomedDiagnosticCode));
     sources.add(
         new TerminologySource(
-            SnomedCodeIdentifier.SNOMED_ENCOUNTER, snomed, snomedService::getAllSnomedEncounterCode));
+            SnomedCodeIdentifier.SNOMED_ENCOUNTER,
+            snomed,
+            snomedService::getAllSnomedEncounterCode));
     sources.add(
         new TerminologySource(
             SnomedCodeIdentifier.SNOMED_MEDICATION_ROUTE,
@@ -50,7 +65,9 @@ public class TerminologyService {
             snomedService::getAllSnomedMedicineRouteCode));
     sources.add(
         new TerminologySource(
-            SnomedCodeIdentifier.SNOMED_MEDICATIONS, snomed, snomedService::getAllSnomedMedicineCode));
+            SnomedCodeIdentifier.SNOMED_MEDICATIONS,
+            snomed,
+            snomedService::getAllSnomedMedicineCode));
     sources.add(
         new TerminologySource(
             SnomedCodeIdentifier.SNOMED_OBSERVATIONS,
@@ -62,6 +79,17 @@ public class TerminologyService {
     sources.add(
         new TerminologySource(
             SnomedCodeIdentifier.SNOMED_VACCINES, snomed, snomedService::getAllSnomedVaccineCode));
+    sources.add(
+        new TerminologySource(
+            SnomedCodeIdentifier.LOINC, BundleUrlIdentifier.LOINC_URL, loincCodeRepo::findAll));
+    sources.add(
+        new TerminologySource(
+            SnomedCodeIdentifier.ICD11, BundleUrlIdentifier.ICD11_URL, icd11CodeRepo::findAll));
+    sources.add(
+        new TerminologySource(
+            SnomedCodeIdentifier.NAMASTE,
+            BundleUrlIdentifier.NAMASTE_URL,
+            namasteCodeRepo::findAll));
     return sources;
   }
 
@@ -84,7 +112,9 @@ public class TerminologyService {
     List<TerminologyMatch> matches = new ArrayList<>();
 
     for (TerminologySource source : sources()) {
-      if (category != null && !category.isBlank() && !source.category().equalsIgnoreCase(category)) {
+      if (category != null
+          && !category.isBlank()
+          && !source.category().equalsIgnoreCase(category)) {
         continue;
       }
       for (Displayable displayable : source.supplier().get()) {
