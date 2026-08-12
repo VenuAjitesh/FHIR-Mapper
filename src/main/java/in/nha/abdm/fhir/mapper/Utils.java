@@ -77,7 +77,8 @@ public class Utils {
       UUID.fromString(id);
       return id.toLowerCase();
     } catch (IllegalArgumentException e) {
-      return UUID.randomUUID().toString();
+      return UUID.nameUUIDFromBytes(id.getBytes(java.nio.charset.StandardCharsets.UTF_8))
+          .toString();
     }
   }
 }

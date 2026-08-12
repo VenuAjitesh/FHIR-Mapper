@@ -1,0 +1,14 @@
+[
+  {
+    "code": "2339-0",
+    "display": "Glucose [Mass/volume] in Blood"
+  },
+  {
+    "code": "718-7",
+    "display": "Hemoglobin [Mass/volume] in Blood"
+  },
+  {
+    "code": "2951-2",
+    "display": "Sodium [Moles/volume] in Serum or Plasma"
+  }
+]

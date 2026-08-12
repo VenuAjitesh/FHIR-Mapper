@@ -1,6 +1,7 @@
 /* (C) 2026 */
 package in.nha.abdm.fhir.mapper.rest.dto.resources.invoice;
 
+import in.nha.abdm.fhir.mapper.rest.common.constants.InvoicePriceType;
 import in.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import in.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import in.nha.abdm.fhir.mapper.rest.requests.InvoiceBundleRequest;
@@ -44,26 +45,20 @@ public class MakeInvoicePriceComponent {
     Invoice.InvoiceLineItemPriceComponentComponent priceComponent =
         new Invoice.InvoiceLineItemPriceComponentComponent();
 
-    Invoice.InvoicePriceComponentType type = Invoice.InvoicePriceComponentType.INFORMATIONAL;
-    if (price.getPriceType() != null && !price.getPriceType().getValue().isBlank()) {
-      try {
-        type = Invoice.InvoicePriceComponentType.fromCode(price.getPriceType().getValue());
-      } catch (Exception e) {
-        throw ExceptionHandler.handle(e, log);
-      }
-    }
-    priceComponent.setType(type);
+    priceComponent.setType(resolveFhirPriceComponentType(price.getPriceType()));
 
     if (price.getPriceType() != null && !price.getPriceType().getValue().isBlank()) {
       String code = price.getPriceType().getCode();
+      String system = price.getPriceType().getSystem();
       if (StringUtils.isBlank(code) || code.equals("00")) {
-        code = type.toCode();
+        code = resolveFhirPriceComponentType(price.getPriceType()).toCode();
+        system = ResourceProfileIdentifier.PROFILE_PRICE_COMPONENT_TYPE;
       }
       CodeableConcept codeConcept =
           new CodeableConcept()
               .addCoding(
                   new Coding()
-                      .setSystem(ResourceProfileIdentifier.PROFILE_PRICE_COMPONENT_TYPE)
+                      .setSystem(system)
                       .setCode(code)
                       .setDisplay(price.getPriceType().getDisplay()))
               .setText(price.getPriceType().getValue());
@@ -76,5 +71,25 @@ public class MakeInvoicePriceComponent {
       priceComponent.setAmount(money);
     }
     return priceComponent;
+  }
+
+  /**
+   * FHIR's invoice-priceComponentType ValueSet only allows base | surcharge | deduction | discount
+   * | tax | informational. SGST/CGST are Indian tax sub-types, not FHIR codes, so they are mapped
+   * to "tax" here; the specific SGST/CGST code is preserved in priceComponent.code.
+   */
+  private Invoice.InvoicePriceComponentType resolveFhirPriceComponentType(
+      InvoicePriceType priceType) {
+    if (priceType == null || StringUtils.isBlank(priceType.getValue())) {
+      return Invoice.InvoicePriceComponentType.INFORMATIONAL;
+    }
+    if (priceType == InvoicePriceType.CGST || priceType == InvoicePriceType.SGST) {
+      return Invoice.InvoicePriceComponentType.TAX;
+    }
+    try {
+      return Invoice.InvoicePriceComponentType.fromCode(priceType.getValue());
+    } catch (Exception e) {
+      throw ExceptionHandler.handle(e, log);
+    }
   }
 }

@@ -260,7 +260,14 @@ public class InvoiceRequestConverter {
       Organization organization,
       Encounter encounter)
       throws ParseException {
+    if (item.getProductType() == null) {
+      return makeChargeItemResource.getChargeItems(item, null, patient, organization, encounter);
+    }
     if (item.getProductType().getValue().equalsIgnoreCase(BundleResourceIdentifier.DEVICE)) {
+      if (item.getDevice() == null) {
+        throw new IllegalArgumentException(
+            "device details are required when productType is 'device'");
+      }
       Device device = makeInvoiceDeviceResource.getDevice(item.getDevice());
       deviceList.add(device);
       return makeChargeItemResource.getChargeItems(
@@ -268,6 +275,10 @@ public class InvoiceRequestConverter {
     } else if (item.getProductType()
         .getValue()
         .equalsIgnoreCase(BundleResourceIdentifier.SUBSTANCE)) {
+      if (item.getSubstance() == null) {
+        throw new IllegalArgumentException(
+            "substance details are required when productType is 'substance'");
+      }
       Substance substance = makeInvoiceSubstanceResource.getSubstance(item.getSubstance());
       substanceList.add(substance);
       return makeChargeItemResource.getChargeItems(
@@ -275,6 +286,10 @@ public class InvoiceRequestConverter {
     } else if (item.getProductType()
         .getValue()
         .equalsIgnoreCase(BundleResourceIdentifier.MEDICATION)) {
+      if (item.getMedication() == null) {
+        throw new IllegalArgumentException(
+            "medication details are required when productType is 'medication'");
+      }
       Organization manufacturer = new Organization();
       if (Objects.nonNull(item.getMedication().getManufacturer())) {
         manufacturer =

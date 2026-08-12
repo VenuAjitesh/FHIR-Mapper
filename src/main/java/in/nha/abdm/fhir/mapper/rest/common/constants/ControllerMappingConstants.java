@@ -11,6 +11,18 @@ public class ControllerMappingConstants {
   public static final String DISCHARGE_SUMMARY_PATH = "/discharge-summary";
   public static final String WELLNESS_RECORD_PATH = "/wellness-record";
   public static final String INVOICE_PATH = "/invoice";
+  public static final String COVERAGE_ELIGIBILITY_REQUEST_PATH = "/coverage-eligibility-request";
+  public static final String COVERAGE_ELIGIBILITY_RESPONSE_PATH = "/coverage-eligibility-response";
+  public static final String CLAIM_PATH = "/claim";
+  public static final String CLAIM_RESPONSE_PATH = "/claim-response";
+  public static final String INSURANCE_PLAN_PATH = "/insurance-plan";
+  public static final String PAYMENT_NOTICE_PATH = "/payment-notice";
+  public static final String EXTRACT_PATH = "/extract";
+  public static final String HTML_PATH = "/html";
   public static final String VALIDATE_PATH = "/validate";
+  public static final String LINT_PATH = "/lint";
   public static final String SNOMED_BASE_PATH = "/v1/snomed";
+  public static final String TERMINOLOGY_BASE_PATH = "/v1/terminology";
+  public static final String TERMINOLOGY_SEARCH_PATH = "/search";
+  public static final String TERMINOLOGY_TRANSLATE_PATH = "/translate";
 }

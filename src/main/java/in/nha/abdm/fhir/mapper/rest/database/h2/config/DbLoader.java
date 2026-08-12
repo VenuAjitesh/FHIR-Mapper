@@ -96,17 +96,21 @@ public class DbLoader {
 
   private TypeReference<?> getTypeReference(String entityName) {
     Map<String, TypeReference<?>> typeMap =
-        Map.of(
-            "SnomedConditionProcedure", new TypeReference<List<SnomedConditionProcedure>>() {},
-            "SnomedDiagnostic", new TypeReference<List<SnomedDiagnostic>>() {},
-            "SnomedEncounter", new TypeReference<List<SnomedEncounter>>() {},
-            "SnomedMedicineRoute", new TypeReference<List<SnomedMedicineRoute>>() {},
-            "SnomedMedicine", new TypeReference<List<SnomedMedicine>>() {},
-            "SnomedObservation", new TypeReference<List<SnomedObservation>>() {},
-            "SnomedSpecimen", new TypeReference<List<SnomedSpecimen>>() {},
-            "SnomedVaccine", new TypeReference<List<SnomedVaccine>>() {},
-            "TypeChargeItem", new TypeReference<List<TypeChargeItem>>() {},
-            "TypeInvoice", new TypeReference<List<TypeChargeItem>>() {});
+        Map.ofEntries(
+            Map.entry(
+                "SnomedConditionProcedure", new TypeReference<List<SnomedConditionProcedure>>() {}),
+            Map.entry("SnomedDiagnostic", new TypeReference<List<SnomedDiagnostic>>() {}),
+            Map.entry("SnomedEncounter", new TypeReference<List<SnomedEncounter>>() {}),
+            Map.entry("SnomedMedicineRoute", new TypeReference<List<SnomedMedicineRoute>>() {}),
+            Map.entry("SnomedMedicine", new TypeReference<List<SnomedMedicine>>() {}),
+            Map.entry("SnomedObservation", new TypeReference<List<SnomedObservation>>() {}),
+            Map.entry("SnomedSpecimen", new TypeReference<List<SnomedSpecimen>>() {}),
+            Map.entry("SnomedVaccine", new TypeReference<List<SnomedVaccine>>() {}),
+            Map.entry("TypeChargeItem", new TypeReference<List<TypeChargeItem>>() {}),
+            Map.entry("TypeInvoice", new TypeReference<List<TypeInvoice>>() {}),
+            Map.entry("LoincCode", new TypeReference<List<LoincCode>>() {}),
+            Map.entry("Icd11Code", new TypeReference<List<Icd11Code>>() {}),
+            Map.entry("NamasteCode", new TypeReference<List<NamasteCode>>() {}));
     TypeReference<?> typeRef = typeMap.get(entityName);
     if (typeRef == null) {
       throw new IllegalArgumentException("Unknown entity name: " + entityName);

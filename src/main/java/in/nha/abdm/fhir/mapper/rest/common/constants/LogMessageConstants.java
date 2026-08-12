@@ -21,6 +21,13 @@ public class LogMessageConstants {
   public static final String NPM_LOAD_SUCCESS =
       "Successfully loaded FHIR NPM package from classpath: /package.tgz";
   public static final String NPM_LOAD_FAILED = "Failed to load FHIR NPM package from classpath: {}";
+  public static final String IG_VERSION_MATCHED = "Bundled NRCES IG version confirmed: {}";
+  public static final String IG_VERSION_DRIFT =
+      "Bundled NRCES IG package.tgz is version {} but the mapper declares support for {} —"
+          + " review builders/extractors for breaking changes before updating"
+          + " IgVersionConstants.EXPECTED_NRCES_IG_VERSION";
+  public static final String IG_VERSION_CHECK_FAILED =
+      "Could not determine bundled NRCES IG version: {}";
   public static final String VALIDATION_FAILED_CONTINUING =
       "FHIR validation failed but continuing: {} errors, {} warnings";
   public static final String DATETIME_NULL_OR_EMPTY = "DateTime string is null or empty";

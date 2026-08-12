@@ -5,10 +5,13 @@ import in.nha.abdm.fhir.mapper.rest.common.constants.ConfigurationConstants;
 import in.nha.abdm.fhir.mapper.rest.common.constants.ControllerMappingConstants;
 import in.nha.abdm.fhir.mapper.rest.common.constants.LogMessageConstants;
 import in.nha.abdm.fhir.mapper.rest.common.constants.SwaggerConstants;
+import in.nha.abdm.fhir.mapper.rest.common.helpers.ExtractedBundleResponse;
 import in.nha.abdm.fhir.mapper.rest.converter.*;
 import in.nha.abdm.fhir.mapper.rest.dto.validation.ValidationResult;
 import in.nha.abdm.fhir.mapper.rest.exceptions.FhirValidationException;
 import in.nha.abdm.fhir.mapper.rest.requests.*;
+import in.nha.abdm.fhir.mapper.rest.services.BundleExtractionService;
+import in.nha.abdm.fhir.mapper.rest.services.BundleHtmlRenderService;
 import in.nha.abdm.fhir.mapper.rest.services.FhirValidationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -23,6 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.Bundle;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +48,15 @@ public class BundleController {
   private final DischargeSummaryConverter dischargeSummaryConverter;
   private final WellnessRecordConverter wellnessRecordConverter;
   private final InvoiceRequestConverter invoiceRequestConverter;
+  private final CoverageEligibilityRequestConverter coverageEligibilityRequestConverter;
+  private final CoverageEligibilityResponseConverter coverageEligibilityResponseConverter;
+  private final ClaimConverter claimConverter;
+  private final ClaimResponseConverter claimResponseConverter;
+  private final InsurancePlanConverter insurancePlanConverter;
+  private final PaymentNoticeConverter paymentNoticeConverter;
   private final FhirValidationService fhirValidationService;
+  private final BundleExtractionService bundleExtractionService;
+  private final BundleHtmlRenderService bundleHtmlRenderService;
 
   @Value(ConfigurationConstants.FHIR_VALIDATION_FAIL_ON_ERROR)
   private boolean failOnValidationError;
@@ -60,7 +73,15 @@ public class BundleController {
       DischargeSummaryConverter dischargeSummaryConverter,
       WellnessRecordConverter wellnessRecordConverter,
       InvoiceRequestConverter invoiceRequestConverter,
-      FhirValidationService fhirValidationService) {
+      CoverageEligibilityRequestConverter coverageEligibilityRequestConverter,
+      CoverageEligibilityResponseConverter coverageEligibilityResponseConverter,
+      ClaimConverter claimConverter,
+      ClaimResponseConverter claimResponseConverter,
+      InsurancePlanConverter insurancePlanConverter,
+      PaymentNoticeConverter paymentNoticeConverter,
+      FhirValidationService fhirValidationService,
+      BundleExtractionService bundleExtractionService,
+      BundleHtmlRenderService bundleHtmlRenderService) {
     this.immunizationConverter = immunizationConverter;
     this.prescriptionConverter = prescriptionConverter;
     this.healthDocumentConverter = healthDocumentConverter;
@@ -69,7 +90,15 @@ public class BundleController {
     this.dischargeSummaryConverter = dischargeSummaryConverter;
     this.wellnessRecordConverter = wellnessRecordConverter;
     this.invoiceRequestConverter = invoiceRequestConverter;
+    this.coverageEligibilityRequestConverter = coverageEligibilityRequestConverter;
+    this.coverageEligibilityResponseConverter = coverageEligibilityResponseConverter;
+    this.claimConverter = claimConverter;
+    this.claimResponseConverter = claimResponseConverter;
+    this.insurancePlanConverter = insurancePlanConverter;
+    this.paymentNoticeConverter = paymentNoticeConverter;
     this.fhirValidationService = fhirValidationService;
+    this.bundleExtractionService = bundleExtractionService;
+    this.bundleHtmlRenderService = bundleHtmlRenderService;
   }
 
   /**
@@ -331,6 +360,226 @@ public class BundleController {
     return validateAndReturnBundle(bundle);
   }
 
+  /**
+   * @param request NHCX coverage eligibility request details (patient, insurer, coverage/policy)
+   * @return FHIR CoverageEligibilityRequest collection bundle if no error found
+   */
+  @PostMapping(path = ControllerMappingConstants.COVERAGE_ELIGIBILITY_REQUEST_PATH)
+  @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = "Create NHCX CoverageEligibilityRequest bundle",
+      description =
+          "Builds an NHCX CoverageEligibilityRequest (collection) bundle for cashless"
+              + " eligibility checks against an insurer.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_201,
+            description = SwaggerConstants.BUNDLE_SUCCESS_DESCRIPTION,
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = Bundle.class))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
+  public Bundle createCoverageEligibilityRequestBundle(
+      @Valid @RequestBody CoverageEligibilityRequestBundleRequest request) {
+    Bundle bundle =
+        coverageEligibilityRequestConverter.makeCoverageEligibilityRequestBundle(request);
+    return validateAndReturnBundle(bundle);
+  }
+
+  /**
+   * @param request NHCX coverage eligibility response details (outcome, in-force, coverage)
+   * @return FHIR CoverageEligibilityResponse collection bundle if no error found
+   */
+  @PostMapping(path = ControllerMappingConstants.COVERAGE_ELIGIBILITY_RESPONSE_PATH)
+  @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = "Create NHCX CoverageEligibilityResponse bundle",
+      description =
+          "Builds an NHCX CoverageEligibilityResponse (collection) bundle conveying the insurer's"
+              + " eligibility decision.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_201,
+            description = SwaggerConstants.BUNDLE_SUCCESS_DESCRIPTION,
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = Bundle.class))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
+  public Bundle createCoverageEligibilityResponseBundle(
+      @Valid @RequestBody CoverageEligibilityResponseBundleRequest request) {
+    Bundle bundle =
+        coverageEligibilityResponseConverter.makeCoverageEligibilityResponseBundle(request);
+    return validateAndReturnBundle(bundle);
+  }
+
+  /**
+   * @param request NHCX claim/pre-authorization details (items, coverage, insurer)
+   * @return FHIR Claim collection bundle if no error found
+   */
+  @PostMapping(path = ControllerMappingConstants.CLAIM_PATH)
+  @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = "Create NHCX Claim bundle",
+      description =
+          "Builds an NHCX Claim (collection) bundle for claim submission or pre-authorization"
+              + " (use=preauthorization) against an insurer.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_201,
+            description = SwaggerConstants.BUNDLE_SUCCESS_DESCRIPTION,
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = Bundle.class))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
+  public Bundle createClaimBundle(@Valid @RequestBody ClaimBundleRequest request) {
+    Bundle bundle = claimConverter.makeClaimBundle(request);
+    return validateAndReturnBundle(bundle);
+  }
+
+  /**
+   * @param request NHCX claim adjudication details (outcome, approved amount, payment)
+   * @return FHIR ClaimResponse collection bundle if no error found
+   */
+  @PostMapping(path = ControllerMappingConstants.CLAIM_RESPONSE_PATH)
+  @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = "Create NHCX ClaimResponse bundle",
+      description =
+          "Builds an NHCX ClaimResponse (collection) bundle conveying the insurer's adjudication"
+              + " outcome and payment details.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_201,
+            description = SwaggerConstants.BUNDLE_SUCCESS_DESCRIPTION,
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = Bundle.class))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
+  public Bundle createClaimResponseBundle(@Valid @RequestBody ClaimResponseBundleRequest request) {
+    Bundle bundle = claimResponseConverter.makeClaimResponseBundle(request);
+    return validateAndReturnBundle(bundle);
+  }
+
+  /**
+   * @param request NHCX insurance plan details (plan name, benefits, insurer)
+   * @return FHIR InsurancePlan collection bundle if no error found
+   */
+  @PostMapping(path = ControllerMappingConstants.INSURANCE_PLAN_PATH)
+  @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = "Create NHCX InsurancePlan bundle",
+      description =
+          "Builds an NHCX InsurancePlan (collection) bundle describing a health insurance package"
+              + " and its covered benefits.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_201,
+            description = SwaggerConstants.BUNDLE_SUCCESS_DESCRIPTION,
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = Bundle.class))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
+  public Bundle createInsurancePlanBundle(@Valid @RequestBody InsurancePlanBundleRequest request) {
+    Bundle bundle = insurancePlanConverter.makeInsurancePlanBundle(request);
+    return validateAndReturnBundle(bundle);
+  }
+
+  /**
+   * @param request NHCX payment notice details (amount, payment status, payee)
+   * @return FHIR PaymentNotice collection bundle if no error found
+   */
+  @PostMapping(path = ControllerMappingConstants.PAYMENT_NOTICE_PATH)
+  @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = "Create NHCX PaymentNotice bundle",
+      description =
+          "Builds an NHCX PaymentNotice (collection) bundle conveying the status of a payment for"
+              + " an adjudicated claim.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_201,
+            description = SwaggerConstants.BUNDLE_SUCCESS_DESCRIPTION,
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = Bundle.class))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
+  public Bundle createPaymentNoticeBundle(@Valid @RequestBody PaymentNoticeBundleRequest request) {
+    Bundle bundle = paymentNoticeConverter.makePaymentNoticeBundle(request);
+    return validateAndReturnBundle(bundle);
+  }
+
+  @PostMapping(path = ControllerMappingConstants.EXTRACT_PATH)
+  @Operation(summary = "Extract DTO from FHIR Bundle", description = "Reverse maps a FHIR Bundle")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_200,
+            description = "DTO extracted successfully",
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = ExtractedBundleResponse.class))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
+  public ExtractedBundleResponse extractBundle(@RequestBody Bundle bundle) {
+    validateIncomingBundle(bundle);
+    return bundleExtractionService.extract(bundle);
+  }
+
+  @PostMapping(path = ControllerMappingConstants.HTML_PATH, produces = MediaType.TEXT_HTML_VALUE)
+  @Operation(
+      summary = "Render FHIR Bundle as human-readable HTML",
+      description =
+          "Reverse maps a FHIR Bundle (NHCX or clinical-record) and renders it as an HTML page")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_200,
+            description = "HTML rendered successfully",
+            content = @Content(mediaType = MediaType.TEXT_HTML_VALUE)),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
+  public ResponseEntity<String> renderBundleHtml(@RequestBody Bundle bundle) {
+    validateIncomingBundle(bundle);
+    return ResponseEntity.ok()
+        .contentType(MediaType.TEXT_HTML)
+        .body(bundleHtmlRenderService.render(bundle));
+  }
+
   private Bundle validateAndReturnBundle(Bundle bundle) {
     if (validationEnabled) {
       ValidationResult validationResult = fhirValidationService.validateBundle(bundle);
@@ -347,5 +596,13 @@ public class BundleController {
       }
     }
     return bundle;
+  }
+
+  private void validateIncomingBundle(Bundle bundle) {
+    ValidationResult validationResult = fhirValidationService.validateBundle(bundle);
+
+    if (!validationResult.isValid()) {
+      throw new FhirValidationException(validationResult);
+    }
   }
 }

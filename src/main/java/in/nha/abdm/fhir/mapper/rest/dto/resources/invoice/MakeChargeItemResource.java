@@ -51,16 +51,16 @@ public class MakeChargeItemResource {
 
     Utils.setNarrative(chargeItem, "Charge Item for " + resource.getChargeType());
 
-    if (StringUtils.isNotBlank(resource.getStatus().getValue())) {
+    if (resource.getStatus() != null && StringUtils.isNotBlank(resource.getStatus().getValue())) {
       try {
-        chargeItem.setStatus(
-            ChargeItem.ChargeItemStatus.valueOf(resource.getStatus().getValue().toUpperCase()));
-      } catch (IllegalArgumentException e) {
+        chargeItem.setStatus(ChargeItem.ChargeItemStatus.fromCode(resource.getStatus().getValue()));
+      } catch (Exception e) {
         throw ExceptionHandler.handle(e, log);
       }
     }
 
-    if (StringUtils.isNotBlank(resource.getProductType().getValue())) {
+    if (resource.getProductType() != null
+        && StringUtils.isNotBlank(resource.getProductType().getValue())) {
       chargeItem.addIdentifier(new Identifier().setValue(resource.getProductType().getValue()));
     }
 

@@ -45,4 +45,12 @@ public class PatientResource {
       regexp = ValidationConstants.DATE_PATTERN,
       message = ValidationConstants.DATE_FORMAT_MESSAGE)
   private String birthDate;
+
+  @Schema(
+      description = "ABHA Number: 14-digit Health ID issued by NDHM",
+      example = "22-7225-4829-5255")
+  private String abhaNumber;
+
+  @Schema(description = "ABHA Address: self-declared ABHA username", example = "ajitesh6x@abdm")
+  private String abhaAddress;
 }

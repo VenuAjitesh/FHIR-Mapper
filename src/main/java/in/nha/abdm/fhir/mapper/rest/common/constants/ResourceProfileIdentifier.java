@@ -57,4 +57,45 @@ public class ResourceProfileIdentifier {
       "http://hl7.org/fhir/invoice-priceComponentType";
   public static final String PROFILE_INVOICE_PAYMENT_TYPE =
       "http://terminology.hl7.org/CodeSystem/payment-type";
+  public static final String PROFILE_COVERAGE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Coverage";
+  public static final String PROFILE_COVERAGE_ELIGIBILITY_REQUEST =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/CoverageEligibilityRequest";
+  public static final String PROFILE_COVERAGE_ELIGIBILITY_REQUEST_BUNDLE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/CoverageEligibilityRequestBundle";
+  public static final String PROCESS_PRIORITY_SYSTEM =
+      "http://terminology.hl7.org/CodeSystem/processpriority";
+  public static final String COVERAGE_POLICY_SYSTEM = "https://irdai.gov.in/policy";
+  public static final String PROFILE_COVERAGE_ELIGIBILITY_RESPONSE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/CoverageEligibilityResponse";
+  public static final String PROFILE_COVERAGE_ELIGIBILITY_RESPONSE_BUNDLE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/CoverageEligibilityResponseBundle";
+  public static final String PROFILE_CLAIM =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Claim";
+  public static final String PROFILE_CLAIM_BUNDLE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ClaimBundle";
+  public static final String CLAIM_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/claim-type";
+  public static final String CURRENCY_INR = "INR";
+  public static final String PROFILE_CLAIM_RESPONSE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ClaimResponse";
+  public static final String PROFILE_CLAIM_RESPONSE_BUNDLE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ClaimResponseBundle";
+  public static final String ADJUDICATION_SYSTEM =
+      "http://terminology.hl7.org/CodeSystem/adjudication";
+  public static final String EX_PAYMENT_TYPE_SYSTEM =
+      "http://terminology.hl7.org/CodeSystem/ex-paymenttype";
+  public static final String PROFILE_INSURANCE_PLAN =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/InsurancePlan";
+  public static final String PROFILE_INSURANCE_PLAN_BUNDLE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/InsurancePlanBundle";
+  public static final String PROFILE_PAYMENT_NOTICE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PaymentNotice";
+  public static final String PROFILE_PAYMENT_NOTICE_BUNDLE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PaymentNoticeBundle";
+  public static final String PAYMENT_STATUS_SYSTEM =
+      "http://terminology.hl7.org/CodeSystem/paymentstatus";
+  public static final String DIAGNOSIS_TYPE_SYSTEM =
+      "http://terminology.hl7.org/CodeSystem/ex-diagnosistype";
+  public static final String PROFILE_PAYMENT_RECONCILIATION =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PaymentReconciliation";
 }

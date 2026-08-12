@@ -3,7 +3,9 @@ package in.nha.abdm.fhir.mapper.rest.controller;
 
 import in.nha.abdm.fhir.mapper.rest.common.constants.ControllerMappingConstants;
 import in.nha.abdm.fhir.mapper.rest.common.constants.SwaggerConstants;
+import in.nha.abdm.fhir.mapper.rest.dto.validation.BundleDoctorReport;
 import in.nha.abdm.fhir.mapper.rest.dto.validation.ValidationResult;
+import in.nha.abdm.fhir.mapper.rest.services.BundleDoctorService;
 import in.nha.abdm.fhir.mapper.rest.services.FhirValidationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 public class ValidationController {
 
   private final FhirValidationService fhirValidationService;
+  private final BundleDoctorService bundleDoctorService;
 
   @PostMapping(ControllerMappingConstants.VALIDATE_PATH)
   @Operation(
@@ -58,5 +61,36 @@ public class ValidationController {
 
     ValidationResult result = fhirValidationService.validateBundle(bundle);
     return ResponseEntity.ok(result);
+  }
+
+  @PostMapping(ControllerMappingConstants.LINT_PATH)
+  @Operation(
+      summary = "Diagnose and auto-fix an ABDM/NHCX FHIR bundle",
+      description =
+          "Runs the Bundle Doctor over a FHIR bundle: enforces Composition as entry[0], injects"
+              + " missing meta.profile, normalizes references to urn:uuid with display, generates"
+              + " missing narrative, and fills bundle-level metadata. Returns the applied fixes,"
+              + " the validation outcome before and after, and the repaired bundle.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_200,
+            description = "Bundle diagnosed and repaired",
+            content =
+                @Content(
+                    mediaType = SwaggerConstants.APPLICATION_JSON,
+                    schema = @Schema(implementation = BundleDoctorReport.class))),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_500,
+            description = SwaggerConstants.INTERNAL_SERVER_ERROR_DESCRIPTION)
+      })
+  public ResponseEntity<BundleDoctorReport> lintBundle(
+      @Parameter(description = SwaggerConstants.BUNDLE_PARAMETER_DESCRIPTION) @RequestBody
+          Bundle bundle) {
+
+    return ResponseEntity.ok(bundleDoctorService.diagnoseAndFix(bundle));
   }
 }

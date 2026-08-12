@@ -2,7 +2,9 @@
 package in.nha.abdm.fhir.mapper.rest.dto.resources.invoice;
 
 import in.nha.abdm.fhir.mapper.Utils;
+import in.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
 import in.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
+import in.nha.abdm.fhir.mapper.rest.common.constants.TypeIdentifiers;
 import in.nha.abdm.fhir.mapper.rest.database.h2.repositories.TypeInvoiceRepo;
 import in.nha.abdm.fhir.mapper.rest.database.h2.tables.TypeInvoice;
 import in.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
@@ -40,12 +42,24 @@ public class MakeInvoiceResource {
 
     Invoice invoice = new Invoice();
 
-    if (invoiceBundleRequest.getInvoice() != null
-        && StringUtils.isNotBlank(invoiceBundleRequest.getInvoice().getId())) {
-      invoice.setId(Utils.ensureUuid(invoiceBundleRequest.getInvoice().getId()));
+    String invoiceNumber =
+        invoiceBundleRequest.getInvoice() != null
+            ? invoiceBundleRequest.getInvoice().getId()
+            : null;
+
+    if (StringUtils.isNotBlank(invoiceNumber)) {
+      invoice.setId(Utils.ensureUuid(invoiceNumber));
     } else {
       invoice.setId(UUID.randomUUID().toString());
     }
+
+    invoice.addIdentifier(
+        new Identifier()
+            .setSystem(BundleUrlIdentifier.WRAPPER_URL)
+            .setValue(
+                StringUtils.isNotBlank(invoiceNumber)
+                    ? invoiceNumber
+                    : invoiceBundleRequest.getCareContextReference()));
 
     if (StringUtils.isNotBlank(invoiceBundleRequest.getStatus().getValue())) {
       try {
@@ -80,7 +94,7 @@ public class MakeInvoiceResource {
               .findTop20ByDisplayContainingIgnoreCase(invoiceBundleRequest.getInvoice().getType())
               .stream()
               .findFirst()
-              .orElse(null);
+              .orElseGet(() -> typeInvoiceRepo.findById(TypeIdentifiers.OTHERS_CODE).orElse(null));
 
       if (typeInvoice != null && StringUtils.isNotBlank(typeInvoice.getCode())) {
         codeConcept.addCoding(
@@ -113,20 +127,22 @@ public class MakeInvoiceResource {
             ? List.of()
             : invoiceBundleRequest.getChargeItems().stream()
                 .filter(Objects::nonNull)
-                .filter(
-                    item ->
-                        StringUtils.isNotBlank(item.getId())
-                            && chargeItemMap.containsKey(item.getId()))
+                .filter(item -> StringUtils.isNotBlank(item.getId()))
                 .map(
                     item -> {
+                      String chargeItemId = Utils.ensureUuid(item.getId());
+                      if (!chargeItemMap.containsKey(chargeItemId)) {
+                        return null;
+                      }
                       Invoice.InvoiceLineItemComponent lineItem =
                           new Invoice.InvoiceLineItemComponent();
-                      lineItem.setChargeItem(Utils.buildReference(item.getId()));
+                      lineItem.setChargeItem(Utils.buildReference(chargeItemId));
                       makeInvoicePriceComponent
                           .makeInvoicePriceComponents(item, invoiceBundleRequest)
                           .forEach(lineItem::addPriceComponent);
                       return lineItem;
                     })
+                .filter(Objects::nonNull)
                 .toList();
 
     if (!lineItems.isEmpty()) {

@@ -68,7 +68,8 @@ public class MakeInvoiceDeviceResource {
     device.setManufactureDate(Utils.getFormattedDate(deviceResource.getManufactureDate()));
     device.setExpirationDate(Utils.getFormattedDate(deviceResource.getExpirationDate()));
 
-    if (StringUtils.isNotBlank(deviceResource.getStatus().getValue())) {
+    if (deviceResource.getStatus() != null
+        && StringUtils.isNotBlank(deviceResource.getStatus().getValue())) {
       try {
         device.setStatus(Device.FHIRDeviceStatus.fromCode(deviceResource.getStatus().getValue()));
       } catch (Exception e) {

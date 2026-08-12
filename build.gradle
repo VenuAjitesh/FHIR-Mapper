@@ -75,6 +75,10 @@ spotless {
     }
 }
 
+test {
+    useJUnitPlatform()
+}
+
 // Configuration for Library and Executable JARs
 jar {
     enabled = true

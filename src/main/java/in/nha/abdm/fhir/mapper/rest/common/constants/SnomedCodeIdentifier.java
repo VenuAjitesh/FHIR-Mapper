@@ -30,6 +30,10 @@ public class SnomedCodeIdentifier {
           SNOMED_SPECIMEN,
           SNOMED_VACCINES);
 
+  public static final String LOINC = "LOINC";
+  public static final String ICD11 = "ICD-11";
+  public static final String NAMASTE = "NAMASTE";
+
   public static final String RETRIEVED = "Retrieved";
   public static final String EMPTY_CODES = "Empty Codes";
   public static final String INVALID_RESOURCE = "Invalid Resource";
