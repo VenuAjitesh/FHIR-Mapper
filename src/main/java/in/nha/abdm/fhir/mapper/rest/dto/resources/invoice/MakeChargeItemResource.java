@@ -53,9 +53,8 @@ public class MakeChargeItemResource {
 
     if (StringUtils.isNotBlank(resource.getStatus().getValue())) {
       try {
-        chargeItem.setStatus(
-            ChargeItem.ChargeItemStatus.valueOf(resource.getStatus().getValue().toUpperCase()));
-      } catch (IllegalArgumentException e) {
+        chargeItem.setStatus(ChargeItem.ChargeItemStatus.fromCode(resource.getStatus().getValue()));
+      } catch (Exception e) {
         throw ExceptionHandler.handle(e, log);
       }
     }

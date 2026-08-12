@@ -209,7 +209,7 @@ public class InvoiceBundleExtractor extends FhirExtractionSupport {
           lineItem.getPriceComponent()) {
         prices.add(
             InvoicePrice.builder()
-                .priceType(safePriceType(priceComponent.getType().toCode()))
+                .priceType(extractPriceType(priceComponent))
                 .amount(
                     priceComponent.hasAmount() && priceComponent.getAmount().hasValue()
                         ? priceComponent.getAmount().getValue().doubleValue()
@@ -218,6 +218,17 @@ public class InvoiceBundleExtractor extends FhirExtractionSupport {
       }
     }
     return prices;
+  }
+
+  private InvoicePriceType extractPriceType(
+      Invoice.InvoiceLineItemPriceComponentComponent priceComponent) {
+    if (priceComponent.hasCode() && priceComponent.getCode().hasText()) {
+      InvoicePriceType fromText = safePriceType(priceComponent.getCode().getText());
+      if (fromText != null) {
+        return fromText;
+      }
+    }
+    return priceComponent.hasType() ? safePriceType(priceComponent.getType().toCode()) : null;
   }
 
   private boolean referenceMatches(Reference reference, String id) {

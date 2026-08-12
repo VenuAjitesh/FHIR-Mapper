@@ -107,7 +107,7 @@ public class DbLoader {
             Map.entry("SnomedSpecimen", new TypeReference<List<SnomedSpecimen>>() {}),
             Map.entry("SnomedVaccine", new TypeReference<List<SnomedVaccine>>() {}),
             Map.entry("TypeChargeItem", new TypeReference<List<TypeChargeItem>>() {}),
-            Map.entry("TypeInvoice", new TypeReference<List<TypeChargeItem>>() {}),
+            Map.entry("TypeInvoice", new TypeReference<List<TypeInvoice>>() {}),
             Map.entry("LoincCode", new TypeReference<List<LoincCode>>() {}),
             Map.entry("Icd11Code", new TypeReference<List<Icd11Code>>() {}),
             Map.entry("NamasteCode", new TypeReference<List<NamasteCode>>() {}));
