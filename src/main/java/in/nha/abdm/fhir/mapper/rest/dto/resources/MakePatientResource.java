@@ -8,6 +8,7 @@ import in.nha.abdm.fhir.mapper.rest.common.helpers.PatientResource;
 import java.text.ParseException;
 import java.util.Locale;
 import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
 import org.springframework.stereotype.Component;
 
@@ -19,11 +20,39 @@ public class MakePatientResource {
     patient.setId(UUID.randomUUID().toString());
     patient.setMeta(buildMeta());
     patient.addIdentifier(buildIdentifier(patientResource));
+    addAbhaIdentifiers(patient, patientResource);
     patient.addName(new HumanName().setText(patientResource.getName()));
     buildGender(patient, patientResource);
     buildBirthDate(patient, patientResource);
     Utils.setNarrative(patient, "Patient: " + patientResource.getName());
     return patient;
+  }
+
+  private void addAbhaIdentifiers(Patient patient, PatientResource patientResource) {
+    if (StringUtils.isNotBlank(patientResource.getAbhaNumber())) {
+      patient.addIdentifier(
+          buildNdhmIdentifier(patientResource.getAbhaNumber(), "HIN", "Health ID issued by NDHM"));
+    }
+    if (StringUtils.isNotBlank(patientResource.getAbhaAddress())) {
+      patient.addIdentifier(
+          buildNdhmIdentifier(
+              patientResource.getAbhaAddress(),
+              "ABHA",
+              "Ayushman Bharat Health Account (ABHA) ID"));
+    }
+  }
+
+  private Identifier buildNdhmIdentifier(String value, String typeCode, String typeDisplay) {
+    Coding coding =
+        new Coding()
+            .setCode(typeCode)
+            .setSystem(BundleUrlIdentifier.NDHM_IDENTIFIER_TYPE_CODE_SYSTEM)
+            .setDisplay(typeDisplay);
+
+    return new Identifier()
+        .setType(new CodeableConcept().addCoding(coding))
+        .setSystem(BundleUrlIdentifier.ABHA_HEALTH_ID_URL)
+        .setValue(value);
   }
 
   private Meta buildMeta() throws ParseException {

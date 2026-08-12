@@ -14,6 +14,9 @@ public class BundleUrlIdentifier {
   public static final String FACILITY_URL = "https://facility.abdm.gov.in";
   public static final String HEALTH_ID_URL = "https://healthid.abdm.gov.in";
   public static final String DOCTOR_ID_URL = "https://doctor.abdm.gov.in";
+  public static final String ABHA_HEALTH_ID_URL = "https://healthid.ndhm.gov.in";
+  public static final String NDHM_IDENTIFIER_TYPE_CODE_SYSTEM =
+      "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-identifier-type-code";
 
   @Value("${abdm.wrapper.url:https://ABDM_WRAPPER/bundle}")
   public void setWrapperUrl(String wrapperUrl) {

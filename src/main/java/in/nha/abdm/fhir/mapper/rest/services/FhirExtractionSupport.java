@@ -14,6 +14,7 @@ import org.hl7.fhir.r4.model.Attachment;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.DocumentReference;
 import org.hl7.fhir.r4.model.Encounter;
+import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
@@ -35,7 +36,20 @@ class FhirExtractionSupport {
         .gender(patient.hasGender() ? patient.getGender().toCode() : null)
         .birthDate(
             patient.hasBirthDateElement() ? patient.getBirthDateElement().getValueAsString() : null)
+        .abhaNumber(identifierByTypeCode(patient, "HIN"))
+        .abhaAddress(identifierByTypeCode(patient, "ABHA"))
         .build();
+  }
+
+  private String identifierByTypeCode(Patient patient, String typeCode) {
+    for (Identifier identifier : patient.getIdentifier()) {
+      if (identifier.hasType()
+          && identifier.getType().getCoding().stream()
+              .anyMatch(coding -> typeCode.equals(coding.getCode()))) {
+        return identifier.getValue();
+      }
+    }
+    return null;
   }
 
   List<PractitionerResource> practitioners(BundleResourceIndex index, List<Reference> references) {
