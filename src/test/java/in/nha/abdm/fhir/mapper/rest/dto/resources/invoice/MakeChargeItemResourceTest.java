@@ -1,7 +1,9 @@
 /* (C) 2026 */
 package in.nha.abdm.fhir.mapper.rest.dto.resources.invoice;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import in.nha.abdm.fhir.mapper.rest.common.constants.ChargeItemStatus;
 import in.nha.abdm.fhir.mapper.rest.common.constants.InvoiceProductType;
@@ -33,5 +35,17 @@ class MakeChargeItemResourceTest {
     ChargeItem chargeItem = makeChargeItemResource.getChargeItems(resource, null, null, null, null);
 
     assertEquals("not-billable", chargeItem.getStatus().toCode());
+  }
+
+  @Test
+  void doesNotThrowWhenStatusAndProductTypeAreAbsent() {
+    ChargeItemResource resource = ChargeItemResource.builder().id("CHG-2").build();
+
+    ChargeItem chargeItem =
+        assertDoesNotThrow(
+            () -> makeChargeItemResource.getChargeItems(resource, null, null, null, null));
+
+    assertFalse(chargeItem.hasStatus());
+    assertFalse(chargeItem.hasIdentifier());
   }
 }
