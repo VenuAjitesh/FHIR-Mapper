@@ -35,6 +35,9 @@ class MakeInvoicePriceComponentTest {
     Invoice.InvoiceLineItemPriceComponentComponent component = components.get(0);
     assertEquals(Invoice.InvoicePriceComponentType.TAX, component.getType());
     assertEquals("04", component.getCode().getCodingFirstRep().getCode());
+    assertEquals(
+        "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-price-components",
+        component.getCode().getCodingFirstRep().getSystem());
   }
 
   @Test
@@ -54,5 +57,8 @@ class MakeInvoicePriceComponentTest {
         target.makeInvoicePriceComponents(chargeItem, bundleRequest);
 
     assertEquals("base", components.get(0).getCode().getCodingFirstRep().getCode());
+    assertEquals(
+        "http://hl7.org/fhir/invoice-priceComponentType",
+        components.get(0).getCode().getCodingFirstRep().getSystem());
   }
 }

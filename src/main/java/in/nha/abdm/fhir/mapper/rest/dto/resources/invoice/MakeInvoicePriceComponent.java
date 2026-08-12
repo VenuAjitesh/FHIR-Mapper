@@ -49,14 +49,16 @@ public class MakeInvoicePriceComponent {
 
     if (price.getPriceType() != null && !price.getPriceType().getValue().isBlank()) {
       String code = price.getPriceType().getCode();
+      String system = price.getPriceType().getSystem();
       if (StringUtils.isBlank(code) || code.equals("00")) {
         code = resolveFhirPriceComponentType(price.getPriceType()).toCode();
+        system = ResourceProfileIdentifier.PROFILE_PRICE_COMPONENT_TYPE;
       }
       CodeableConcept codeConcept =
           new CodeableConcept()
               .addCoding(
                   new Coding()
-                      .setSystem(ResourceProfileIdentifier.PROFILE_PRICE_COMPONENT_TYPE)
+                      .setSystem(system)
                       .setCode(code)
                       .setDisplay(price.getPriceType().getDisplay()))
               .setText(price.getPriceType().getValue());
