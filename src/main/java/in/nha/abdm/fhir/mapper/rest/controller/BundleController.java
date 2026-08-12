@@ -11,6 +11,7 @@ import in.nha.abdm.fhir.mapper.rest.dto.validation.ValidationResult;
 import in.nha.abdm.fhir.mapper.rest.exceptions.FhirValidationException;
 import in.nha.abdm.fhir.mapper.rest.requests.*;
 import in.nha.abdm.fhir.mapper.rest.services.BundleExtractionService;
+import in.nha.abdm.fhir.mapper.rest.services.BundleHtmlRenderService;
 import in.nha.abdm.fhir.mapper.rest.services.FhirValidationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,6 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.Bundle;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,6 +56,7 @@ public class BundleController {
   private final PaymentNoticeConverter paymentNoticeConverter;
   private final FhirValidationService fhirValidationService;
   private final BundleExtractionService bundleExtractionService;
+  private final BundleHtmlRenderService bundleHtmlRenderService;
 
   @Value(ConfigurationConstants.FHIR_VALIDATION_FAIL_ON_ERROR)
   private boolean failOnValidationError;
@@ -76,7 +80,8 @@ public class BundleController {
       InsurancePlanConverter insurancePlanConverter,
       PaymentNoticeConverter paymentNoticeConverter,
       FhirValidationService fhirValidationService,
-      BundleExtractionService bundleExtractionService) {
+      BundleExtractionService bundleExtractionService,
+      BundleHtmlRenderService bundleHtmlRenderService) {
     this.immunizationConverter = immunizationConverter;
     this.prescriptionConverter = prescriptionConverter;
     this.healthDocumentConverter = healthDocumentConverter;
@@ -93,6 +98,7 @@ public class BundleController {
     this.paymentNoticeConverter = paymentNoticeConverter;
     this.fhirValidationService = fhirValidationService;
     this.bundleExtractionService = bundleExtractionService;
+    this.bundleHtmlRenderService = bundleHtmlRenderService;
   }
 
   /**
@@ -550,6 +556,28 @@ public class BundleController {
   public ExtractedBundleResponse extractBundle(@RequestBody Bundle bundle) {
     validateIncomingBundle(bundle);
     return bundleExtractionService.extract(bundle);
+  }
+
+  @PostMapping(path = ControllerMappingConstants.HTML_PATH, produces = MediaType.TEXT_HTML_VALUE)
+  @Operation(
+      summary = "Render FHIR Bundle as human-readable HTML",
+      description =
+          "Reverse maps a FHIR Bundle (NHCX or clinical-record) and renders it as an HTML page")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_200,
+            description = "HTML rendered successfully",
+            content = @Content(mediaType = MediaType.TEXT_HTML_VALUE)),
+        @ApiResponse(
+            responseCode = SwaggerConstants.HTTP_400,
+            description = SwaggerConstants.INVALID_BUNDLE_DESCRIPTION)
+      })
+  public ResponseEntity<String> renderBundleHtml(@RequestBody Bundle bundle) {
+    validateIncomingBundle(bundle);
+    return ResponseEntity.ok()
+        .contentType(MediaType.TEXT_HTML)
+        .body(bundleHtmlRenderService.render(bundle));
   }
 
   private Bundle validateAndReturnBundle(Bundle bundle) {
