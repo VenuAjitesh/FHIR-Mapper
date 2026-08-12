@@ -5,11 +5,14 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport;
 import ca.uhn.fhir.context.support.IValidationSupport;
 import ca.uhn.fhir.validation.FhirValidator;
+import in.nha.abdm.fhir.mapper.rest.common.constants.IgVersionConstants;
 import in.nha.abdm.fhir.mapper.rest.common.constants.LogMessageConstants;
+import java.io.InputStream;
 import java.util.List;
 import org.hl7.fhir.common.hapi.validation.support.*;
 import org.hl7.fhir.common.hapi.validation.validator.FhirInstanceValidator;
 import org.hl7.fhir.r5.utils.validation.constants.BestPracticeWarningLevel;
+import org.hl7.fhir.utilities.npm.NpmPackage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -80,6 +83,23 @@ public class FhirConfiguration implements WebMvcConfigurer {
       log.info(LogMessageConstants.NPM_LOAD_SUCCESS);
     } catch (Exception e) {
       log.error(LogMessageConstants.NPM_LOAD_FAILED, e.getMessage());
+    }
+    checkIgVersion();
+  }
+
+  private void checkIgVersion() {
+    try (InputStream stream = getClass().getResourceAsStream(NPM_PACKAGE_PATH)) {
+      String version = NpmPackage.fromPackage(stream).version();
+      if (IgVersionConstants.EXPECTED_NRCES_IG_VERSION.equals(version)) {
+        log.info(LogMessageConstants.IG_VERSION_MATCHED, version);
+      } else {
+        log.warn(
+            LogMessageConstants.IG_VERSION_DRIFT,
+            version,
+            IgVersionConstants.EXPECTED_NRCES_IG_VERSION);
+      }
+    } catch (Exception e) {
+      log.warn(LogMessageConstants.IG_VERSION_CHECK_FAILED, e.getMessage());
     }
   }
 
