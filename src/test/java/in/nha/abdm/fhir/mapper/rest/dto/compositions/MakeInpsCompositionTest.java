@@ -56,6 +56,18 @@ class MakeInpsCompositionTest {
                 List.of(),
                 List.of(),
                 List.of(),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of(),
+                null,
+                null,
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of(),
                 List.of()));
 
     assertEquals(3, composition.getSection().size());
@@ -87,7 +99,8 @@ class MakeInpsCompositionTest {
             null,
             new InpsResources(
                 List.of(), List.of(), List.of(), List.of(), List.of(), List.of(), List.of(),
-                List.of(), List.of(), List.of(), List.of()));
+                List.of(), List.of(), List.of(), List.of(), List.of(), List.of(), List.of(), null,
+                null, List.of(), List.of(), List.of(), List.of(), List.of(), List.of(), List.of()));
 
     assertTrue(composition.getSection().isEmpty());
   }

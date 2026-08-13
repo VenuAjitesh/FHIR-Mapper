@@ -5,13 +5,19 @@ import in.nha.abdm.fhir.mapper.rest.common.constants.ValidationConstants;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.OrganisationResource;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.PatientResource;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.PractitionerResource;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.AlertResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.AllergyResource;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.CarePlanResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.ConditionResource;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.ConsentResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.DiagnosticResource;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.FunctionalAssessmentResource;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.ImmunizationRecommendationResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.ImmunizationResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.MedicalDeviceResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.MedicationStatementResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.ProcedureResource;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.WellnessObservationResource;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -64,4 +70,18 @@ public class InpsRequest {
   @Valid private List<MedicalDeviceResource> medicalDevices;
   @Valid private List<DiagnosticResource> labResults;
   @Valid private List<DiagnosticResource> radiologyResults;
+
+  @Valid private List<ConditionResource> pastProblems;
+  @Valid private List<WellnessObservationResource> pregnancyStatus;
+  @Valid private List<WellnessObservationResource> pregnancyOutcome;
+  @Valid private WellnessObservationResource tobaccoUse;
+  @Valid private WellnessObservationResource alcoholUse;
+  @Valid private List<WellnessObservationResource> vitalSigns;
+  @Valid private List<CarePlanResource> carePlans;
+  @Valid private List<ImmunizationRecommendationResource> immunizationRecommendations;
+  @Valid private List<ConsentResource> advanceDirectives;
+  @Valid private List<AlertResource> alerts;
+  @Valid private List<ConditionResource> functionalStatusConditions;
+  @Valid private List<FunctionalAssessmentResource> functionalAssessments;
+  private String patientStoryText;
 }

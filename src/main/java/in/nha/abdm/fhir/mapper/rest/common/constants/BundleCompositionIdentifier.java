@@ -89,4 +89,22 @@ public class BundleCompositionIdentifier {
   public static final String INPS_MEDICAL_DEVICES_SECTION_CODE = "46264-8";
   public static final String INPS_RESULTS_SECTION = "Results";
   public static final String INPS_RESULTS_SECTION_CODE = "30954-2";
+  public static final String INPS_PAST_PROBLEMS_SECTION = "History of Past Problems";
+  public static final String INPS_PAST_PROBLEMS_SECTION_CODE = "11348-0";
+  public static final String INPS_PREGNANCY_SECTION = "Pregnancy History";
+  public static final String INPS_PREGNANCY_SECTION_CODE = "10162-6";
+  public static final String INPS_SOCIAL_HISTORY_SECTION = "Social History";
+  public static final String INPS_SOCIAL_HISTORY_SECTION_CODE = "29762-2";
+  public static final String INPS_VITAL_SIGNS_SECTION = "Vital Signs";
+  public static final String INPS_VITAL_SIGNS_SECTION_CODE = "8716-3";
+  public static final String INPS_ADVANCE_DIRECTIVES_SECTION = "Advance Directives";
+  public static final String INPS_ADVANCE_DIRECTIVES_SECTION_CODE = "42348-3";
+  public static final String INPS_ALERTS_SECTION = "Alerts";
+  public static final String INPS_ALERTS_SECTION_CODE = "104605-1";
+  public static final String INPS_FUNCTIONAL_STATUS_SECTION = "Functional Status";
+  public static final String INPS_FUNCTIONAL_STATUS_SECTION_CODE = "47420-5";
+  public static final String INPS_PATIENT_STORY_SECTION = "Patient Story";
+  public static final String INPS_PATIENT_STORY_SECTION_CODE = "81338-6";
+  public static final String INPS_PLAN_OF_CARE_SECTION = "Plan of Care";
+  public static final String INPS_PLAN_OF_CARE_SECTION_CODE = "18776-5";
 }

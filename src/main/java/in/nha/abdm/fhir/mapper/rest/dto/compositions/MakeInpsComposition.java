@@ -42,7 +42,7 @@ public class MakeInpsComposition {
       composition.setCustodian(createCustodian(organization));
     }
     composition.setIdentifier(createIdentifier());
-    composition.setSection(createSections(resources));
+    composition.setSection(createSections(request, resources));
     Utils.setNarrative(composition, "Patient Summary for " + patient.getName().get(0).getText());
     return composition;
   }
@@ -82,7 +82,8 @@ public class MakeInpsComposition {
         .setValue(UUID.randomUUID().toString());
   }
 
-  private List<Composition.SectionComponent> createSections(InpsResources resources) {
+  private List<Composition.SectionComponent> createSections(
+      InpsRequest request, InpsResources resources) {
     List<Composition.SectionComponent> sections = new ArrayList<>();
     addSection(
         sections,
@@ -119,6 +120,51 @@ public class MakeInpsComposition {
         resultsEntries(resources),
         BundleCompositionIdentifier.INPS_RESULTS_SECTION,
         BundleCompositionIdentifier.INPS_RESULTS_SECTION_CODE);
+    addSection(
+        sections,
+        resources.pastProblems(),
+        BundleCompositionIdentifier.INPS_PAST_PROBLEMS_SECTION,
+        BundleCompositionIdentifier.INPS_PAST_PROBLEMS_SECTION_CODE);
+    addSection(
+        sections,
+        pregnancyEntries(resources),
+        BundleCompositionIdentifier.INPS_PREGNANCY_SECTION,
+        BundleCompositionIdentifier.INPS_PREGNANCY_SECTION_CODE);
+    addSection(
+        sections,
+        socialHistoryEntries(resources),
+        BundleCompositionIdentifier.INPS_SOCIAL_HISTORY_SECTION,
+        BundleCompositionIdentifier.INPS_SOCIAL_HISTORY_SECTION_CODE);
+    addSection(
+        sections,
+        resources.vitalSigns(),
+        BundleCompositionIdentifier.INPS_VITAL_SIGNS_SECTION,
+        BundleCompositionIdentifier.INPS_VITAL_SIGNS_SECTION_CODE);
+    addSection(
+        sections,
+        planOfCareEntries(resources),
+        BundleCompositionIdentifier.INPS_PLAN_OF_CARE_SECTION,
+        BundleCompositionIdentifier.INPS_PLAN_OF_CARE_SECTION_CODE);
+    addSection(
+        sections,
+        resources.advanceDirectives(),
+        BundleCompositionIdentifier.INPS_ADVANCE_DIRECTIVES_SECTION,
+        BundleCompositionIdentifier.INPS_ADVANCE_DIRECTIVES_SECTION_CODE);
+    addSection(
+        sections,
+        resources.alerts(),
+        BundleCompositionIdentifier.INPS_ALERTS_SECTION,
+        BundleCompositionIdentifier.INPS_ALERTS_SECTION_CODE);
+    addSection(
+        sections,
+        functionalStatusEntries(resources),
+        BundleCompositionIdentifier.INPS_FUNCTIONAL_STATUS_SECTION,
+        BundleCompositionIdentifier.INPS_FUNCTIONAL_STATUS_SECTION_CODE);
+    addNarrativeOnlySection(
+        sections,
+        request.getPatientStoryText(),
+        BundleCompositionIdentifier.INPS_PATIENT_STORY_SECTION,
+        BundleCompositionIdentifier.INPS_PATIENT_STORY_SECTION_CODE);
     return sections;
   }
 
@@ -128,6 +174,38 @@ public class MakeInpsComposition {
     entries.addAll(resources.labReports());
     entries.addAll(resources.radiologyObservations());
     entries.addAll(resources.radiologyReports());
+    return entries;
+  }
+
+  private List<Resource> pregnancyEntries(InpsResources resources) {
+    List<Resource> entries = new ArrayList<>();
+    entries.addAll(resources.pregnancyStatus());
+    entries.addAll(resources.pregnancyOutcome());
+    return entries;
+  }
+
+  private List<Resource> socialHistoryEntries(InpsResources resources) {
+    List<Resource> entries = new ArrayList<>();
+    if (resources.tobaccoUse() != null) {
+      entries.add(resources.tobaccoUse());
+    }
+    if (resources.alcoholUse() != null) {
+      entries.add(resources.alcoholUse());
+    }
+    return entries;
+  }
+
+  private List<Resource> planOfCareEntries(InpsResources resources) {
+    List<Resource> entries = new ArrayList<>();
+    entries.addAll(resources.carePlans());
+    entries.addAll(resources.immunizationRecommendations());
+    return entries;
+  }
+
+  private List<Resource> functionalStatusEntries(InpsResources resources) {
+    List<Resource> entries = new ArrayList<>();
+    entries.addAll(resources.functionalStatusConditions());
+    entries.addAll(resources.functionalAssessments());
     return entries;
   }
 
@@ -150,6 +228,25 @@ public class MakeInpsComposition {
     for (T resource : resources) {
       section.addEntry(Utils.buildReference(resource.getId()));
     }
+    sections.add(section);
+  }
+
+  private void addNarrativeOnlySection(
+      List<Composition.SectionComponent> sections, String text, String title, String code) {
+    if (StringUtils.isBlank(text)) {
+      return;
+    }
+    Composition.SectionComponent section = new Composition.SectionComponent();
+    section.setTitle(title);
+    section.setCode(
+        new CodeableConcept()
+            .setText(title)
+            .addCoding(
+                new Coding()
+                    .setSystem(BundleUrlIdentifier.LOINC_URL)
+                    .setCode(code)
+                    .setDisplay(title)));
+    section.setText(buildNarrative(text));
     sections.add(section);
   }
 

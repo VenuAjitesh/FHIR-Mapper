@@ -2,6 +2,7 @@
 package in.nha.abdm.fhir.mapper.rest.converter;
 
 import in.nha.abdm.fhir.mapper.Utils;
+import in.nha.abdm.fhir.mapper.rest.common.constants.BundleFieldIdentifier;
 import in.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
 import in.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.BundleUtils;
@@ -9,10 +10,15 @@ import in.nha.abdm.fhir.mapper.rest.dto.compositions.InpsResources;
 import in.nha.abdm.fhir.mapper.rest.dto.compositions.MakeInpsComposition;
 import in.nha.abdm.fhir.mapper.rest.dto.resources.MakeAllergyToleranceResource;
 import in.nha.abdm.fhir.mapper.rest.dto.resources.MakeBundleMetaResource;
+import in.nha.abdm.fhir.mapper.rest.dto.resources.MakeCarePlanResource;
+import in.nha.abdm.fhir.mapper.rest.dto.resources.MakeClinicalImpressionResource;
 import in.nha.abdm.fhir.mapper.rest.dto.resources.MakeConditionResource;
+import in.nha.abdm.fhir.mapper.rest.dto.resources.MakeConsentResource;
 import in.nha.abdm.fhir.mapper.rest.dto.resources.MakeDeviceResource;
 import in.nha.abdm.fhir.mapper.rest.dto.resources.MakeDeviceUseStatementResource;
 import in.nha.abdm.fhir.mapper.rest.dto.resources.MakeDiagnosticLabResource;
+import in.nha.abdm.fhir.mapper.rest.dto.resources.MakeFlagResource;
+import in.nha.abdm.fhir.mapper.rest.dto.resources.MakeImmunizationRecommendationResource;
 import in.nha.abdm.fhir.mapper.rest.dto.resources.MakeImmunizationResource;
 import in.nha.abdm.fhir.mapper.rest.dto.resources.MakeMedicationStatementResource;
 import in.nha.abdm.fhir.mapper.rest.dto.resources.MakeObservationResource;
@@ -20,11 +26,13 @@ import in.nha.abdm.fhir.mapper.rest.dto.resources.MakeOrganisationResource;
 import in.nha.abdm.fhir.mapper.rest.dto.resources.MakePatientResource;
 import in.nha.abdm.fhir.mapper.rest.dto.resources.MakePractitionerResource;
 import in.nha.abdm.fhir.mapper.rest.dto.resources.MakeProcedureResource;
+import in.nha.abdm.fhir.mapper.rest.dto.resources.MakeWellnessObservationResource;
 import in.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import in.nha.abdm.fhir.mapper.rest.exceptions.StreamUtils;
 import in.nha.abdm.fhir.mapper.rest.requests.InpsRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.DiagnosticResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.MedicalDeviceResource;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.WellnessObservationResource;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,13 +42,18 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.hl7.fhir.r4.model.AllergyIntolerance;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.CarePlan;
+import org.hl7.fhir.r4.model.ClinicalImpression;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.Condition;
+import org.hl7.fhir.r4.model.Consent;
 import org.hl7.fhir.r4.model.Device;
 import org.hl7.fhir.r4.model.DeviceUseStatement;
 import org.hl7.fhir.r4.model.DiagnosticReport;
+import org.hl7.fhir.r4.model.Flag;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Immunization;
+import org.hl7.fhir.r4.model.ImmunizationRecommendation;
 import org.hl7.fhir.r4.model.MedicationStatement;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Organization;
@@ -67,6 +80,12 @@ public class InpsConverter {
   private final MakeDeviceUseStatementResource makeDeviceUseStatementResource;
   private final MakeObservationResource makeObservationResource;
   private final MakeDiagnosticLabResource makeDiagnosticLabResource;
+  private final MakeWellnessObservationResource makeWellnessObservationResource;
+  private final MakeCarePlanResource makeCarePlanResource;
+  private final MakeImmunizationRecommendationResource makeImmunizationRecommendationResource;
+  private final MakeConsentResource makeConsentResource;
+  private final MakeFlagResource makeFlagResource;
+  private final MakeClinicalImpressionResource makeClinicalImpressionResource;
   private final MakeInpsComposition makeInpsComposition;
   private final MakeBundleMetaResource makeBundleMetaResource;
 
@@ -83,6 +102,12 @@ public class InpsConverter {
       MakeDeviceUseStatementResource makeDeviceUseStatementResource,
       MakeObservationResource makeObservationResource,
       MakeDiagnosticLabResource makeDiagnosticLabResource,
+      MakeWellnessObservationResource makeWellnessObservationResource,
+      MakeCarePlanResource makeCarePlanResource,
+      MakeImmunizationRecommendationResource makeImmunizationRecommendationResource,
+      MakeConsentResource makeConsentResource,
+      MakeFlagResource makeFlagResource,
+      MakeClinicalImpressionResource makeClinicalImpressionResource,
       MakeInpsComposition makeInpsComposition,
       MakeBundleMetaResource makeBundleMetaResource) {
     this.makePatientResource = makePatientResource;
@@ -97,6 +122,12 @@ public class InpsConverter {
     this.makeDeviceUseStatementResource = makeDeviceUseStatementResource;
     this.makeObservationResource = makeObservationResource;
     this.makeDiagnosticLabResource = makeDiagnosticLabResource;
+    this.makeWellnessObservationResource = makeWellnessObservationResource;
+    this.makeCarePlanResource = makeCarePlanResource;
+    this.makeImmunizationRecommendationResource = makeImmunizationRecommendationResource;
+    this.makeConsentResource = makeConsentResource;
+    this.makeFlagResource = makeFlagResource;
+    this.makeClinicalImpressionResource = makeClinicalImpressionResource;
     this.makeInpsComposition = makeInpsComposition;
     this.makeBundleMetaResource = makeBundleMetaResource;
   }
@@ -135,7 +166,49 @@ public class InpsConverter {
               labResults.observations,
               labResults.reports,
               radiologyResults.observations,
-              radiologyResults.reports);
+              radiologyResults.reports,
+              createPastProblems(request, patient),
+              createWellnessObservations(
+                  request.getPregnancyStatus(),
+                  patient,
+                  practitionerList,
+                  request.getCompositionDate(),
+                  BundleFieldIdentifier.WOMAN_HEALTH,
+                  ResourceProfileIdentifier.PROFILE_IN_PS_OBSERVATION_PREGNANCY_STATUS),
+              createWellnessObservations(
+                  request.getPregnancyOutcome(),
+                  patient,
+                  practitionerList,
+                  request.getCompositionDate(),
+                  BundleFieldIdentifier.WOMAN_HEALTH,
+                  ResourceProfileIdentifier.PROFILE_IN_PS_OBSERVATION_PREGNANCY_OUTCOME),
+              createWellnessObservation(
+                  request.getTobaccoUse(),
+                  patient,
+                  practitionerList,
+                  request.getCompositionDate(),
+                  BundleFieldIdentifier.LIFE_STYLE,
+                  ResourceProfileIdentifier.PROFILE_IN_PS_OBSERVATION_SOCIAL_TOBACCO_USE),
+              createWellnessObservation(
+                  request.getAlcoholUse(),
+                  patient,
+                  practitionerList,
+                  request.getCompositionDate(),
+                  BundleFieldIdentifier.LIFE_STYLE,
+                  ResourceProfileIdentifier.PROFILE_IN_PS_OBSERVATION_SOCIAL_ALCOHOL_USE),
+              createWellnessObservations(
+                  request.getVitalSigns(),
+                  patient,
+                  practitionerList,
+                  request.getCompositionDate(),
+                  BundleFieldIdentifier.VITAL_SIGNS,
+                  ResourceProfileIdentifier.PROFILE_VITAL_SIGNS),
+              createCarePlans(request, patient),
+              createImmunizationRecommendations(request, patient),
+              createAdvanceDirectives(request, patient),
+              createAlerts(request, patient),
+              createFunctionalStatusConditions(request, patient),
+              createFunctionalAssessments(request, patient));
 
       Composition composition =
           makeInpsComposition.make(request, patient, practitionerList, organization, resources);
@@ -290,6 +363,114 @@ public class InpsConverter {
     return new LabResults(allObservations, allReports);
   }
 
+  private List<Condition> createPastProblems(InpsRequest request, Patient patient) {
+    return Optional.ofNullable(request.getPastProblems()).orElse(Collections.emptyList()).stream()
+        .map(
+            StreamUtils.wrapException(
+                conditionResource ->
+                    makeConditionResource.getCondition(
+                        conditionResource,
+                        patient,
+                        ResourceProfileIdentifier.PROFILE_IN_PS_CONDITION)))
+        .toList();
+  }
+
+  private List<Observation> createWellnessObservations(
+      List<WellnessObservationResource> resources,
+      Patient patient,
+      List<Practitioner> practitionerList,
+      String date,
+      String type,
+      String profile) {
+    return Optional.ofNullable(resources).orElse(Collections.emptyList()).stream()
+        .map(
+            observationResource ->
+                makeWellnessObservationResource.getObservation(
+                    patient, practitionerList, observationResource, type, date, profile))
+        .toList();
+  }
+
+  private Observation createWellnessObservation(
+      WellnessObservationResource resource,
+      Patient patient,
+      List<Practitioner> practitionerList,
+      String date,
+      String type,
+      String profile) {
+    if (resource == null) {
+      return null;
+    }
+    return makeWellnessObservationResource.getObservation(
+        patient, practitionerList, resource, type, date, profile);
+  }
+
+  private List<CarePlan> createCarePlans(InpsRequest request, Patient patient) {
+    return Optional.ofNullable(request.getCarePlans()).orElse(Collections.emptyList()).stream()
+        .map(
+            carePlanResource ->
+                makeCarePlanResource.getCarePlan(
+                    carePlanResource, patient, ResourceProfileIdentifier.PROFILE_CARE_PLAN_NRCES))
+        .toList();
+  }
+
+  private List<ImmunizationRecommendation> createImmunizationRecommendations(
+      InpsRequest request, Patient patient) {
+    return Optional.ofNullable(request.getImmunizationRecommendations())
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(
+            StreamUtils.wrapException(
+                recommendationResource ->
+                    makeImmunizationRecommendationResource.getImmunizationRecommendation(
+                        patient, recommendationResource)))
+        .toList();
+  }
+
+  private List<Consent> createAdvanceDirectives(InpsRequest request, Patient patient) {
+    return Optional.ofNullable(request.getAdvanceDirectives())
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(
+            StreamUtils.wrapException(
+                consentResource -> makeConsentResource.getConsent(patient, consentResource)))
+        .toList();
+  }
+
+  private List<Flag> createAlerts(InpsRequest request, Patient patient) {
+    return Optional.ofNullable(request.getAlerts()).orElse(Collections.emptyList()).stream()
+        .map(
+            StreamUtils.wrapException(
+                alertResource -> makeFlagResource.getFlag(patient, alertResource)))
+        .toList();
+  }
+
+  private List<Condition> createFunctionalStatusConditions(InpsRequest request, Patient patient) {
+    return Optional.ofNullable(request.getFunctionalStatusConditions())
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(
+            StreamUtils.wrapException(
+                conditionResource ->
+                    makeConditionResource.getCondition(
+                        conditionResource,
+                        patient,
+                        ResourceProfileIdentifier.PROFILE_IN_PS_CONDITION)))
+        .toList();
+  }
+
+  private List<ClinicalImpression> createFunctionalAssessments(
+      InpsRequest request, Patient patient) {
+    return Optional.ofNullable(request.getFunctionalAssessments())
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(
+            StreamUtils.wrapException(
+                assessmentResource ->
+                    makeClinicalImpressionResource.getClinicalImpression(
+                        patient, assessmentResource)))
+        .toList();
+  }
+
   private Bundle buildBundle(
       InpsRequest request,
       Composition composition,
@@ -323,6 +504,18 @@ public class InpsConverter {
     BundleUtils.addEntries(bundle, resources.labReports());
     BundleUtils.addEntries(bundle, resources.radiologyObservations());
     BundleUtils.addEntries(bundle, resources.radiologyReports());
+    BundleUtils.addEntries(bundle, resources.pastProblems());
+    BundleUtils.addEntries(bundle, resources.pregnancyStatus());
+    BundleUtils.addEntries(bundle, resources.pregnancyOutcome());
+    BundleUtils.addEntry(bundle, resources.tobaccoUse());
+    BundleUtils.addEntry(bundle, resources.alcoholUse());
+    BundleUtils.addEntries(bundle, resources.vitalSigns());
+    BundleUtils.addEntries(bundle, resources.carePlans());
+    BundleUtils.addEntries(bundle, resources.immunizationRecommendations());
+    BundleUtils.addEntries(bundle, resources.advanceDirectives());
+    BundleUtils.addEntries(bundle, resources.alerts());
+    BundleUtils.addEntries(bundle, resources.functionalStatusConditions());
+    BundleUtils.addEntries(bundle, resources.functionalAssessments());
     return bundle;
   }
 

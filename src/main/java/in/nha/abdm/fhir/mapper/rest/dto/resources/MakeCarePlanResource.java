@@ -20,8 +20,15 @@ public class MakeCarePlanResource {
   private final SnomedService snomedService;
 
   public CarePlan getCarePlan(CarePlanResource carePlanResource, Patient patient) {
+    return getCarePlan(carePlanResource, patient, null);
+  }
+
+  public CarePlan getCarePlan(CarePlanResource carePlanResource, Patient patient, String profile) {
     CarePlan carePlan = new CarePlan();
     carePlan.setId(UUID.randomUUID().toString());
+    if (profile != null) {
+      carePlan.setMeta(new Meta().addProfile(profile));
+    }
     carePlan.setStatus(CarePlan.CarePlanStatus.ACTIVE);
     carePlan.setIntent(CarePlan.CarePlanIntent.fromCode(carePlanResource.getIntent()));
     if (carePlanResource.getDescription() != null) {
