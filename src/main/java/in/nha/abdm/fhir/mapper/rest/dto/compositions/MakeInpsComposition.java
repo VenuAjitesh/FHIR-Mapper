@@ -119,7 +119,7 @@ public class MakeInpsComposition {
                     .setDisplay(title)));
     section.setText(buildNarrative(title));
     for (T resource : resources) {
-      section.addEntry(Utils.buildReference(resource.getId(), resource.fhirType()));
+      section.addEntry(Utils.buildReference(resource.getId()));
     }
     sections.add(section);
   }
