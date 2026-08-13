@@ -71,4 +71,14 @@ public class BundleCompositionIdentifier {
   public static final String DOCUMENT_REFERENCE = "Document Reference";
 
   public static final String INVOICE_RECORD = "Invoice Record";
+
+  // INPS (Indian Patient Summary)
+  public static final String INPS_TITLE = "Patient Summary";
+  public static final String INPS_COMPOSITION_TYPE_CODE = "60591-5";
+  public static final String INPS_PROBLEMS_SECTION = "Problem List";
+  public static final String INPS_PROBLEMS_SECTION_CODE = "11450-4";
+  public static final String INPS_ALLERGIES_SECTION = "Allergies and Intolerances";
+  public static final String INPS_ALLERGIES_SECTION_CODE = "48765-2";
+  public static final String INPS_MEDICATIONS_SECTION = "Medication Summary";
+  public static final String INPS_MEDICATIONS_SECTION_CODE = "10160-0";
 }

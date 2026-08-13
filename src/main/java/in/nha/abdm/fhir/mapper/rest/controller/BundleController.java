@@ -54,6 +54,7 @@ public class BundleController {
   private final ClaimResponseConverter claimResponseConverter;
   private final InsurancePlanConverter insurancePlanConverter;
   private final PaymentNoticeConverter paymentNoticeConverter;
+  private final InpsConverter inpsConverter;
   private final FhirValidationService fhirValidationService;
   private final BundleExtractionService bundleExtractionService;
   private final BundleHtmlRenderService bundleHtmlRenderService;
@@ -79,6 +80,7 @@ public class BundleController {
       ClaimResponseConverter claimResponseConverter,
       InsurancePlanConverter insurancePlanConverter,
       PaymentNoticeConverter paymentNoticeConverter,
+      InpsConverter inpsConverter,
       FhirValidationService fhirValidationService,
       BundleExtractionService bundleExtractionService,
       BundleHtmlRenderService bundleHtmlRenderService) {
@@ -96,6 +98,7 @@ public class BundleController {
     this.claimResponseConverter = claimResponseConverter;
     this.insurancePlanConverter = insurancePlanConverter;
     this.paymentNoticeConverter = paymentNoticeConverter;
+    this.inpsConverter = inpsConverter;
     this.fhirValidationService = fhirValidationService;
     this.bundleExtractionService = bundleExtractionService;
     this.bundleHtmlRenderService = bundleHtmlRenderService;
@@ -535,6 +538,18 @@ public class BundleController {
       })
   public Bundle createPaymentNoticeBundle(@Valid @RequestBody PaymentNoticeBundleRequest request) {
     Bundle bundle = paymentNoticeConverter.makePaymentNoticeBundle(request);
+    return validateAndReturnBundle(bundle);
+  }
+
+  @PostMapping(path = ControllerMappingConstants.INPS_PATH)
+  @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = "Create INPS (Indian Patient Summary) bundle",
+      description =
+          "Builds an INPS document bundle (NRCES IG 7.0.0, derived from HL7 IPS 2.0.0) with"
+              + " Problems, Allergies and Medications sections")
+  public Bundle createInpsBundle(@Valid @RequestBody InpsRequest inpsRequest) {
+    Bundle bundle = inpsConverter.convertToInps(inpsRequest);
     return validateAndReturnBundle(bundle);
   }
 

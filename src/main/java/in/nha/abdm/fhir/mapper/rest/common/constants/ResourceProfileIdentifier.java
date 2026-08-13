@@ -98,4 +98,20 @@ public class ResourceProfileIdentifier {
       "http://terminology.hl7.org/CodeSystem/ex-diagnosistype";
   public static final String PROFILE_PAYMENT_RECONCILIATION =
       "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PaymentReconciliation";
+  public static final String PROFILE_IN_PS_BUNDLE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/in-ps-bundle";
+  public static final String PROFILE_IN_PS_COMPOSITION =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/in-ps-composition";
+  public static final String PROFILE_IN_PS_PATIENT =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/in-ps-patient";
+  public static final String PROFILE_IN_PS_ORGANIZATION =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/in-ps-organization";
+  public static final String PROFILE_IN_PS_PRACTITIONER =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/in-ps-practitioner";
+  public static final String PROFILE_IN_PS_CONDITION =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/in-ps-condition";
+  public static final String PROFILE_IN_PS_ALLERGY_INTOLERANCE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/in-ps-allergyintolerance";
+  public static final String PROFILE_IN_PS_MEDICATION_STATEMENT =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/in-ps-medicationstatement";
 }
