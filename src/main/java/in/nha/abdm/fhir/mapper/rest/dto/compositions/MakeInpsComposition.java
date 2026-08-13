@@ -99,7 +99,36 @@ public class MakeInpsComposition {
         resources.medications(),
         BundleCompositionIdentifier.INPS_MEDICATIONS_SECTION,
         BundleCompositionIdentifier.INPS_MEDICATIONS_SECTION_CODE);
+    addSection(
+        sections,
+        resources.immunizations(),
+        BundleCompositionIdentifier.INPS_IMMUNIZATIONS_SECTION,
+        BundleCompositionIdentifier.INPS_IMMUNIZATIONS_SECTION_CODE);
+    addSection(
+        sections,
+        resources.procedures(),
+        BundleCompositionIdentifier.INPS_PROCEDURES_SECTION,
+        BundleCompositionIdentifier.INPS_PROCEDURES_SECTION_CODE);
+    addSection(
+        sections,
+        resources.deviceUseStatements(),
+        BundleCompositionIdentifier.INPS_MEDICAL_DEVICES_SECTION,
+        BundleCompositionIdentifier.INPS_MEDICAL_DEVICES_SECTION_CODE);
+    addSection(
+        sections,
+        resultsEntries(resources),
+        BundleCompositionIdentifier.INPS_RESULTS_SECTION,
+        BundleCompositionIdentifier.INPS_RESULTS_SECTION_CODE);
     return sections;
+  }
+
+  private List<Resource> resultsEntries(InpsResources resources) {
+    List<Resource> entries = new ArrayList<>();
+    entries.addAll(resources.labObservations());
+    entries.addAll(resources.labReports());
+    entries.addAll(resources.radiologyObservations());
+    entries.addAll(resources.radiologyReports());
+    return entries;
   }
 
   private <T extends Resource> void addSection(

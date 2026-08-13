@@ -81,4 +81,12 @@ public class BundleCompositionIdentifier {
   public static final String INPS_ALLERGIES_SECTION_CODE = "48765-2";
   public static final String INPS_MEDICATIONS_SECTION = "Medication Summary";
   public static final String INPS_MEDICATIONS_SECTION_CODE = "10160-0";
+  public static final String INPS_IMMUNIZATIONS_SECTION = "History of Immunizations";
+  public static final String INPS_IMMUNIZATIONS_SECTION_CODE = "11369-6";
+  public static final String INPS_PROCEDURES_SECTION = "History of Procedures";
+  public static final String INPS_PROCEDURES_SECTION_CODE = "47519-4";
+  public static final String INPS_MEDICAL_DEVICES_SECTION = "Medical Devices";
+  public static final String INPS_MEDICAL_DEVICES_SECTION_CODE = "46264-8";
+  public static final String INPS_RESULTS_SECTION = "Results";
+  public static final String INPS_RESULTS_SECTION_CODE = "30954-2";
 }

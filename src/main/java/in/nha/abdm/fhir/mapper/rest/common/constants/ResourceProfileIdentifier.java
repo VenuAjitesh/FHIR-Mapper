@@ -114,4 +114,20 @@ public class ResourceProfileIdentifier {
       "https://nrces.in/ndhm/fhir/r4/StructureDefinition/in-ps-allergyintolerance";
   public static final String PROFILE_IN_PS_MEDICATION_STATEMENT =
       "https://nrces.in/ndhm/fhir/r4/StructureDefinition/in-ps-medicationstatement";
+  public static final String PROFILE_IN_PS_IMMUNIZATION =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/in-ps-immunization";
+  public static final String PROFILE_IN_PS_PROCEDURE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/in-ps-procedure";
+  public static final String PROFILE_IN_PS_DIAGNOSTIC_REPORT_LAB =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/in-ps-diagnosticreport-laboratory-pathology";
+  public static final String PROFILE_IN_PS_DIAGNOSTIC_REPORT_RADIOLOGY =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/in-ps-diagnosticreport-radiology";
+  public static final String PROFILE_IN_PS_OBSERVATION_RESULTS_LAB =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/in-ps-observation-results-laboratory-pathology";
+  public static final String PROFILE_IN_PS_OBSERVATION_RESULTS_RADIOLOGY =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/in-ps-observation-results-radiology";
+  public static final String PROFILE_IN_PS_DEVICE =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/in-ps-device";
+  public static final String PROFILE_IN_PS_DEVICE_USE_STATEMENT =
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/in-ps-deviceusestatement";
 }

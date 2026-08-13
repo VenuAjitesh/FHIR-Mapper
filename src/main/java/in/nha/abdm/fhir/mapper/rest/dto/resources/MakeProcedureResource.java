@@ -20,9 +20,14 @@ public class MakeProcedureResource {
 
   public Procedure getProcedure(Patient patient, ProcedureResource procedureResource)
       throws ParseException {
+    return getProcedure(patient, procedureResource, ResourceProfileIdentifier.PROFILE_PROCEDURE);
+  }
+
+  public Procedure getProcedure(
+      Patient patient, ProcedureResource procedureResource, String profile) throws ParseException {
     Procedure procedure = new Procedure();
     procedure.setId(UUID.randomUUID().toString());
-    procedure.setMeta(new Meta().addProfile(ResourceProfileIdentifier.PROFILE_PROCEDURE));
+    procedure.setMeta(new Meta().addProfile(profile));
     buildStatus(procedure, procedureResource);
     procedure.setSubject(Utils.buildReference(patient.getId()));
     buildCode(procedure, procedureResource);

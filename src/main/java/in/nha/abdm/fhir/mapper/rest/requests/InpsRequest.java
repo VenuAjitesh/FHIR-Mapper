@@ -7,7 +7,11 @@ import in.nha.abdm.fhir.mapper.rest.common.helpers.PatientResource;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.PractitionerResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.AllergyResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.ConditionResource;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.DiagnosticResource;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.ImmunizationResource;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.MedicalDeviceResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.MedicationStatementResource;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.ProcedureResource;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -54,4 +58,10 @@ public class InpsRequest {
   @Valid private List<AllergyResource> allergies;
 
   @Valid private List<MedicationStatementResource> medications;
+
+  @Valid private List<ImmunizationResource> immunizations;
+  @Valid private List<ProcedureResource> procedures;
+  @Valid private List<MedicalDeviceResource> medicalDevices;
+  @Valid private List<DiagnosticResource> labResults;
+  @Valid private List<DiagnosticResource> radiologyResults;
 }

@@ -45,7 +45,18 @@ class MakeInpsCompositionTest {
             patient,
             List.of(),
             null,
-            new InpsResources(List.of(condition), List.of(allergy), List.of(medicationStatement)));
+            new InpsResources(
+                List.of(condition),
+                List.of(allergy),
+                List.of(medicationStatement),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of()));
 
     assertEquals(3, composition.getSection().size());
     for (Composition.SectionComponent section : composition.getSection()) {
@@ -70,7 +81,13 @@ class MakeInpsCompositionTest {
 
     Composition composition =
         makeInpsComposition.make(
-            request, patient, List.of(), null, new InpsResources(List.of(), List.of(), List.of()));
+            request,
+            patient,
+            List.of(),
+            null,
+            new InpsResources(
+                List.of(), List.of(), List.of(), List.of(), List.of(), List.of(), List.of(),
+                List.of(), List.of(), List.of(), List.of()));
 
     assertTrue(composition.getSection().isEmpty());
   }
