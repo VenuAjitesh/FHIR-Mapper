@@ -3,6 +3,7 @@ package in.nha.abdm.fhir.mapper;
 
 import static in.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants.ISO_DATE_TIME_FORMAT;
 
+import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import in.nha.abdm.fhir.mapper.rest.common.constants.LogMessageConstants;
 import in.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import java.text.ParseException;
@@ -35,9 +36,15 @@ public class Utils {
     dateTimeString = dateTimeString.trim();
     if (dateTimeString.length() <= 10) {
       return new DateTimeType(dateTimeString);
-    } else {
+    }
+    try {
       return (DateTimeType)
           new DateTimeType(ISO_DATE_TIME_FORMAT.parse(dateTimeString)).setTimeZoneZulu(true);
+    } catch (ParseException e) {
+      DateTimeType lenient = new DateTimeType(dateTimeString);
+      lenient.setTimeZoneZulu(true);
+      lenient.setPrecision(TemporalPrecisionEnum.MILLI);
+      return lenient;
     }
   }
 
