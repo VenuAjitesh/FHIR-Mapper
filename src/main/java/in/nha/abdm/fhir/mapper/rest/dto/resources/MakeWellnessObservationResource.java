@@ -68,7 +68,7 @@ public class MakeWellnessObservationResource {
   }
 
   private void addFixedLoincCode(Observation observation, String profile) {
-    FixedLoincCode fixedCode = FIXED_LOINC_CODE_BY_PROFILE.get(profile);
+    FixedLoincCode fixedCode = profile == null ? null : FIXED_LOINC_CODE_BY_PROFILE.get(profile);
     if (fixedCode != null) {
       observation
           .getCode()
