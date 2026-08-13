@@ -44,6 +44,7 @@ Recommended RAM: Systems with more than 8 GB RAM
 | PrescriptionRecord     | The Clinical Artifact represents the medication advice to the patient in compliance with the Pharmacy Council of India (PCI) guidelines, which can be shared across the health ecosystem.                                                |
 | WellnessRecord         | The Clinical Artifact represents regular wellness information of patients typically through the Patient Health Record (PHR) application covering clinical information such as vitals, physical examination, general wellness, women wellness, etc., that can be shared across the health ecosystem.                            |
 | InvoiceRecord          | The billing artifact represents the invoice details such as pharmacy invoice, consultation invoice etc. along with the support for scanned documents attached for the patient which can be shared across the health ecosystem.                                                                                                                                                                                                                                                                                                             |
+| PatientSummaryRecord   | The Indian Patient Summary (INPS), derived from HL7 IPS 2.0.0 and dual-conformant with NRCES IG 7.0.0. Summarizes a patient's problems, allergies, medications and other clinical history for continuity of care.                                                                                                                                                                                                                                                                                                          |
 
 ---
 ### FHIR Validation & SNOMED APIs
@@ -717,6 +718,54 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
     }
       ```
     </details>
+<details>
+  <summary><span style="font-weight:bold; font-size:16px;"> 📋 PatientSummaryRecord (INPS) </span></summary>
+
+- For the INPS bundle you need to
+  * `POST` Request `/v1/bundle/inps` — only `problems`, `allergies` and `medications` are mandatory; 13 more optional sections are supported (see `docs/fhir-mapper.yaml` for the full schema).
+
+  ```
+  {
+    "bundleType": "PatientSummaryRecord", //mandatory
+    "careContextReference": "visit-2026-08-14T10:00:00Z", //mandatory
+    "status": "final", //mandatory
+    "compositionDate": "2026-08-14T10:00:00.000Z", //mandatory
+    "patient": { //mandatory
+        "name": "Venu Ajitesh", //mandatory
+        "patientReference": "ajitesh6x", //mandatory
+        "gender": "male",
+        "birthDate": "2001-04-27"
+    },
+    "practitioners": [{ //mandatory
+        "name": "Dr.Venu Ajitesh", //mandatory
+        "practitionerId": "Predator"
+    }],
+    "organisation": {
+        "facilityName": "Predator_HIP",
+        "facilityId": "Predator_HIP"
+    },
+    "problems": [
+        {
+            "condition": "Hypertension", //mandatory
+            "recordedDate": "2026-08-01T09:00:00.000Z" //mandatory
+        }
+    ],
+    "allergies": [
+        {
+            "allergy": "Penicillin" //mandatory
+        }
+    ],
+    "medications": [
+        {
+            "medicine": "Amlodipine 5mg", //mandatory
+            "status": "active" //mandatory
+        }
+    ]
+  }
+  ```
+
+  * `POST` Request `/v1/bundle/inps/aggregate` — builds an INPS bundle from already-built discharge-summary, OP-consult, prescription, immunization, diagnostic-report and wellness-record bundles. Request body is a bare JSON array of FHIR Bundles.
+  </details>
 
 ---
 ### Error response in 400 BadRequest
