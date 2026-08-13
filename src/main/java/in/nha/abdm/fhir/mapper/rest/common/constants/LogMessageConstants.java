@@ -21,6 +21,10 @@ public class LogMessageConstants {
   public static final String NPM_LOAD_SUCCESS =
       "Successfully loaded FHIR NPM package from classpath: /package.tgz";
   public static final String NPM_LOAD_FAILED = "Failed to load FHIR NPM package from classpath: {}";
+  public static final String IPS_NPM_LOAD_SUCCESS =
+      "Successfully loaded HL7 IPS base FHIR NPM package from classpath: /ips-package.tgz";
+  public static final String IPS_NPM_LOAD_FAILED =
+      "Failed to load HL7 IPS base FHIR NPM package from classpath: {}";
   public static final String IG_VERSION_MATCHED = "Bundled NRCES IG version confirmed: {}";
   public static final String IG_VERSION_DRIFT =
       "Bundled NRCES IG package.tgz is version {} but the mapper declares support for {} —"

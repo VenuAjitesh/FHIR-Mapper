@@ -25,6 +25,7 @@ public class FhirConfiguration implements WebMvcConfigurer {
 
   private static final Logger log = LoggerFactory.getLogger(FhirConfiguration.class);
   private static final String NPM_PACKAGE_PATH = "/package.tgz";
+  private static final String IPS_NPM_PACKAGE_PATH = "/ips-package.tgz";
 
   @Bean
   public FhirContext fhirContext() {
@@ -85,6 +86,13 @@ public class FhirConfiguration implements WebMvcConfigurer {
       log.error(LogMessageConstants.NPM_LOAD_FAILED, e.getMessage());
     }
     checkIgVersion();
+
+    try {
+      npmSupport.loadPackageFromClasspath(IPS_NPM_PACKAGE_PATH);
+      log.info(LogMessageConstants.IPS_NPM_LOAD_SUCCESS);
+    } catch (Exception e) {
+      log.error(LogMessageConstants.IPS_NPM_LOAD_FAILED, e.getMessage());
+    }
   }
 
   private void checkIgVersion() {
