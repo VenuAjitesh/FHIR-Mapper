@@ -13,6 +13,7 @@ import in.nha.abdm.fhir.mapper.rest.requests.*;
 import in.nha.abdm.fhir.mapper.rest.services.BundleExtractionService;
 import in.nha.abdm.fhir.mapper.rest.services.BundleHtmlRenderService;
 import in.nha.abdm.fhir.mapper.rest.services.FhirValidationService;
+import in.nha.abdm.fhir.mapper.rest.services.InpsAggregationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -55,6 +56,7 @@ public class BundleController {
   private final InsurancePlanConverter insurancePlanConverter;
   private final PaymentNoticeConverter paymentNoticeConverter;
   private final InpsConverter inpsConverter;
+  private final InpsAggregationService inpsAggregationService;
   private final FhirValidationService fhirValidationService;
   private final BundleExtractionService bundleExtractionService;
   private final BundleHtmlRenderService bundleHtmlRenderService;
@@ -81,6 +83,7 @@ public class BundleController {
       InsurancePlanConverter insurancePlanConverter,
       PaymentNoticeConverter paymentNoticeConverter,
       InpsConverter inpsConverter,
+      InpsAggregationService inpsAggregationService,
       FhirValidationService fhirValidationService,
       BundleExtractionService bundleExtractionService,
       BundleHtmlRenderService bundleHtmlRenderService) {
@@ -99,6 +102,7 @@ public class BundleController {
     this.insurancePlanConverter = insurancePlanConverter;
     this.paymentNoticeConverter = paymentNoticeConverter;
     this.inpsConverter = inpsConverter;
+    this.inpsAggregationService = inpsAggregationService;
     this.fhirValidationService = fhirValidationService;
     this.bundleExtractionService = bundleExtractionService;
     this.bundleHtmlRenderService = bundleHtmlRenderService;
@@ -550,6 +554,19 @@ public class BundleController {
               + " Problems, Allergies and Medications sections")
   public Bundle createInpsBundle(@Valid @RequestBody InpsRequest inpsRequest) {
     Bundle bundle = inpsConverter.convertToInps(inpsRequest);
+    return validateAndReturnBundle(bundle);
+  }
+
+  @PostMapping(path = ControllerMappingConstants.INPS_AGGREGATE_PATH)
+  @ResponseStatus(HttpStatus.CREATED)
+  @Operation(
+      summary = "Build an INPS bundle from existing clinical-record bundles",
+      description =
+          "Aggregates already-built discharge-summary, OP-consult, prescription, immunization,"
+              + " diagnostic-report and wellness-record bundles into a single INPS bundle. Request"
+              + " body is a JSON array of FHIR Bundles.")
+  public Bundle createInpsAggregateBundle(@RequestBody String rawBundlesJson) {
+    Bundle bundle = inpsAggregationService.aggregate(rawBundlesJson);
     return validateAndReturnBundle(bundle);
   }
 
