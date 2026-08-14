@@ -553,8 +553,7 @@ public class BundleController {
           "Builds an INPS document bundle (NRCES IG 7.0.0, derived from HL7 IPS 2.0.0) with"
               + " Problems, Allergies and Medications sections")
   public Bundle createInpsBundle(@Valid @RequestBody InpsRequest inpsRequest) {
-    Bundle bundle = inpsConverter.convertToInps(inpsRequest);
-    return validateAndReturnBundle(bundle);
+    return inpsConverter.convertToInps(inpsRequest);
   }
 
   @PostMapping(path = ControllerMappingConstants.INPS_AGGREGATE_PATH)
@@ -566,8 +565,7 @@ public class BundleController {
               + " diagnostic-report and wellness-record bundles into a single INPS bundle. Request"
               + " body is a JSON array of FHIR Bundles.")
   public Bundle createInpsAggregateBundle(@RequestBody String rawBundlesJson) {
-    Bundle bundle = inpsAggregationService.aggregate(rawBundlesJson);
-    return validateAndReturnBundle(bundle);
+    return inpsAggregationService.aggregate(rawBundlesJson);
   }
 
   @PostMapping(path = ControllerMappingConstants.EXTRACT_PATH)
