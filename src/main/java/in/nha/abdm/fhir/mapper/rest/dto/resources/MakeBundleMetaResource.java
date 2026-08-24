@@ -12,10 +12,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class MakeBundleMetaResource {
   public Meta getMeta() throws ParseException {
+    return getMeta(ResourceProfileIdentifier.PROFILE_DOCUMENT_BUNDLE);
+  }
+
+  public Meta getMeta(String profile) throws ParseException {
     Meta meta = new Meta();
     meta.setVersionId("1");
     meta.setLastUpdatedElement(Utils.getCurrentTimeStamp());
-    meta.addProfile(ResourceProfileIdentifier.PROFILE_DOCUMENT_BUNDLE);
+    meta.addProfile(profile);
     meta.addSecurity(
         new Coding()
             .setSystem(ResourceProfileIdentifier.PROFILE_BUNDLE_META)

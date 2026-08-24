@@ -57,8 +57,11 @@ public class ValidationConstants {
   public static final String CLAIM_RESPONSE_RECORD = "ClaimResponse";
   public static final String INSURANCE_PLAN_RECORD = "InsurancePlan";
   public static final String PAYMENT_NOTICE_RECORD = "PaymentNotice";
+  public static final String INPS_RECORD = "PatientSummaryRecord";
   public static final String INVOICE_MANDATORY = "invoice is mandatory";
   public static final String STATUS_MANDATORY = "status is mandatory";
+  public static final String TYPE_MANDATORY = "type is mandatory";
+  public static final String SUMMARY_MANDATORY = "summary is mandatory";
   public static final String CHARGE_ITEMS_MANDATORY =
       "chargeItems are mandatory and must not be empty";
   public static final String IMMUNIZATIONS_MANDATORY = "Immunizations is mandatory";

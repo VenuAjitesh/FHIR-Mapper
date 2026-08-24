@@ -25,18 +25,32 @@ public class MakeObservationResource {
       ObservationResource observationResource,
       String date)
       throws ParseException {
+    return getObservation(
+        patient,
+        practitionerList,
+        observationResource,
+        date,
+        ResourceProfileIdentifier.PROFILE_OBSERVATION);
+  }
+
+  public Observation getObservation(
+      Patient patient,
+      List<Practitioner> practitionerList,
+      ObservationResource observationResource,
+      String date,
+      String profile)
+      throws ParseException {
     Observation observation = new Observation();
     observation.setId(UUID.randomUUID().toString());
     observation.setStatus(Observation.ObservationStatus.FINAL);
     observation.setMeta(
-        new Meta()
-            .setLastUpdatedElement(Utils.getCurrentTimeStamp())
-            .addProfile(ResourceProfileIdentifier.PROFILE_OBSERVATION));
+        new Meta().setLastUpdatedElement(Utils.getCurrentTimeStamp()).addProfile(profile));
 
     if (date != null) {
       observation.setEffective(Utils.getFormattedDateTime(date));
     }
 
+    buildCategory(observation, profile);
     buildObservationCode(observation, observationResource);
     buildSubject(observation, patient);
     buildPerformers(observation, practitionerList);
@@ -56,6 +70,24 @@ public class MakeObservationResource {
     Utils.setNarrative(observation, "Observation: " + observationResource.getObservation());
 
     return observation;
+  }
+
+  private void buildCategory(Observation observation, String profile) {
+    String categoryCode;
+    if (ResourceProfileIdentifier.PROFILE_IN_PS_OBSERVATION_RESULTS_LAB.equals(profile)) {
+      categoryCode = "laboratory";
+    } else if (ResourceProfileIdentifier.PROFILE_IN_PS_OBSERVATION_RESULTS_RADIOLOGY.equals(
+        profile)) {
+      categoryCode = "imaging";
+    } else {
+      return;
+    }
+    observation.addCategory(
+        new CodeableConcept()
+            .addCoding(
+                new Coding()
+                    .setSystem("http://terminology.hl7.org/CodeSystem/observation-category")
+                    .setCode(categoryCode)));
   }
 
   private void buildObservationCode(

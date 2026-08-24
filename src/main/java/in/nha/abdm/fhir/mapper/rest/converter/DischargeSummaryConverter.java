@@ -250,7 +250,9 @@ public class DischargeSummaryConverter {
       throws ParseException {
     List<MedicationRequest> medicationList = new ArrayList<>();
     List<Condition> medicationConditionList = new ArrayList<>();
-    for (PrescriptionResource prescriptionResource : dischargeSummaryRequest.getMedications()) {
+    for (PrescriptionResource prescriptionResource :
+        Optional.ofNullable(dischargeSummaryRequest.getMedications())
+            .orElse(Collections.emptyList())) {
       Condition medicationCondition =
           prescriptionResource.getReason() != null
               ? makeConditionResource.getCondition(
@@ -342,7 +344,9 @@ public class DischargeSummaryConverter {
 
   private CarePlan createCarePlan(
       DischargeSummaryRequest dischargeSummaryRequest, Patient patient) {
-    return makeCarePlanResource.getCarePlan(dischargeSummaryRequest.getCarePlan(), patient);
+    return dischargeSummaryRequest.getCarePlan() == null
+        ? null
+        : makeCarePlanResource.getCarePlan(dischargeSummaryRequest.getCarePlan(), patient);
   }
 
   private Composition createComposition(

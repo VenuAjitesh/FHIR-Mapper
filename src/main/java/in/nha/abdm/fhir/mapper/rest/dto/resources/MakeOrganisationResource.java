@@ -15,20 +15,25 @@ import org.springframework.stereotype.Component;
 public class MakeOrganisationResource {
   public Organization getOrganization(OrganisationResource organisationResource)
       throws ParseException {
+    return getOrganization(organisationResource, ResourceProfileIdentifier.PROFILE_ORGANISATION);
+  }
+
+  public Organization getOrganization(OrganisationResource organisationResource, String profile)
+      throws ParseException {
     Organization organization = new Organization();
     organization.setId(UUID.randomUUID().toString());
-    organization.setMeta(buildMeta());
+    organization.setMeta(buildMeta(profile));
     organization.addIdentifier(buildIdentifier(organisationResource));
     organization.setName(extractOrganizationName(organisationResource));
     Utils.setNarrative(organization, "Organization: " + organization.getName());
     return organization;
   }
 
-  private Meta buildMeta() throws ParseException {
+  private Meta buildMeta(String profile) throws ParseException {
     return new Meta()
         .setVersionId("1")
         .setLastUpdatedElement(Utils.getCurrentTimeStamp())
-        .addProfile(ResourceProfileIdentifier.PROFILE_ORGANISATION);
+        .addProfile(profile);
   }
 
   private Identifier buildIdentifier(OrganisationResource organisationResource) {

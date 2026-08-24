@@ -15,20 +15,25 @@ import org.springframework.stereotype.Component;
 public class MakePractitionerResource {
   public Practitioner getPractitioner(PractitionerResource practitionerResource)
       throws ParseException {
+    return getPractitioner(practitionerResource, ResourceProfileIdentifier.PROFILE_PRACTITIONER);
+  }
+
+  public Practitioner getPractitioner(PractitionerResource practitionerResource, String profile)
+      throws ParseException {
     Practitioner practitioner = new Practitioner();
     practitioner.setId(UUID.randomUUID().toString());
-    practitioner.setMeta(buildMeta());
+    practitioner.setMeta(buildMeta(profile));
     practitioner.addIdentifier(buildIdentifier(practitionerResource));
     practitioner.addName(new HumanName().setText(practitionerResource.getName()));
     Utils.setNarrative(practitioner, "Practitioner: " + practitionerResource.getName());
     return practitioner;
   }
 
-  private Meta buildMeta() throws ParseException {
+  private Meta buildMeta(String profile) throws ParseException {
     return new Meta()
         .setVersionId("1")
         .setLastUpdatedElement(Utils.getCurrentTimeStamp())
-        .addProfile(ResourceProfileIdentifier.PROFILE_PRACTITIONER);
+        .addProfile(profile);
   }
 
   private Identifier buildIdentifier(PractitionerResource practitionerResource) {

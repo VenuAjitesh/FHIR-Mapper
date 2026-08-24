@@ -27,13 +27,28 @@ public class MakeDiagnosticLabResource {
       Encounter encounter,
       DiagnosticResource resource)
       throws ParseException {
+    return getDiagnosticReport(
+        patient,
+        practitionerList,
+        observationList,
+        encounter,
+        resource,
+        ResourceProfileIdentifier.PROFILE_DIAGNOSTIC_REPORT_LAB);
+  }
+
+  public DiagnosticReport getDiagnosticReport(
+      Patient patient,
+      List<Practitioner> practitionerList,
+      List<Observation> observationList,
+      Encounter encounter,
+      DiagnosticResource resource,
+      String profile)
+      throws ParseException {
 
     DiagnosticReport report = new DiagnosticReport();
     report.setId(UUID.randomUUID().toString());
     report.setMeta(
-        new Meta()
-            .setLastUpdatedElement(Utils.getCurrentTimeStamp())
-            .addProfile(ResourceProfileIdentifier.PROFILE_DIAGNOSTIC_REPORT_LAB));
+        new Meta().setLastUpdatedElement(Utils.getCurrentTimeStamp()).addProfile(profile));
     report.setStatus(DiagnosticReport.DiagnosticReportStatus.FINAL);
 
     SnomedDiagnostic snomed = snomedService.getSnomedDiagnosticCode(resource.getServiceName());
@@ -80,6 +95,7 @@ public class MakeDiagnosticLabResource {
 
     if (resource.getAuthoredOn() != null) {
       report.setIssued(Utils.getFormattedDate(resource.getAuthoredOn()));
+      report.setEffective(Utils.getFormattedDateTime(resource.getAuthoredOn()));
     } else if (encounter != null && encounter.hasPeriod()) {
       report.setIssued(encounter.getPeriod().getStart());
     }

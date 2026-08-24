@@ -16,9 +16,13 @@ import org.springframework.stereotype.Component;
 public class MakePatientResource {
 
   public Patient getPatient(PatientResource patientResource) throws ParseException {
+    return getPatient(patientResource, ResourceProfileIdentifier.PROFILE_PATIENT);
+  }
+
+  public Patient getPatient(PatientResource patientResource, String profile) throws ParseException {
     Patient patient = new Patient();
     patient.setId(UUID.randomUUID().toString());
-    patient.setMeta(buildMeta());
+    patient.setMeta(buildMeta(profile));
     patient.addIdentifier(buildIdentifier(patientResource));
     addAbhaIdentifiers(patient, patientResource);
     patient.addName(new HumanName().setText(patientResource.getName()));
@@ -55,11 +59,11 @@ public class MakePatientResource {
         .setValue(value);
   }
 
-  private Meta buildMeta() throws ParseException {
+  private Meta buildMeta(String profile) throws ParseException {
     return new Meta()
         .setVersionId("1")
         .setLastUpdatedElement(Utils.getCurrentTimeStamp())
-        .addProfile(ResourceProfileIdentifier.PROFILE_PATIENT);
+        .addProfile(profile);
   }
 
   private Identifier buildIdentifier(PatientResource patientResource) {

@@ -7,6 +7,7 @@ import in.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import in.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedObservation;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.WellnessObservationResource;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -17,6 +18,19 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class MakeWellnessObservationResource {
+  private record FixedLoincCode(String code, String display) {}
+
+  private static final Map<String, FixedLoincCode> FIXED_LOINC_CODE_BY_PROFILE =
+      Map.of(
+          ResourceProfileIdentifier.PROFILE_IN_PS_OBSERVATION_PREGNANCY_STATUS,
+              new FixedLoincCode("82810-3", "Pregnancy status"),
+          ResourceProfileIdentifier.PROFILE_IN_PS_OBSERVATION_PREGNANCY_OUTCOME,
+              new FixedLoincCode("11640-0", "Births total"),
+          ResourceProfileIdentifier.PROFILE_IN_PS_OBSERVATION_SOCIAL_TOBACCO_USE,
+              new FixedLoincCode("72166-2", "Tobacco smoking status"),
+          ResourceProfileIdentifier.PROFILE_IN_PS_OBSERVATION_SOCIAL_ALCOHOL_USE,
+              new FixedLoincCode("74013-4", "Alcoholic drinks per drinking day"));
+
   private final SnomedService snomedService;
 
   public Observation getObservation(
@@ -25,17 +39,56 @@ public class MakeWellnessObservationResource {
       WellnessObservationResource observationResource,
       String type,
       String date) {
+    return getObservation(patient, practitionerList, observationResource, type, date, null);
+  }
+
+  public Observation getObservation(
+      Patient patient,
+      List<Practitioner> practitionerList,
+      WellnessObservationResource observationResource,
+      String type,
+      String date,
+      String profile) {
     Observation observation = new Observation();
     observation.setId(UUID.randomUUID().toString());
     observation.setStatus(Observation.ObservationStatus.FINAL);
+    if (profile != null) {
+      observation.setMeta(new Meta().addProfile(profile));
+    }
 
     buildCode(observation, observationResource, type);
+    addFixedLoincCode(observation, profile);
+    buildCategory(observation, profile);
     buildEffective(observation, date);
     buildSubject(observation, patient);
     buildPerformers(observation, practitionerList);
     buildValue(observation, observationResource);
 
     return observation;
+  }
+
+  private void addFixedLoincCode(Observation observation, String profile) {
+    FixedLoincCode fixedCode = profile == null ? null : FIXED_LOINC_CODE_BY_PROFILE.get(profile);
+    if (fixedCode != null) {
+      observation
+          .getCode()
+          .addCoding(
+              new Coding()
+                  .setSystem(BundleUrlIdentifier.LOINC_URL)
+                  .setCode(fixedCode.code())
+                  .setDisplay(fixedCode.display()));
+    }
+  }
+
+  private void buildCategory(Observation observation, String profile) {
+    if (ResourceProfileIdentifier.PROFILE_VITAL_SIGNS.equals(profile)) {
+      observation.addCategory(
+          new CodeableConcept()
+              .addCoding(
+                  new Coding()
+                      .setSystem("http://terminology.hl7.org/CodeSystem/observation-category")
+                      .setCode("vital-signs")));
+    }
   }
 
   private void buildCode(

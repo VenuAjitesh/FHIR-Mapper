@@ -26,6 +26,21 @@ public class MakeImmunizationResource {
       Organization organization,
       ImmunizationResource resource)
       throws ParseException {
+    return getImmunization(
+        patient,
+        practitionerList,
+        organization,
+        resource,
+        ResourceProfileIdentifier.PROFILE_IMMUNIZATION);
+  }
+
+  public Immunization getImmunization(
+      Patient patient,
+      List<Practitioner> practitionerList,
+      Organization organization,
+      ImmunizationResource resource,
+      String profile)
+      throws ParseException {
 
     Immunization immunization = new Immunization();
     immunization.setId(UUID.randomUUID().toString());
@@ -33,7 +48,7 @@ public class MakeImmunizationResource {
         new Meta()
             .setVersionId("1")
             .setLastUpdatedElement(Utils.getCurrentTimeStamp())
-            .addProfile(ResourceProfileIdentifier.PROFILE_IMMUNIZATION));
+            .addProfile(profile));
     immunization.setStatus(Immunization.ImmunizationStatus.COMPLETED);
     immunization.setPatient(Utils.buildReference(patient.getId()));
     immunization.setPrimarySource(true);

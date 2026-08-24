@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +33,10 @@ public class MakeHealthDocumentComposition {
       composition.setCustodian(createCustodian(organization));
     }
     composition.setSubject(createSubject(patient));
-    composition.setDateElement(Utils.getFormattedDateTime(authoredOn));
+    composition.setDateElement(
+        StringUtils.isNotBlank(authoredOn)
+            ? Utils.getFormattedDateTime(authoredOn)
+            : new DateTimeType(new java.util.Date()));
     composition.setStatus(Composition.CompositionStatus.FINAL);
     composition.setIdentifier(createIdentifier());
     composition.setId(UUID.randomUUID().toString());

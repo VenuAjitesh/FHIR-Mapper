@@ -15,6 +15,7 @@ import in.nha.abdm.fhir.mapper.rest.requests.DiagnosticReportRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.DischargeSummaryRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.HealthDocumentRecord;
 import in.nha.abdm.fhir.mapper.rest.requests.ImmunizationRequest;
+import in.nha.abdm.fhir.mapper.rest.requests.InpsRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.InsurancePlanBundleRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.InvoiceBundleRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.OPConsultationRequest;
@@ -58,6 +59,7 @@ public class BundleExtractionService {
   private final ClaimResponseBundleExtractor claimResponseBundleExtractor;
   private final InsurancePlanBundleExtractor insurancePlanBundleExtractor;
   private final PaymentNoticeBundleExtractor paymentNoticeBundleExtractor;
+  private final InpsBundleExtractor inpsBundleExtractor;
 
   public ExtractedBundleResponse extract(Bundle bundle) {
     NhcxExtractorDefinition nhcxDefinition = identifyNhcxExtractor(bundle);
@@ -229,6 +231,15 @@ public class BundleExtractionService {
               OPConsultationRequest request =
                   opConsultationBundleExtractor.extract(bundle, composition);
               request.setBundleType(ValidationConstants.OP_CONSULT_RECORD);
+              return request;
+            }),
+        extractorDefinition(
+            ValidationConstants.INPS_RECORD,
+            List.of(BundleCompositionIdentifier.INPS_COMPOSITION_TYPE_CODE),
+            List.of(BundleCompositionIdentifier.INPS_TITLE),
+            (bundle, composition) -> {
+              InpsRequest request = inpsBundleExtractor.extract(bundle, composition);
+              request.setBundleType(ValidationConstants.INPS_RECORD);
               return request;
             }));
   }

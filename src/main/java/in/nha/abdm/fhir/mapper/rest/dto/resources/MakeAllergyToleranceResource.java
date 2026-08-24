@@ -24,13 +24,26 @@ public class MakeAllergyToleranceResource {
       AllergyResource resource,
       String authoredOn)
       throws ParseException {
+    return getAllergy(
+        patient,
+        practitionerList,
+        resource,
+        authoredOn,
+        ResourceProfileIdentifier.PROFILE_ALLERGY_INTOLERANCE);
+  }
+
+  public AllergyIntolerance getAllergy(
+      Patient patient,
+      List<Practitioner> practitionerList,
+      AllergyResource resource,
+      String authoredOn,
+      String profile)
+      throws ParseException {
 
     AllergyIntolerance allergy = new AllergyIntolerance();
     allergy.setId(UUID.randomUUID().toString());
     allergy.setMeta(
-        new Meta()
-            .setLastUpdatedElement(Utils.getCurrentTimeStamp())
-            .addProfile(ResourceProfileIdentifier.PROFILE_ALLERGY_INTOLERANCE));
+        new Meta().setLastUpdatedElement(Utils.getCurrentTimeStamp()).addProfile(profile));
 
     SnomedConditionProcedure snomed =
         snomedService.getConditionProcedureCode(resource.getAllergy());

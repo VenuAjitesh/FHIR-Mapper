@@ -1132,6 +1132,80 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericErrorResponse'
+  /inps:
+    post:
+      tags:
+        - HI Types
+      summary: Create an INPS (Indian Patient Summary) bundle
+      description: |
+        Builds an INPS document bundle (NRCES IG 7.0.0, derived from HL7 IPS 2.0.0).
+        Only Problems, Allergies and Medications are mandatory; the other 13 sections
+        (Immunizations, Procedures, Medical Devices, Results, Past Problems, Pregnancy,
+        Social History, Vital Signs, Plan of Care, Advance Directives, Alerts, Functional
+        Status, Patient Story) are optional.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InpsRequest'
+      responses:
+        '201':
+          description: Successfully created
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationErrorResponse'
+                  - $ref: '#/components/schemas/GenericErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorResponse'
+  /inps/aggregate:
+    post:
+      tags:
+        - HI Types
+      summary: Build an INPS bundle from existing clinical-record bundles
+      description: |
+        Aggregates already-built discharge-summary, OP-consult, prescription, immunization,
+        diagnostic-report and wellness-record bundles into a single INPS bundle.
+
+        Request body is a bare JSON array of FHIR Bundles (not wrapped in an object).
+        careContextReference, status and compositionDate are generated automatically.
+
+        Problems, Past Problems, Allergies and Practitioners are deduped by case-insensitive
+        text match (first occurrence wins). Medications, Procedures, Immunizations and Results
+        are never deduped, since repeat entries represent distinct clinical events.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Bundle'
+      responses:
+        '201':
+          description: Successfully created
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationErrorResponse'
+                  - $ref: '#/components/schemas/GenericErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorResponse'
   /validate:
     post:
       tags:
@@ -1856,6 +1930,293 @@ components:
           - type: Prescription
             contentType: application/pdf
             data: JVBERi0xLjMKJf////8KOCAwIG9iago8PAovVHlwZSAvRXh0R1N0YXRlCi9jYSAxCj4
+
+    InpsRequest:
+      type: object
+      description: |
+        Request body for creating an ABDM/NRCES-compliant INPS (Indian Patient Summary) bundle.
+        Derived from HL7 IPS 2.0.0, dual-conformant with NRCES IG 7.0.0. Only Problems,
+        Allergies and Medications are mandatory; every other section is optional.
+      required:
+        - bundleType
+        - careContextReference
+        - status
+        - compositionDate
+        - patient
+        - practitioners
+      properties:
+        bundleType:
+          type: string
+          description: Type of the record bundle (must be PatientSummaryRecord)
+          enum:
+            - PatientSummaryRecord
+        careContextReference:
+          type: string
+          example: visit-2026-08-14T10:00:00Z
+        status:
+          type: string
+          description: Composition status
+          example: final
+        compositionDate:
+          type: string
+          description: Date the summary was composed (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+          example: 2026-08-14T10:00:00.000Z
+        title:
+          type: string
+          description: Composition title, defaults to "Patient Summary" if omitted
+        patient:
+          $ref: '#/components/schemas/Patient'
+        practitioners:
+          type: array
+          items:
+            $ref: '#/components/schemas/Practitioner'
+        organisation:
+          $ref: '#/components/schemas/Organisation'
+        problems:
+          type: array
+          description: Problem List section (mandatory per IPS)
+          items:
+            $ref: '#/components/schemas/ConditionResource'
+        allergies:
+          type: array
+          description: Allergies and Intolerances section (mandatory per IPS)
+          items:
+            $ref: '#/components/schemas/AllergyResource'
+        medications:
+          type: array
+          description: Medication Summary section (mandatory per IPS)
+          items:
+            $ref: '#/components/schemas/MedicationStatementResource'
+        immunizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Immunization'
+        procedures:
+          type: array
+          items:
+            $ref: '#/components/schemas/Procedure'
+        medicalDevices:
+          type: array
+          description: Medical Devices section
+          items:
+            $ref: '#/components/schemas/MedicalDeviceResource'
+        labResults:
+          type: array
+          description: Laboratory/pathology results (Results section)
+          items:
+            $ref: '#/components/schemas/Diagnostic'
+        radiologyResults:
+          type: array
+          description: Radiology results (Results section)
+          items:
+            $ref: '#/components/schemas/Diagnostic'
+        pastProblems:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConditionResource'
+        pregnancyStatus:
+          type: array
+          items:
+            $ref: '#/components/schemas/Observation'
+        pregnancyOutcome:
+          type: array
+          items:
+            $ref: '#/components/schemas/Observation'
+        tobaccoUse:
+          $ref: '#/components/schemas/Observation'
+        alcoholUse:
+          $ref: '#/components/schemas/Observation'
+        vitalSigns:
+          type: array
+          items:
+            $ref: '#/components/schemas/Observation'
+        carePlans:
+          type: array
+          description: Plan of Care section
+          items:
+            $ref: '#/components/schemas/CarePlan'
+        immunizationRecommendations:
+          type: array
+          description: Plan of Care section
+          items:
+            $ref: '#/components/schemas/ImmunizationRecommendationResource'
+        advanceDirectives:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentResource'
+        alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlertResource'
+        functionalStatusConditions:
+          type: array
+          description: Functional Status section (disability entries)
+          items:
+            $ref: '#/components/schemas/ConditionResource'
+        functionalAssessments:
+          type: array
+          description: Functional Status section (assessment entries)
+          items:
+            $ref: '#/components/schemas/FunctionalAssessmentResource'
+        patientStoryText:
+          type: string
+          description: Free-text Patient Story section (narrative only, no entries)
+      example:
+        bundleType: PatientSummaryRecord
+        careContextReference: visit-2026-08-14T10:00:00Z
+        status: final
+        compositionDate: 2026-08-14T10:00:00.000Z
+        patient:
+          name: Venu Ajitesh
+          patientReference: ajitesh6x
+          gender: male
+          birthDate: 2001-04-27
+        practitioners:
+          - name: Dr.Venu Ajitesh
+            practitionerId: Predator
+        organisation:
+          facilityName: Predator_HIP
+          facilityId: Predator_HIP
+        problems:
+          - condition: Hypertension
+            recordedDate: 2026-08-01T09:00:00.000Z
+            clinicalStatus: active
+            verificationStatus: confirmed
+        allergies:
+          - allergy: Penicillin
+            clinicalStatus: active
+            type: allergy
+        medications:
+          - medicine: Amlodipine 5mg
+            status: active
+            effectiveStart: 2026-07-01T00:00:00.000Z
+            dosageText: Once daily
+
+    MedicationStatementResource:
+      type: object
+      description: A medication the patient is/was taking (statement, not a prescription order)
+      properties:
+        medicine:
+          type: string
+          example: Amlodipine 5mg
+        status:
+          type: string
+          enum: [active, completed, entered-in-error, intended, stopped, on-hold, unknown, not-taken]
+          example: active
+        effectiveStart:
+          type: string
+          example: 2026-07-01T00:00:00.000Z
+        dateAsserted:
+          type: string
+        reasonCode:
+          type: string
+        dosageText:
+          type: string
+          example: Once daily
+      required:
+        - medicine
+        - status
+
+    MedicalDeviceResource:
+      type: object
+      description: A medical device in use by the patient (Medical Devices section)
+      properties:
+        deviceName:
+          type: string
+          example: Insulin Pump
+        manufacturer:
+          type: string
+        modelNumber:
+          type: string
+        serialNumber:
+          type: string
+        status:
+          type: string
+          example: active
+        recordedDate:
+          type: string
+      required:
+        - deviceName
+        - status
+
+    ImmunizationRecommendationResource:
+      type: object
+      description: A recommended (not yet administered) immunization, part of Plan of Care
+      properties:
+        vaccineName:
+          type: string
+          example: Tetanus booster
+        date:
+          type: string
+          example: 2026-09-01T09:00:00.000Z
+        forecastStatus:
+          type: string
+          example: due
+        targetDisease:
+          type: string
+          example: Tetanus
+      required:
+        - vaccineName
+        - date
+
+    ConsentResource:
+      type: object
+      description: An advance directive (Advance Directives section)
+      properties:
+        type:
+          type: string
+          example: Do Not Resuscitate
+        status:
+          type: string
+          example: active
+        dateTime:
+          type: string
+      required:
+        - type
+
+    AlertResource:
+      type: object
+      description: A clinical alert or flag (Alerts section)
+      properties:
+        code:
+          type: string
+          example: Penicillin allergy - high risk
+        status:
+          type: string
+          example: active
+      required:
+        - code
+        - status
+
+    FunctionalAssessmentResource:
+      type: object
+      description: A functional status assessment (Functional Status section)
+      properties:
+        summary:
+          type: string
+          example: Independent with mobility aid
+        status:
+          type: string
+          example: completed
+        date:
+          type: string
+      required:
+        - summary
+
+    Bundle:
+      type: object
+      description: A FHIR R4 Bundle document, as produced by any of this API's bundle-creation endpoints
+      properties:
+        resourceType:
+          type: string
+          example: Bundle
+        type:
+          type: string
+          example: document
+        entry:
+          type: array
+          items:
+            type: object
 
     Patient:
       type: object

@@ -31,20 +31,25 @@ public class MakeConditionResource {
             .verificationStatus("confirmed")
             .category("encounter-diagnosis")
             .build();
-    return buildCondition(conditionResource, patient);
+    return buildCondition(conditionResource, patient, ResourceProfileIdentifier.PROFILE_CONDITION);
   }
 
   public Condition getCondition(ConditionResource conditionResource, Patient patient)
       throws ParseException {
-    return buildCondition(conditionResource, patient);
+    return buildCondition(conditionResource, patient, ResourceProfileIdentifier.PROFILE_CONDITION);
   }
 
-  private Condition buildCondition(ConditionResource conditionResource, Patient patient)
-      throws ParseException {
+  public Condition getCondition(
+      ConditionResource conditionResource, Patient patient, String profile) throws ParseException {
+    return buildCondition(conditionResource, patient, profile);
+  }
+
+  private Condition buildCondition(
+      ConditionResource conditionResource, Patient patient, String profile) throws ParseException {
     Condition condition = new Condition();
     condition.setId(UUID.randomUUID().toString());
     condition.setCode(createCode(conditionResource.getCondition()));
-    condition.setMeta(createMeta());
+    condition.setMeta(createMeta(profile));
     condition.setSubject(createSubject(patient));
     setRecordedDate(condition, conditionResource.getRecordedDate());
     setOnset(condition, conditionResource.getDateRange());
@@ -71,10 +76,8 @@ public class MakeConditionResource {
         .setText(conditionDetails);
   }
 
-  private Meta createMeta() throws ParseException {
-    return new Meta()
-        .setLastUpdatedElement(Utils.getCurrentTimeStamp())
-        .addProfile(ResourceProfileIdentifier.PROFILE_CONDITION);
+  private Meta createMeta(String profile) throws ParseException {
+    return new Meta().setLastUpdatedElement(Utils.getCurrentTimeStamp()).addProfile(profile);
   }
 
   private Reference createSubject(Patient patient) {
