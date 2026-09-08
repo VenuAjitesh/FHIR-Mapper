@@ -29,6 +29,7 @@ Recommended RAM: Systems with more than 8 GB RAM
 * If you have chosen to install Java and gradle components, then here is how you can bring the service up:
   - Go to root of this repository and start fhir-mapper by running `gradle bootrun`
 - Using any of the above approaches the server will be running on port `8085`
+- Open `http://localhost:8085/` to confirm the service is up; it returns a small JSON index of the available base paths. The API reference is published separately at [venuajitesh.github.io/FHIR-Mapper](https://venuajitesh.github.io/FHIR-Mapper/) — the application itself does not host a Swagger UI.
 
 ### ABDM PROFILES (HI-Types)
 - The HI type is primarily defined based on the data being collected. However the type of interaction should also be considered.
