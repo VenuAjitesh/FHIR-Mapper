@@ -11,6 +11,10 @@ import java.io.InputStream;
 import java.util.List;
 import org.hl7.fhir.common.hapi.validation.support.*;
 import org.hl7.fhir.common.hapi.validation.validator.FhirInstanceValidator;
+import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.CanonicalType;
+import org.hl7.fhir.r4.model.ElementDefinition;
+import org.hl7.fhir.r4.model.StructureDefinition;
 import org.hl7.fhir.r5.utils.validation.constants.BestPracticeWarningLevel;
 import org.hl7.fhir.utilities.npm.NpmPackage;
 import org.slf4j.Logger;
@@ -60,6 +64,7 @@ public class FhirConfiguration implements WebMvcConfigurer {
     // ABDM Profile Support (NPM Package)
     NpmPackageValidationSupport npmSupport = new NpmPackageValidationSupport(fhirContext);
     loadABDMProfiles(npmSupport);
+    normaliseTargetProfiles(npmSupport);
 
     // Remote Terminology Support (tx.fhir.org)
     RemoteTerminologyServiceValidationSupport remoteTerminology =
@@ -92,6 +97,28 @@ public class FhirConfiguration implements WebMvcConfigurer {
       log.info(LogMessageConstants.IPS_NPM_LOAD_SUCCESS);
     } catch (Exception e) {
       log.error(LogMessageConstants.IPS_NPM_LOAD_FAILED, e.getMessage());
+    }
+  }
+
+  void normaliseTargetProfiles(NpmPackageValidationSupport npmSupport) {
+    for (IBaseResource resource : npmSupport.fetchAllStructureDefinitions()) {
+      if (resource instanceof StructureDefinition structureDefinition) {
+        stripCanonicalVersions(structureDefinition.getSnapshot().getElement());
+        stripCanonicalVersions(structureDefinition.getDifferential().getElement());
+      }
+    }
+  }
+
+  private void stripCanonicalVersions(List<ElementDefinition> elements) {
+    for (ElementDefinition element : elements) {
+      for (ElementDefinition.TypeRefComponent type : element.getType()) {
+        for (CanonicalType target : type.getTargetProfile()) {
+          String value = target.getValue();
+          if (value != null && value.contains("|")) {
+            target.setValue(value.substring(0, value.indexOf('|')));
+          }
+        }
+      }
     }
   }
 
