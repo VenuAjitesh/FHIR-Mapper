@@ -2,6 +2,7 @@
 package in.nha.abdm.fhir.mapper.rest.common.constants;
 
 public class ControllerMappingConstants {
+  public static final String ROOT_PATH = "/";
   public static final String BUNDLE_BASE_PATH = "/v1/bundle";
   public static final String IMMUNIZATION_PATH = "/immunization";
   public static final String PRESCRIPTION_PATH = "/prescription";
@@ -27,4 +28,7 @@ public class ControllerMappingConstants {
   public static final String TERMINOLOGY_BASE_PATH = "/v1/terminology";
   public static final String TERMINOLOGY_SEARCH_PATH = "/search";
   public static final String TERMINOLOGY_TRANSLATE_PATH = "/translate";
+  public static final String SERVICE_NAME = "FHIR-Mapper";
+  public static final String SERVICE_STATUS_UP = "UP";
+  public static final String DOCUMENTATION_URL = "https://venuajitesh.github.io/FHIR-Mapper/";
 }
