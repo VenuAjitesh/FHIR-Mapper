@@ -662,7 +662,7 @@ paths:
             example:
               bundleType: Invoice
               careContextReference: visit-2025-08-20T10:00:00Z
-              invoiceDate: 2025-08-12T10:30:00+05:30
+              invoiceDate: "2025-08-12T10:30:00.000Z"
               status: issued
               encounter: ""
               patient:
@@ -744,7 +744,7 @@ paths:
               payment:
                 method: upi
                 status: active
-                paymentDate: 2025-08-12T11:00:00+05:30
+                paymentDate: "2025-08-12T11:00:00.000Z"
                 paidAmount: 2200.00
                 transactionId: TXN-98765
       responses:
@@ -1271,7 +1271,7 @@ components:
           facilityName: Predator_HIP
           facilityId: Predator_HIP
         chiefComplaints:
-          - complaint: Fever
+          - condition: Fever
             recordedDate: 2024-05-20
         physicalExaminations:
           - observation: Blood Pressure
@@ -1422,7 +1422,7 @@ components:
         - prescriptions
       example:
         bundleType: PrescriptionRecord
-        careContextReference: visit-{{$isoTimestamp}}
+        careContextReference: visit 21-03-2025
         authoredOn: 2001-05-22
         encounter: ""
         patient:
@@ -1507,17 +1507,18 @@ components:
           facilityId: Predator_HIP
         encounter: ""
         documents:
-          - contentType: application/pdf
-            data: xyzadybcljbabvlalbfdbvubujzbj
+          - type: health-document
+            contentType: application/pdf
+            data: JVBERi0xLjMKJf////8K
     DiagnosticReport:
       type: object
       description: Request body for creating an ABDM compliant Diagnostic Report bundle.
       properties:
         bundleType:
           type: string
-          description: Type of the record bundle (must be DiagnosticReport)
+          description: Type of the record bundle (must be DiagnosticReportRecord)
           enum:
-            - DiagnosticReport
+            - DiagnosticReportRecord
         careContextReference:
           type: string
           description: Reference to the care context
@@ -1556,9 +1557,9 @@ components:
         - authoredOn
         - diagnostics
       example:
-        bundleType: DiagnosticReport
+        bundleType: DiagnosticReportRecord
         careContextReference: visist 21-03-2024
-        authoredOn: 2024-05-20
+        visitDate: 2024-05-20
         patient:
           name: Venu Ajitesh
           patientReference: ajitesh6x
@@ -1574,6 +1575,7 @@ components:
         diagnostics:
           - serviceName: BloodTest
             serviceCategory: Hematography
+            authoredOn: 2024-05-20
             result:
               - observation: Blood Pressure
                 status: final
@@ -1590,10 +1592,11 @@ components:
             conclusion: Normal
             presentedForm:
               contentType: application/pdf
-              data: skciybewydcugueducuyeduychidhyuchyedyhcb
+              data: JVBERi0xLjMKJf////8K
         documents:
-          - contentType: pdf
-            data: xyzadybcljbabvlalbfdbvubujzbj
+          - type: diagnosticReport
+            contentType: application/pdf
+            data: JVBERi0xLjMKJf////8K
 
     ImmunizationRecord:
       type: object
@@ -1633,7 +1636,8 @@ components:
         - immunizations
       example:
         bundleType: ImmunizationRecord
-        careContextReference: visit-{{$isoTimestamp}}
+        careContextReference: visit 21-03-2025
+        authoredOn: 2024-06-15
         patient:
           name: Venu Ajitesh
           patientReference: ajitesh6x
@@ -1654,7 +1658,7 @@ components:
         documents:
           - type: immunization
             contentType: application/pdf
-            data: xyzadybcljbabvlalbfdbvubujzbj
+            data: JVBERi0xLjMKJf////8K
     DischargeSummary:
       type: object
       description: Request body for creating an ABDM compliant Discharge Summary bundle.
@@ -1785,6 +1789,7 @@ components:
         diagnostics:
           - serviceName: BloodTest
             serviceCategory: Hematography
+            authoredOn: 2024-05-20
             result:
               - observation: Blood Pressure
                 status: final
@@ -1800,16 +1805,17 @@ components:
             conclusion: Normal
             presentedForm:
               contentType: application/pdf
-              data: skciybewydcugueducuyeduychidhyuchyedyhcb
+              data: JVBERi0xLjMKJf////8K
         procedures:
-          - status: INPROGRESS
-            condition: Severe
+          - date: 2024-05-07
+            status: INPROGRESS
+            procedureReason: Severe
             outcome: Healthy
-            details: Operation
+            procedureName: Operation
         documents:
           - type: OP record
             contentType: application/pdf
-            data: xyzadybcljbabvlalbfdbvubujzbj
+            data: JVBERi0xLjMKJf////8K
     WellnessRecord:
       type: object
       description: Request body for creating an ABDM compliant Wellness Record bundle (vitals, body measurements, physical activities, etc.).
@@ -1869,14 +1875,15 @@ components:
         - practitioners
         - careContextReference
       example:
-        bundleType: wellness-record
+        bundleType: WellnessRecord
+        authoredOn: 2025-03-21
         careContextReference: visist 21-03-2025
         patient:
           name: Venu Ajitesh
           patientReference: ajitesh6x
           gender: male
           birthDate: 2001-04-27
-        practitioner:
+        practitioners:
           - name: Dr.Venu Ajitesh
             practitionerId: Predator
         organisation:
@@ -1929,7 +1936,7 @@ components:
         documents:
           - type: Prescription
             contentType: application/pdf
-            data: JVBERi0xLjMKJf////8KOCAwIG9iago8PAovVHlwZSAvRXh0R1N0YXRlCi9jYSAxCj4
+            data: JVBERi0xLjMKJf////8K
 
     InpsRequest:
       type: object
@@ -2326,7 +2333,7 @@ components:
         conclusion: Negative for disease
         presentedForm:
           contentType: application/pdf
-          data: skciybewydcugueducuyeduychidhyuchyedyhcb
+          data: JVBERi0xLjMKJf////8K
     Immunization:
       type: object
       description: Details of a single immunization event
@@ -2949,7 +2956,7 @@ components:
       example:
         type: OP record
         contentType: application/pdf
-        data: xyzadybcljbabvlalbfdbvubujzbj
+        data: JVBERi0xLjMKJf////8K
     InvoiceBundleRequest:
       type: object
       description: Request body for creating an ABDM compliant Invoice Bundle

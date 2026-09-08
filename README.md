@@ -75,7 +75,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
     {
       "bundleType": "DiagnosticReportRecord", 
       "careContextReference": "visist 21-03-2024", 
-      "authoredOn": "2006-04-22", 
+      "visitDate": "2006-04-22", 
       "patient": { 
         "name": "Venu Ajitesh", 
         "patientReference": "ajitesh6x", 
@@ -94,6 +94,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
       "diagnostics": [{
         "serviceName": "BloodTest", 
         "serviceCategory": "Hematography", 
+        "authoredOn": "2006-04-22", 
         "result": [{ 
           "observation": "Height", 
           "result": "Normal",
@@ -105,15 +106,16 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
         "conclusion": "Normal", 
         "presentedForm": {
           "contentType": "application/pdf",
-          "data": "Base64 data of the pdf"
+          "data": "JVBERi0xLjM="
         }
       }],
       "documents": [{
         "type": "diagnosticReport",  
         "contentType": "application/pdf",  
-        "data": "Base64 data of the pdf"  
+        "data": "JVBERi0xLjM="  
       }]
-    } ```
+    }
+    ```
 </details> 
 
 <details>
@@ -142,7 +144,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
     },
     "chiefComplaints":[
         {
-            "complaint":"Sugar", //mandatory
+            "condition":"Sugar", //mandatory
             "recordedDate":"2024-05-20", //mandatory
             "dateRange":{
                 "from":"2018-04-27",
@@ -161,11 +163,14 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
         }
     ],
     "allergies":[
-        "Walnuts"
+        {
+            "allergy":"Walnuts", //mandatory
+            "clinicalStatus":"active" //mandatory
+        }
     ],
     "medicalHistories":[
         {
-            "complaint":"Sugar", //mandatory
+            "condition":"Sugar", //mandatory
             "recordedDate":"2024-05-20", //mandatory
             "dateRange":{
                 "from":"2018-04-27",
@@ -179,12 +184,15 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
             "observation":"Toxic" //mandatory
         }
     ],
-    "authoredOn":"2024-02-03", //mandatory
+    "visitDetails":{ //mandatory
+        "visitDate":"2024-02-03", //mandatory
+        "dischargeDate":"2024-02-06"
+    },
     "medications":[
         {
           "medicine":"Aspirin 75 mg oral tablet", //mandatory
           "dosage":"1-0-1", //mandatory
-          "timing":"2-5-d",
+          "timing":"2-5-D",
           "route":"Oral",
           "method":"swallow",
           "additionalInstructions":"Take them after food",
@@ -193,7 +201,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
       ,{
           "medicine":"Disprin",  //mandatory
           "dosage":"0-0-1", //mandatory
-          "timing":"1-2-d",
+          "timing":"1-2-D",
           "route":"Syrup",
           "method":"drink",
           "additionalInstructions":"Take them before food",
@@ -203,6 +211,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
     "diagnostics":[{
         "serviceName":"BloodTest", //mandatory
         "serviceCategory":"Hematography", //mandatory
+        "authoredOn":"2024-02-03", //mandatory
         "result":[{ 
             "observation":"Height", //mandatory
             "result":"Normal", //you can pass either result or valueQuantity not both
@@ -214,7 +223,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
         "conclusion":"Normal", //mandatory
         "presentedForm":{
             "contentType":"application/pdf",
-            "data":"Base64 data of the pdf"
+            "data":"JVBERi0xLjM="
           }
     }],
     
@@ -231,7 +240,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
     "documents":[{
         "type":"Discharge record", //mandatory
         "contentType":"application/pdf", //mandatory
-        "data":"Base64 data of the pdf" //mandatory
+        "data":"JVBERi0xLjM=" //mandatory
     }]
   }
   ```
@@ -265,7 +274,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
     "documents":[{
         "type":"health-document", //mandatory
         "contentType":"application/pdf", //mandatory
-        "data":"Base64 data of the pdf" //mandatory
+        "data":"JVBERi0xLjM=" //mandatory
     }]
   }
   ```
@@ -278,7 +287,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
   ```
   {
     "bundleType":"ImmunizationRecord", //mandatory
-    "careContextReference":"visit-{{$isoTimestamp}}", //mandatory
+    "careContextReference":"visit 21-03-2024", //mandatory
     "authoredOn":"2022-02-14", //mandatory
     "patient":{ //mandatory
         "name":"Venu Ajitesh", //mandatory
@@ -304,7 +313,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
     "documents":[{
         "type":"immunization", //mandatory
         "contentType":"application/pdf", //mandatory
-        "data":"Base64 data of the pdf" //mandatory
+        "data":"JVBERi0xLjM=" //mandatory
       }]
   }
   ```
@@ -335,7 +344,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
     },
     "chiefComplaints":[
         {
-            "complaint":"Sugar", //mandatory
+            "condition":"Sugar", //mandatory
             "recordedDate":"2024-05-20", //mandatory
             "dateRange":{
                 "from":"2018-04-27",
@@ -354,11 +363,14 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
         }
     ],
     "allergies":[
-        "Walnuts"
+        {
+            "allergy":"Walnuts", //mandatory
+            "clinicalStatus":"active" //mandatory
+        }
     ],
     "medicalHistories":[
         {
-            "complaint":"Sugar", //mandatory
+            "condition":"Sugar", //mandatory
             "recordedDate":"2024-05-20", //mandatory
             "dateRange":{
                 "from":"2018-04-27",
@@ -383,7 +395,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
         {
             "medicine":"Aspirin 75 mg oral tablet", //mandatory
             "dosage":"1-0-1", //mandatory
-            "timing":"2-5-d",
+            "timing":"2-5-D",
             "route":"Oral",
             "method":"swallow",
             "additionalInstructions":"Take them after food",
@@ -392,7 +404,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
         ,{
             "medicine":"Disprin", //mandatory
             "dosage":"0-0-1", //mandatory
-            "timing":"1-2-d",
+            "timing":"1-2-D",
             "route":"Syrup",
             "method":"drink",
             "additionalInstructions":"Take them before food",
@@ -435,7 +447,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
     "documents":[{
         "type":"OP record", //mandatory
         "contentType":"application/pdf", //mandatory
-        "data":"Base64 data of the pdf" //mandatory
+        "data":"JVBERi0xLjM=" //mandatory
       }]
   }
   ```
@@ -448,7 +460,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
   ```
   {
     "bundleType":"PrescriptionRecord", //mandatory
-    "careContextReference":"visit-{{$isoTimestamp}}", //mandatory
+    "careContextReference":"visit 21-03-2024", //mandatory
     "authoredOn":"2001-05-22", //mandatory
     "encounter":"",
     "patient":{ //mandatory
@@ -469,7 +481,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
         {
             "medicine":"Aspirin 75 mg oral tablet", //mandatory
             "dosage":"1-0-1", //mandatory
-            "timing":"2-5-d",
+            "timing":"2-5-D",
             "route":"Oral",
             "method":"swallow",
             "additionalInstructions":"Take them after food",
@@ -478,7 +490,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
         ,{
             "medicine":"Disprin", //mandatory
             "dosage":"0-0-1", //mandatory
-            "timing":"1-2-d",
+            "timing":"1-2-D",
             "route":"Syrup",
             "method":"drink",
             "additionalInstructions":"Take them before food",
@@ -488,7 +500,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
     "documents":[{
         "type":"Prescription", //mandatory
         "contentType":"application/pdf", //mandatory
-        "data":"Base64 data of the pdf" //mandatory
+        "data":"JVBERi0xLjM=" //mandatory
       }]
   }
   ```
@@ -589,7 +601,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
     "documents":[{
         "type":"Wellness record", //mandatory
         "contentType":"application/pdf", //mandatory
-        "data":"Base64 data of the pdf" //mandatory
+        "data":"JVBERi0xLjM=" //mandatory
       }]
   }
   ```
@@ -602,7 +614,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
     ```
     {
       "bundleType": "Invoice",
-      "careContextReference": "visit-{{$isoTimestamp}}",
+      "careContextReference": "visit 21-03-2024",
       "invoiceDate": "2024-05-01T06:33:37.361Z",
       "status": "issued",
       "encounter": "",
@@ -652,7 +664,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
                   "manufacturer": "ABC Pharma",
                   "medicationForm": "tablet",
                   "lotNumber": "ABC123",
-                  "expiryDate": "{{$isoTimestamp}}"
+                  "expiryDate": "2026-04-27"
               }
           },
           {
@@ -703,7 +715,7 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
                   "code": "LAB-REAGENT-001",
                   "category": "chemical",
                   "description": "Used to treat infections",
-                  "expiry": "{{$isoTimestamp}}",
+                  "expiry": "2026-04-27",
                   "quantity": "2.0"
               }
           }
@@ -711,10 +723,10 @@ The system includes an embedded H2 database with SNOMED codes used in ABDM profi
       "payment": {
           "method": "upi", // Optional
           "status":"active", // Optional
-          "paymentDate":"", /// Optional
+          "paymentDate":"2024-02-06", // Optional
           "paidAmount": 2200.00, // Optional
           "transactionId": "TXN-98765" // Optional
-      },
+      }
     }
       ```
     </details>
