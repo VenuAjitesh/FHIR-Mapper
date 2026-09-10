@@ -2,6 +2,7 @@
 package in.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import in.nha.abdm.fhir.mapper.Utils;
+import in.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
 import in.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.ObservationUtils;
 import in.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
@@ -9,6 +10,8 @@ import in.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedObservation;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.ObservationResource;
 import java.text.ParseException;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.r4.model.*;
@@ -17,6 +20,19 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class MakeObservationResource {
+  private static final Map<String, String> INTERPRETATION_CODES =
+      Map.ofEntries(
+          Map.entry("normal", "N"),
+          Map.entry("abnormal", "A"),
+          Map.entry("high", "H"),
+          Map.entry("low", "L"),
+          Map.entry("critical high", "HH"),
+          Map.entry("critical low", "LL"),
+          Map.entry("positive", "POS"),
+          Map.entry("negative", "NEG"),
+          Map.entry("detected", "DET"),
+          Map.entry("not detected", "ND"));
+
   private final SnomedService snomedService;
 
   public Observation getObservation(
@@ -66,15 +82,24 @@ public class MakeObservationResource {
     if (observationResource.getBodySite() != null && !observationResource.getBodySite().isEmpty()) {
       observation.setBodySite(new CodeableConcept().setText(observationResource.getBodySite()));
     }
-    if (observationResource.getInterpretation() != null
-        && !observationResource.getInterpretation().isEmpty()) {
-      observation.addInterpretation(
-          new CodeableConcept().setText(observationResource.getInterpretation()));
-    }
+    buildInterpretation(observation, observationResource.getInterpretation());
     buildComponents(observation, observationResource);
     Utils.setNarrative(observation, "Observation: " + observationResource.getObservation());
 
     return observation;
+  }
+
+  private void buildInterpretation(Observation observation, String interpretation) {
+    if (interpretation == null || interpretation.isEmpty()) {
+      return;
+    }
+    CodeableConcept concept = new CodeableConcept().setText(interpretation);
+    String code = INTERPRETATION_CODES.get(interpretation.trim().toLowerCase(Locale.ROOT));
+    if (code != null) {
+      concept.addCoding(
+          new Coding().setSystem(BundleUrlIdentifier.OBSERVATION_INTERPRETATION_URL).setCode(code));
+    }
+    observation.addInterpretation(concept);
   }
 
   private void buildCategory(Observation observation, String profile) {

@@ -36,4 +36,23 @@ class MakeConsentResourceTest {
         ResourceProfileIdentifier.PROFILE_CONSENT,
         consent.getMeta().getProfile().get(0).getValue());
   }
+
+  /**
+   * The LOINC section code used previously is not in the consent-category value set, so the
+   * extensible binding warned on every advance directive.
+   */
+  @Test
+  void categoryUsesTheAdvanceDirectiveCodeFromTheBoundValueSet() throws Exception {
+    Patient patient = new Patient();
+    patient.setId("patient-1");
+    patient.addName(new HumanName().setText("Test Patient"));
+
+    Consent consent =
+        target.getConsent(patient, ConsentResource.builder().type("Do Not Resuscitate").build());
+
+    assertEquals(
+        "http://terminology.hl7.org/CodeSystem/consentcategorycodes",
+        consent.getCategoryFirstRep().getCodingFirstRep().getSystem());
+    assertEquals("acd", consent.getCategoryFirstRep().getCodingFirstRep().getCode());
+  }
 }
