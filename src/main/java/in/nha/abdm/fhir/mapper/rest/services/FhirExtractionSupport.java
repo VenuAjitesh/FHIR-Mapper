@@ -1,10 +1,13 @@
 /* (C) 2026 */
 package in.nha.abdm.fhir.mapper.rest.services;
 
+import in.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
+import in.nha.abdm.fhir.mapper.rest.common.helpers.DateRange;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.DocumentResource;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.OrganisationResource;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.PatientResource;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.PractitionerResource;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.DiagnosticPresentedForm;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.ObservationComponentResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.ObservationResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.ValueQuantityResource;
@@ -12,15 +15,20 @@ import java.util.ArrayList;
 import java.util.List;
 import org.hl7.fhir.r4.model.Attachment;
 import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.DocumentReference;
 import org.hl7.fhir.r4.model.Encounter;
+import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Period;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.Type;
 
 class FhirExtractionSupport {
@@ -172,6 +180,49 @@ class FhirExtractionSupport {
     return ValueQuantityResource.builder()
         .value(quantity.hasValue() ? quantity.getValue().doubleValue() : 0)
         .unit(quantity.getUnit())
+        .build();
+  }
+
+  protected String vaccineBrandName(Immunization immunization) {
+    for (Extension extension : immunization.getExtension()) {
+      if (ResourceProfileIdentifier.PROFILE_VACCINE_BRAND_NAME.equals(extension.getUrl())) {
+        Type value = extension.getValue();
+        if (value instanceof StringType stringType) {
+          return stringType.getValue();
+        }
+        return value == null ? null : value.primitiveValue();
+      }
+    }
+    return null;
+  }
+
+  protected String vaccineReaction(Immunization immunization) {
+    if (!immunization.hasReaction()
+        || !immunization.getReactionFirstRep().hasDetail()
+        || !immunization.getReactionFirstRep().getDetail().hasDisplay()) {
+      return null;
+    }
+    return immunization.getReactionFirstRep().getDetail().getDisplay();
+  }
+
+  protected DiagnosticPresentedForm presentedForm(DiagnosticReport report) {
+    if (!report.hasPresentedForm()) {
+      return null;
+    }
+    Attachment attachment = report.getPresentedFormFirstRep();
+    return DiagnosticPresentedForm.builder()
+        .contentType(attachment.getContentType())
+        .data(attachment.getData())
+        .build();
+  }
+
+  protected DateRange period(Period period) {
+    if (period == null || period.isEmpty()) {
+      return null;
+    }
+    return DateRange.builder()
+        .from(period.hasStartElement() ? period.getStartElement().getValueAsString() : null)
+        .to(period.hasEndElement() ? period.getEndElement().getValueAsString() : null)
         .build();
   }
 }

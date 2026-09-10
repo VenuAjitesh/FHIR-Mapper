@@ -141,7 +141,15 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
                       : null)
               .clinicalStatus(firstCodingCode(condition.getClinicalStatus()))
               .verificationStatus(firstCodingCode(condition.getVerificationStatus()))
+              .category(
+                  condition.hasCategory() ? firstCodingCode(condition.getCategoryFirstRep()) : null)
               .severity(conceptText(condition.getSeverity()))
+              .stage(
+                  condition.hasStage()
+                      ? conceptText(condition.getStageFirstRep().getSummary())
+                      : null)
+              .bodySite(
+                  condition.hasBodySite() ? conceptText(condition.getBodySiteFirstRep()) : null)
               .note(condition.hasNote() ? condition.getNoteFirstRep().getText() : null)
               .build());
     }
@@ -161,6 +169,11 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
               .allergy(conceptText(allergy.getCode()))
               .clinicalStatus(firstCodingCode(allergy.getClinicalStatus()))
               .type(allergy.hasType() ? allergy.getType().toCode() : null)
+              .category(
+                  allergy.getCategory().stream()
+                      .filter(category -> category.getValue() != null)
+                      .map(category -> category.getValue().toCode())
+                      .toList())
               .note(allergy.hasNote() ? allergy.getNoteFirstRep().getText() : null)
               .reaction(extractReaction(allergy))
               .build());
@@ -232,6 +245,8 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
                       ? immunization.getOccurrenceDateTimeType().getValueAsString()
                       : null)
               .vaccineName(conceptText(immunization.getVaccineCode()))
+              .brandName(vaccineBrandName(immunization))
+              .reaction(vaccineReaction(immunization))
               .lotNumber(immunization.getLotNumber())
               .manufacturer(referenceDisplay(immunization.getManufacturer()))
               .recorded(
@@ -353,6 +368,7 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
               .result(observations)
               .specimen(
                   report.hasSpecimen() ? referenceDisplay(report.getSpecimenFirstRep()) : null)
+              .presentedForm(presentedForm(report))
               .build());
     }
     return results;
@@ -389,6 +405,7 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
               .intent(carePlan.hasIntent() ? carePlan.getIntent().toCode() : null)
               .type(carePlan.hasTitle() ? carePlan.getTitle() : null)
               .description(carePlan.hasDescription() ? carePlan.getDescription() : null)
+              .period(period(carePlan.getPeriod()))
               .notes(carePlan.hasNote() ? carePlan.getNoteFirstRep().getText() : null)
               .build());
     }
@@ -489,7 +506,7 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
       if (BundleCompositionIdentifier.INPS_PATIENT_STORY_SECTION.equalsIgnoreCase(
               section.getTitle())
           && section.hasText()) {
-        return section.getText().getDiv().allText();
+        return section.getText().getDiv().allText().strip();
       }
     }
     return null;
