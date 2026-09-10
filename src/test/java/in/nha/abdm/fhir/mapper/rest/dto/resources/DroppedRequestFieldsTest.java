@@ -84,6 +84,30 @@ class DroppedRequestFieldsTest {
 
     assertEquals(1, observation.getInterpretation().size());
     assertEquals("Normal", observation.getInterpretationFirstRep().getText());
+    assertEquals(
+        "N",
+        observation.getInterpretationFirstRep().getCodingFirstRep().getCode(),
+        "a recognised interpretation should also carry the coded value the binding asks for");
+  }
+
+  @Test
+  void unrecognisedInterpretationStaysTextOnly() throws Exception {
+    when(snomedService.getSnomedObservationCode(anyString()))
+        .thenReturn(SnomedObservation.builder().code("718-7").display("Haemoglobin").build());
+
+    Observation observation =
+        new MakeObservationResource(snomedService)
+            .getObservation(
+                patient(),
+                List.of(),
+                ObservationResource.builder()
+                    .observation("Haemoglobin")
+                    .interpretation("Slightly unusual")
+                    .build(),
+                "2026-09-10T10:00:00.000Z");
+
+    assertEquals("Slightly unusual", observation.getInterpretationFirstRep().getText());
+    assertTrue(observation.getInterpretationFirstRep().getCoding().isEmpty());
   }
 
   private Patient patient() {

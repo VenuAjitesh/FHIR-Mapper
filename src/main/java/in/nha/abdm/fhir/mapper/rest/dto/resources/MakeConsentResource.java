@@ -2,7 +2,6 @@
 package in.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import in.nha.abdm.fhir.mapper.Utils;
-import in.nha.abdm.fhir.mapper.rest.common.constants.BundleCompositionIdentifier;
 import in.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.ConsentResource;
 import java.text.ParseException;
@@ -35,9 +34,9 @@ public class MakeConsentResource {
             .setText(resource.getType())
             .addCoding(
                 new Coding()
-                    .setSystem("http://loinc.org")
-                    .setCode(BundleCompositionIdentifier.INPS_ADVANCE_DIRECTIVES_SECTION_CODE)
-                    .setDisplay("Advance directives")));
+                    .setSystem("http://terminology.hl7.org/CodeSystem/consentcategorycodes")
+                    .setCode("acd")
+                    .setDisplay("Advance Directive")));
     consent.setPatient(Utils.buildReference(patient.getId()));
     consent.setPolicyRule(new CodeableConcept().setText("Organizational advance directive policy"));
 
