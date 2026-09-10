@@ -8,13 +8,16 @@ import ca.uhn.fhir.validation.FhirValidator;
 import in.nha.abdm.fhir.mapper.rest.common.constants.IgVersionConstants;
 import in.nha.abdm.fhir.mapper.rest.common.constants.LogMessageConstants;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import org.hl7.fhir.common.hapi.validation.support.*;
 import org.hl7.fhir.common.hapi.validation.validator.FhirInstanceValidator;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.CanonicalType;
+import org.hl7.fhir.r4.model.CodeSystem;
 import org.hl7.fhir.r4.model.ElementDefinition;
 import org.hl7.fhir.r4.model.StructureDefinition;
+import org.hl7.fhir.r4.model.ValueSet;
 import org.hl7.fhir.r5.utils.validation.constants.BestPracticeWarningLevel;
 import org.hl7.fhir.utilities.npm.NpmPackage;
 import org.slf4j.Logger;
@@ -30,6 +33,7 @@ public class FhirConfiguration implements WebMvcConfigurer {
   private static final Logger log = LoggerFactory.getLogger(FhirConfiguration.class);
   private static final String NPM_PACKAGE_PATH = "/package.tgz";
   private static final String IPS_NPM_PACKAGE_PATH = "/ips-package.tgz";
+  private static final String CONCEPT_FILTER_PROPERTY = "concept";
 
   @Bean
   public FhirContext fhirContext() {
@@ -65,6 +69,8 @@ public class FhirConfiguration implements WebMvcConfigurer {
     NpmPackageValidationSupport npmSupport = new NpmPackageValidationSupport(fhirContext);
     loadABDMProfiles(npmSupport);
     normaliseTargetProfiles(npmSupport);
+    normaliseSubsumptionExcludes(
+        npmSupport, new ValidationSupportChain(npmSupport, defaultSupport));
 
     // Remote Terminology Support (tx.fhir.org)
     RemoteTerminologyServiceValidationSupport remoteTerminology =
@@ -120,6 +126,79 @@ public class FhirConfiguration implements WebMvcConfigurer {
         }
       }
     }
+  }
+
+  void normaliseSubsumptionExcludes(
+      NpmPackageValidationSupport npmSupport, IValidationSupport codeSystemSupport) {
+    for (IBaseResource resource : npmSupport.fetchAllConformanceResources()) {
+      if (resource instanceof ValueSet valueSet) {
+        for (ValueSet.ConceptSetComponent exclude : valueSet.getCompose().getExclude()) {
+          replaceSubsumptionFilters(exclude, codeSystemSupport);
+        }
+      }
+    }
+  }
+
+  private void replaceSubsumptionFilters(
+      ValueSet.ConceptSetComponent exclude, IValidationSupport codeSystemSupport) {
+    if (!exclude.hasFilter()) {
+      return;
+    }
+    CodeSystem codeSystem = enumerableCodeSystem(exclude.getSystem(), codeSystemSupport);
+    if (codeSystem == null) {
+      return;
+    }
+    List<ValueSet.ConceptSetFilterComponent> unresolved = new ArrayList<>();
+    for (ValueSet.ConceptSetFilterComponent filter : exclude.getFilter()) {
+      List<String> subsumed = subsumedCodes(filter, codeSystem);
+      if (subsumed.isEmpty()) {
+        unresolved.add(filter);
+      } else {
+        subsumed.forEach(code -> exclude.addConcept().setCode(code));
+      }
+    }
+    exclude.setFilter(unresolved);
+  }
+
+  private CodeSystem enumerableCodeSystem(String system, IValidationSupport codeSystemSupport) {
+    if (system == null
+        || !(codeSystemSupport.fetchCodeSystem(system) instanceof CodeSystem codeSystem)
+        || codeSystem.getContent() != CodeSystem.CodeSystemContentMode.COMPLETE) {
+      return null;
+    }
+    return codeSystem;
+  }
+
+  private List<String> subsumedCodes(
+      ValueSet.ConceptSetFilterComponent filter, CodeSystem codeSystem) {
+    if (filter.getOp() != ValueSet.FilterOperator.ISA
+        || !CONCEPT_FILTER_PROPERTY.equals(filter.getProperty())) {
+      return List.of();
+    }
+    return descendants(codeSystem.getConcept(), filter.getValue());
+  }
+
+  private List<String> descendants(
+      List<CodeSystem.ConceptDefinitionComponent> concepts, String rootCode) {
+    for (CodeSystem.ConceptDefinitionComponent concept : concepts) {
+      if (concept.getCode().equals(rootCode)) {
+        return selfAndDescendants(concept);
+      }
+      List<String> nested = descendants(concept.getConcept(), rootCode);
+      if (!nested.isEmpty()) {
+        return nested;
+      }
+    }
+    return List.of();
+  }
+
+  private List<String> selfAndDescendants(CodeSystem.ConceptDefinitionComponent concept) {
+    List<String> codes = new ArrayList<>();
+    codes.add(concept.getCode());
+    for (CodeSystem.ConceptDefinitionComponent child : concept.getConcept()) {
+      codes.addAll(selfAndDescendants(child));
+    }
+    return codes;
   }
 
   private void checkIgVersion() {
