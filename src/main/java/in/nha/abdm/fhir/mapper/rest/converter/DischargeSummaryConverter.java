@@ -342,8 +342,8 @@ public class DischargeSummaryConverter {
         .toList();
   }
 
-  private CarePlan createCarePlan(
-      DischargeSummaryRequest dischargeSummaryRequest, Patient patient) {
+  private CarePlan createCarePlan(DischargeSummaryRequest dischargeSummaryRequest, Patient patient)
+      throws ParseException {
     return dischargeSummaryRequest.getCarePlan() == null
         ? null
         : makeCarePlanResource.getCarePlan(dischargeSummaryRequest.getCarePlan(), patient);

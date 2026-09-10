@@ -4,9 +4,11 @@ package in.nha.abdm.fhir.mapper.rest.dto.resources;
 import in.nha.abdm.fhir.mapper.Utils;
 import in.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
 import in.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
+import in.nha.abdm.fhir.mapper.rest.common.helpers.DateRange;
 import in.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import in.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedEncounter;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.CarePlanResource;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -20,11 +22,13 @@ public class MakeCarePlanResource {
 
   private final SnomedService snomedService;
 
-  public CarePlan getCarePlan(CarePlanResource carePlanResource, Patient patient) {
+  public CarePlan getCarePlan(CarePlanResource carePlanResource, Patient patient)
+      throws ParseException {
     return getCarePlan(carePlanResource, patient, null);
   }
 
-  public CarePlan getCarePlan(CarePlanResource carePlanResource, Patient patient, String profile) {
+  public CarePlan getCarePlan(CarePlanResource carePlanResource, Patient patient, String profile)
+      throws ParseException {
     CarePlan carePlan = new CarePlan();
     carePlan.setId(UUID.randomUUID().toString());
     if (profile != null) {
@@ -38,6 +42,7 @@ public class MakeCarePlanResource {
     carePlan.setTitle(carePlanResource.getType());
     carePlan.setSubject(createSubject(patient));
     carePlan.setCategory(Collections.singletonList(createCategory(carePlanResource)));
+    setPeriod(carePlan, carePlanResource);
     setActivityAndNotes(carePlan, carePlanResource);
     Utils.setNarrative(carePlan, "Care plan: " + carePlanResource.getType());
     return carePlan;
@@ -48,6 +53,24 @@ public class MakeCarePlanResource {
         .setReference(MapperConstants.URN_UUID + patient.getId())
         .setDisplay(
             patient.getName().stream().map(HumanName::getText).collect(Collectors.joining(" ")));
+  }
+
+  private void setPeriod(CarePlan carePlan, CarePlanResource carePlanResource)
+      throws ParseException {
+    DateRange dateRange = carePlanResource.getPeriod();
+    if (dateRange == null) {
+      return;
+    }
+    Period period = new Period();
+    if (dateRange.getFrom() != null) {
+      period.setStartElement(Utils.getFormattedDateTime(dateRange.getFrom()));
+    }
+    if (dateRange.getTo() != null) {
+      period.setEndElement(Utils.getFormattedDateTime(dateRange.getTo()));
+    }
+    if (period.hasStart() || period.hasEnd()) {
+      carePlan.setPeriod(period);
+    }
   }
 
   private CodeableConcept createCategory(CarePlanResource carePlanResource) {

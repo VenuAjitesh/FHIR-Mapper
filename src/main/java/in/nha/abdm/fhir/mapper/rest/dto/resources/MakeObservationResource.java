@@ -66,6 +66,11 @@ public class MakeObservationResource {
     if (observationResource.getBodySite() != null && !observationResource.getBodySite().isEmpty()) {
       observation.setBodySite(new CodeableConcept().setText(observationResource.getBodySite()));
     }
+    if (observationResource.getInterpretation() != null
+        && !observationResource.getInterpretation().isEmpty()) {
+      observation.addInterpretation(
+          new CodeableConcept().setText(observationResource.getInterpretation()));
+    }
     buildComponents(observation, observationResource);
     Utils.setNarrative(observation, "Observation: " + observationResource.getObservation());
 
