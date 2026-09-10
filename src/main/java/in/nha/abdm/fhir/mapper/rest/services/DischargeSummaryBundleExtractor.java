@@ -252,7 +252,7 @@ public class DischargeSummaryBundleExtractor extends FhirExtractionSupport {
                   procedure.hasPerformedDateTimeType()
                       ? procedure.getPerformedDateTimeType().getValueAsString()
                       : null)
-              .status(procedure.hasStatus() ? procedure.getStatus().toCode().toUpperCase() : null)
+              .status(procedure.hasStatus() ? procedure.getStatus().name() : null)
               .procedureName(conceptText(procedure.getCode()))
               .procedureReason(
                   procedure.hasReasonCode() ? conceptText(procedure.getReasonCodeFirstRep()) : null)
