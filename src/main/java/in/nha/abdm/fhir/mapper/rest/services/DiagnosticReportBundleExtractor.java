@@ -3,12 +3,10 @@ package in.nha.abdm.fhir.mapper.rest.services;
 
 import in.nha.abdm.fhir.mapper.rest.common.helpers.DocumentResource;
 import in.nha.abdm.fhir.mapper.rest.requests.DiagnosticReportRequest;
-import in.nha.abdm.fhir.mapper.rest.requests.helpers.DiagnosticPresentedForm;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.DiagnosticResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.ObservationResource;
 import java.util.ArrayList;
 import java.util.List;
-import org.hl7.fhir.r4.model.Attachment;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.DiagnosticReport;
@@ -57,7 +55,7 @@ public class DiagnosticReportBundleExtractor extends FhirExtractionSupport {
         .conclusion(report.getConclusion())
         .result(extractObservations(report, index))
         .specimen(report.hasSpecimen() ? referenceDisplay(report.getSpecimenFirstRep()) : null)
-        .presentedForm(extractPresentedForm(report))
+        .presentedForm(presentedForm(report))
         .build();
   }
 
@@ -71,17 +69,6 @@ public class DiagnosticReportBundleExtractor extends FhirExtractionSupport {
       }
     }
     return observations;
-  }
-
-  private DiagnosticPresentedForm extractPresentedForm(DiagnosticReport report) {
-    if (!report.hasPresentedForm()) {
-      return null;
-    }
-    Attachment attachment = report.getPresentedFormFirstRep();
-    return DiagnosticPresentedForm.builder()
-        .contentType(attachment.getContentType())
-        .data(attachment.getData())
-        .build();
   }
 
   private List<DocumentResource> extractDocuments(

@@ -1,7 +1,6 @@
 /* (C) 2026 */
 package in.nha.abdm.fhir.mapper.rest.services;
 
-import in.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.DocumentResource;
 import in.nha.abdm.fhir.mapper.rest.requests.ImmunizationRequest;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.ImmunizationResource;
@@ -11,13 +10,10 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.DocumentReference;
 import org.hl7.fhir.r4.model.Encounter;
-import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Quantity;
-import org.hl7.fhir.r4.model.StringType;
-import org.hl7.fhir.r4.model.Type;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -61,7 +57,7 @@ public class ImmunizationBundleExtractor extends FhirExtractionSupport {
             .vaccineName(conceptText(immunization.getVaccineCode()))
             .lotNumber(immunization.getLotNumber())
             .manufacturer(referenceDisplay(immunization.getManufacturer()))
-            .brandName(extractBrandName(immunization))
+            .brandName(vaccineBrandName(immunization))
             .recorded(
                 immunization.hasRecordedElement()
                     ? immunization.getRecordedElement().getValueAsString()
@@ -77,7 +73,7 @@ public class ImmunizationBundleExtractor extends FhirExtractionSupport {
                 immunization.hasReasonCode()
                     ? conceptText(immunization.getReasonCodeFirstRep())
                     : null)
-            .reaction(extractReaction(immunization));
+            .reaction(vaccineReaction(immunization));
 
     if (immunization.hasDoseQuantity()) {
       Quantity doseQuantity = immunization.getDoseQuantity();
@@ -109,19 +105,6 @@ public class ImmunizationBundleExtractor extends FhirExtractionSupport {
       documents.add(document(documentReference));
     }
     return documents;
-  }
-
-  private String extractBrandName(Immunization immunization) {
-    for (Extension extension : immunization.getExtension()) {
-      if (ResourceProfileIdentifier.PROFILE_VACCINE_BRAND_NAME.equals(extension.getUrl())) {
-        Type value = extension.getValue();
-        if (value instanceof StringType stringType) {
-          return stringType.getValue();
-        }
-        return value == null ? null : value.primitiveValue();
-      }
-    }
-    return null;
   }
 
   private String extractReaction(Immunization immunization) {
