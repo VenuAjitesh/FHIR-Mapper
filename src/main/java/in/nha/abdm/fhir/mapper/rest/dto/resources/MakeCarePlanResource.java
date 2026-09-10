@@ -1,6 +1,7 @@
 /* (C) 2026 */
 package in.nha.abdm.fhir.mapper.rest.dto.resources;
 
+import in.nha.abdm.fhir.mapper.Utils;
 import in.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
 import in.nha.abdm.fhir.mapper.rest.common.constants.MapperConstants;
 import in.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
@@ -38,6 +39,7 @@ public class MakeCarePlanResource {
     carePlan.setSubject(createSubject(patient));
     carePlan.setCategory(Collections.singletonList(createCategory(carePlanResource)));
     setActivityAndNotes(carePlan, carePlanResource);
+    Utils.setNarrative(carePlan, "Care plan: " + carePlanResource.getType());
     return carePlan;
   }
 
