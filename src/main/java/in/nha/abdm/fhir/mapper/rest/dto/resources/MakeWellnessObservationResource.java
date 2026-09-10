@@ -57,7 +57,7 @@ public class MakeWellnessObservationResource {
     }
 
     buildCode(observation, observationResource, type);
-    addFixedLoincCode(observation, profile);
+    applyFixedLoincCode(observation, profile);
     buildCategory(observation, profile);
     buildEffective(observation, date);
     buildSubject(observation, patient);
@@ -67,16 +67,17 @@ public class MakeWellnessObservationResource {
     return observation;
   }
 
-  private void addFixedLoincCode(Observation observation, String profile) {
+  private void applyFixedLoincCode(Observation observation, String profile) {
     FixedLoincCode fixedCode = profile == null ? null : FIXED_LOINC_CODE_BY_PROFILE.get(profile);
     if (fixedCode != null) {
       observation
           .getCode()
-          .addCoding(
-              new Coding()
-                  .setSystem(BundleUrlIdentifier.LOINC_URL)
-                  .setCode(fixedCode.code())
-                  .setDisplay(fixedCode.display()));
+          .setCoding(
+              List.of(
+                  new Coding()
+                      .setSystem(BundleUrlIdentifier.LOINC_URL)
+                      .setCode(fixedCode.code())
+                      .setDisplay(fixedCode.display())));
     }
   }
 
