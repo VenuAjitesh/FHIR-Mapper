@@ -63,6 +63,7 @@ public class MakeWellnessObservationResource {
     buildSubject(observation, patient);
     buildPerformers(observation, practitionerList);
     buildValue(observation, observationResource);
+    Utils.setNarrative(observation, "Observation: " + observationResource.getObservation());
 
     return observation;
   }

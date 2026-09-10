@@ -98,6 +98,7 @@ public class MakeImmunizationResource {
                 new Immunization.ImmunizationPerformerComponent()
                     .setActor(Utils.buildReference(p.getId()))));
 
+    Utils.setNarrative(immunization, "Immunization: " + resource.getVaccineName());
     return immunization;
   }
 
