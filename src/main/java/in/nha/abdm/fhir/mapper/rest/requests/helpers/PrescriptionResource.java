@@ -48,4 +48,9 @@ public class PrescriptionResource {
   private String method;
   private String reason;
   private String note;
+
+  @Pattern(
+      regexp = ValidationConstants.MEDICATION_REQUEST_STATUS_PATTERN,
+      message = ValidationConstants.MEDICATION_REQUEST_STATUS_MESSAGE)
+  private String status;
 }

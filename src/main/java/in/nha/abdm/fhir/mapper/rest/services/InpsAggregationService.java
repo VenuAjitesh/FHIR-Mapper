@@ -29,10 +29,12 @@ import in.nha.abdm.fhir.mapper.rest.requests.helpers.PrescriptionResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.ProcedureResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.WellnessObservationResource;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -43,6 +45,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class InpsAggregationService {
+
+  private static final String DEFAULT_STATEMENT_STATUS = "active";
+  private static final Map<String, String> STATEMENT_STATUS_BY_REQUEST_STATUS =
+      Map.of("cancelled", "not-taken", "draft", "intended");
 
   private final BundleExtractionService bundleExtractionService;
   private final InpsConverter inpsConverter;
@@ -237,11 +243,49 @@ public class InpsAggregationService {
         PrescriptionResource prescription, String effectiveStart) {
       return MedicationStatementResource.builder()
           .medicine(prescription.getMedicine())
-          .status("active")
+          .status(statementStatus(prescription.getStatus()))
           .effectiveStart(effectiveStart)
-          .dosageText(prescription.getDosage())
+          .dosageText(dosageText(prescription))
           .reasonCode(prescription.getReason())
           .build();
+    }
+
+    private String dosageText(PrescriptionResource prescription) {
+      List<String> parts = new ArrayList<>();
+      addPart(parts, "", prescription.getDosage());
+      addPart(parts, "dose ", doseText(prescription));
+      addPart(parts, "form ", prescription.getForm());
+      addPart(parts, "route ", prescription.getRoute());
+      addPart(parts, "method ", prescription.getMethod());
+      addPart(parts, "timing ", prescription.getTiming());
+      addPart(parts, "duration ", prescription.getDuration());
+      addPart(parts, "", prescription.getAdditionalInstructions());
+      addPart(parts, "note: ", prescription.getNote());
+      return parts.isEmpty() ? null : String.join("; ", parts);
+    }
+
+    private void addPart(List<String> parts, String label, String value) {
+      if (StringUtils.isNotBlank(value)) {
+        parts.add(label + value.trim());
+      }
+    }
+
+    private String doseText(PrescriptionResource prescription) {
+      if (prescription.getDoseQuantity() <= 0) {
+        return null;
+      }
+      String quantity =
+          BigDecimal.valueOf(prescription.getDoseQuantity()).stripTrailingZeros().toPlainString();
+      return StringUtils.isBlank(prescription.getDoseUnit())
+          ? quantity
+          : quantity + " " + prescription.getDoseUnit().trim();
+    }
+
+    private String statementStatus(String requestStatus) {
+      if (StringUtils.isBlank(requestStatus)) {
+        return DEFAULT_STATEMENT_STATUS;
+      }
+      return STATEMENT_STATUS_BY_REQUEST_STATUS.getOrDefault(requestStatus, requestStatus);
     }
 
     private boolean isRadiology(String serviceCategory) {

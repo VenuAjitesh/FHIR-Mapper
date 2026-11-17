@@ -218,6 +218,7 @@ public class DischargeSummaryBundleExtractor extends FhirExtractionSupport {
       PrescriptionResource.PrescriptionResourceBuilder builder =
           PrescriptionResource.builder()
               .medicine(conceptText(medication.getMedicationCodeableConcept()))
+              .status(medication.hasStatus() ? medication.getStatus().toCode() : null)
               .note(medication.hasNote() ? medication.getNoteFirstRep().getText() : null);
       if (medication.hasDosageInstruction()) {
         Dosage dosage = medication.getDosageInstructionFirstRep();

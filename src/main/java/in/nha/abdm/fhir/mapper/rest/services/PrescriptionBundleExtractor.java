@@ -58,6 +58,7 @@ public class PrescriptionBundleExtractor extends FhirExtractionSupport {
                 medicationRequest.hasMedicationCodeableConcept()
                     ? conceptText(medicationRequest.getMedicationCodeableConcept())
                     : extractMedicationReferenceDisplay(medicationRequest))
+            .status(medicationRequest.hasStatus() ? medicationRequest.getStatus().toCode() : null)
             .note(
                 medicationRequest.hasNote() ? medicationRequest.getNoteFirstRep().getText() : null);
 
@@ -68,7 +69,8 @@ public class PrescriptionBundleExtractor extends FhirExtractionSupport {
           .additionalInstructions(extractFirstConceptText(dosage.getAdditionalInstruction()))
           .route(conceptText(dosage.getRoute()))
           .method(conceptText(dosage.getMethod()))
-          .timing(extractTiming(dosage.getTiming()));
+          .timing(extractTiming(dosage.getTiming()))
+          .duration(extractDuration(dosage.getTiming()));
 
       if (dosage.hasDoseAndRate()
           && dosage.getDoseAndRateFirstRep().hasDose()
@@ -116,6 +118,13 @@ public class PrescriptionBundleExtractor extends FhirExtractionSupport {
     return medicationRequest.hasMedicationReference()
         ? referenceDisplay(medicationRequest.getMedicationReference())
         : null;
+  }
+
+  private String extractDuration(Timing timing) {
+    if (timing == null || !timing.hasRepeat() || !timing.getRepeat().hasDuration()) {
+      return null;
+    }
+    return timing.getRepeat().getDuration().stripTrailingZeros().toPlainString();
   }
 
   private String extractTiming(Timing timing) {
