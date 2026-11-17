@@ -67,6 +67,10 @@ public class WellnessRecordBundleExtractor extends FhirExtractionSupport {
         .result(valueText(observation.getValue()))
         .valueQuantity(valueQuantity(observation.getValue()))
         .components(observation.hasComponent() ? components(observation) : null)
+        .effectiveDateTime(
+            observation.hasEffectiveDateTimeType()
+                ? dateTimeText(observation.getEffectiveDateTimeType())
+                : null)
         .build();
   }
 

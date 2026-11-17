@@ -61,7 +61,7 @@ public class MakeWellnessObservationResource {
     buildCode(observation, observationResource, type);
     applyFixedLoincCode(observation, profile);
     buildCategory(observation, profile);
-    buildEffective(observation, date);
+    buildEffective(observation, ownDateOrShared(observationResource, date));
     buildSubject(observation, patient);
     buildPerformers(observation, practitionerList);
     buildValue(observation, observationResource);
@@ -121,6 +121,12 @@ public class MakeWellnessObservationResource {
     }
 
     observation.setCode(typeCode);
+  }
+
+  private String ownDateOrShared(WellnessObservationResource resource, String sharedDate) {
+    return resource.getEffectiveDateTime() != null && !resource.getEffectiveDateTime().isBlank()
+        ? resource.getEffectiveDateTime()
+        : sharedDate;
   }
 
   private void buildEffective(Observation observation, String date) {

@@ -24,4 +24,6 @@ public class WellnessObservationResource {
   private ValueQuantityResource valueQuantity;
 
   @Valid private List<ObservationComponentResource> components;
+
+  private String effectiveDateTime;
 }

@@ -87,6 +87,30 @@ class MakeWellnessObservationResourceTest {
   }
 
   @Test
+  void vitalSignWithItsOwnDateKeepsIt() {
+    unknownSnomedLookup();
+
+    Observation observation =
+        vitalSign(
+            WellnessObservationResource.builder()
+                .observation("Heart rate")
+                .effectiveDateTime("2024-05-04T06:33:37.000Z")
+                .build());
+
+    assertEquals("2024-05-04T06:33:37Z", observation.getEffectiveDateTimeType().getValueAsString());
+  }
+
+  @Test
+  void vitalSignWithoutItsOwnDateTakesTheSharedDate() {
+    unknownSnomedLookup();
+
+    Observation observation =
+        vitalSign(WellnessObservationResource.builder().observation("Heart rate").build());
+
+    assertEquals("2026-08-13T10:30:00Z", observation.getEffectiveDateTimeType().getValueAsString());
+  }
+
+  @Test
   void vitalSignWithoutAValueCarriesADataAbsentReason() {
     unknownSnomedLookup();
 
