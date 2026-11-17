@@ -18,6 +18,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MakeInpsComposition {
+  private static final String EMPTY_SECTION_NARRATIVE = "No information available";
+  private static final String EMPTY_REASON_UNAVAILABLE_CODE = "unavailable";
+  private static final String EMPTY_REASON_UNAVAILABLE_DISPLAY = "Unavailable";
 
   public Composition make(
       InpsRequest request,
@@ -85,17 +88,17 @@ public class MakeInpsComposition {
   private List<Composition.SectionComponent> createSections(
       InpsRequest request, InpsResources resources) {
     List<Composition.SectionComponent> sections = new ArrayList<>();
-    addSection(
+    addMandatorySection(
         sections,
         resources.problems(),
         BundleCompositionIdentifier.INPS_PROBLEMS_SECTION,
         BundleCompositionIdentifier.INPS_PROBLEMS_SECTION_CODE);
-    addSection(
+    addMandatorySection(
         sections,
         resources.allergies(),
         BundleCompositionIdentifier.INPS_ALLERGIES_SECTION,
         BundleCompositionIdentifier.INPS_ALLERGIES_SECTION_CODE);
-    addSection(
+    addMandatorySection(
         sections,
         resources.medications(),
         BundleCompositionIdentifier.INPS_MEDICATIONS_SECTION,
@@ -214,20 +217,29 @@ public class MakeInpsComposition {
     if (resources == null || resources.isEmpty()) {
       return;
     }
-    Composition.SectionComponent section = new Composition.SectionComponent();
-    section.setTitle(title);
-    section.setCode(
-        new CodeableConcept()
-            .setText(title)
-            .addCoding(
-                new Coding()
-                    .setSystem(BundleUrlIdentifier.LOINC_URL)
-                    .setCode(code)
-                    .setDisplay(title)));
-    section.setText(buildNarrative(title));
+    Composition.SectionComponent section = newSection(title, code, title);
     for (T resource : resources) {
       section.addEntry(Utils.buildReference(resource.getId()));
     }
+    sections.add(section);
+  }
+
+  private <T extends Resource> void addMandatorySection(
+      List<Composition.SectionComponent> sections, List<T> resources, String title, String code) {
+    if (resources != null && !resources.isEmpty()) {
+      addSection(sections, resources, title, code);
+      return;
+    }
+    Composition.SectionComponent section =
+        newSection(title, code, title + ": " + EMPTY_SECTION_NARRATIVE);
+    section.setEmptyReason(
+        new CodeableConcept()
+            .setText(EMPTY_SECTION_NARRATIVE)
+            .addCoding(
+                new Coding()
+                    .setSystem(BundleUrlIdentifier.LIST_EMPTY_REASON_URL)
+                    .setCode(EMPTY_REASON_UNAVAILABLE_CODE)
+                    .setDisplay(EMPTY_REASON_UNAVAILABLE_DISPLAY)));
     sections.add(section);
   }
 
@@ -236,6 +248,10 @@ public class MakeInpsComposition {
     if (StringUtils.isBlank(text)) {
       return;
     }
+    sections.add(newSection(title, code, text));
+  }
+
+  private Composition.SectionComponent newSection(String title, String code, String narrative) {
     Composition.SectionComponent section = new Composition.SectionComponent();
     section.setTitle(title);
     section.setCode(
@@ -246,8 +262,8 @@ public class MakeInpsComposition {
                     .setSystem(BundleUrlIdentifier.LOINC_URL)
                     .setCode(code)
                     .setDisplay(title)));
-    section.setText(buildNarrative(text));
-    sections.add(section);
+    section.setText(buildNarrative(narrative));
+    return section;
   }
 
   private Narrative buildNarrative(String text) {

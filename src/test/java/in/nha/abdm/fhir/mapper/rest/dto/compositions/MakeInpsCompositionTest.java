@@ -80,7 +80,7 @@ class MakeInpsCompositionTest {
   }
 
   @Test
-  void emptyResourceListsProduceNoSections() throws Exception {
+  void emptyMandatoryListsProduceSectionsWithEmptyReason() throws Exception {
     Patient patient = new Patient();
     patient.addName(new HumanName().setText("Test Patient"));
 
@@ -102,6 +102,11 @@ class MakeInpsCompositionTest {
                 List.of(), List.of(), List.of(), List.of(), List.of(), List.of(), List.of(), null,
                 null, List.of(), List.of(), List.of(), List.of(), List.of(), List.of(), List.of()));
 
-    assertTrue(composition.getSection().isEmpty());
+    assertEquals(3, composition.getSection().size());
+    for (Composition.SectionComponent section : composition.getSection()) {
+      assertTrue(section.getEntry().isEmpty());
+      assertTrue(section.hasText());
+      assertEquals("unavailable", section.getEmptyReason().getCodingFirstRep().getCode());
+    }
   }
 }
