@@ -258,7 +258,7 @@ public class InpsAggregationService {
       addPart(parts, "route ", prescription.getRoute());
       addPart(parts, "method ", prescription.getMethod());
       addPart(parts, "timing ", prescription.getTiming());
-      addPart(parts, "duration ", prescription.getDuration());
+      addPart(parts, "duration ", durationText(prescription));
       addPart(parts, "", prescription.getAdditionalInstructions());
       addPart(parts, "note: ", prescription.getNote());
       return parts.isEmpty() ? null : String.join("; ", parts);
@@ -268,6 +268,24 @@ public class InpsAggregationService {
       if (StringUtils.isNotBlank(value)) {
         parts.add(label + value.trim());
       }
+    }
+
+    private String durationText(PrescriptionResource prescription) {
+      if (StringUtils.isBlank(prescription.getDuration())) {
+        return null;
+      }
+      String unit = timingUnit(prescription.getTiming());
+      return unit == null
+          ? prescription.getDuration().trim()
+          : prescription.getDuration().trim() + " " + unit;
+    }
+
+    private String timingUnit(String timing) {
+      if (StringUtils.isBlank(timing)) {
+        return null;
+      }
+      String[] timingParts = timing.trim().split("-");
+      return timingParts.length == 3 ? timingParts[2].toLowerCase() : null;
     }
 
     private String doseText(PrescriptionResource prescription) {
