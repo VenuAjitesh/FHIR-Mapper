@@ -61,6 +61,16 @@ class InpsAggregationServiceTest {
             .patient(patient)
             .practitioners(List.of(practitioner))
             .organisation(organisation)
+            .medications(
+                List.of(
+                    PrescriptionResource.builder()
+                        .medicine("Paracetamol")
+                        .status("completed")
+                        .build(),
+                    PrescriptionResource.builder()
+                        .medicine("Ibuprofen")
+                        .status("cancelled")
+                        .build()))
             .chiefComplaints(List.of(ConditionResource.builder().condition("hypertension").build()))
             .build();
 
@@ -88,7 +98,9 @@ class InpsAggregationServiceTest {
     assertEquals(1, merged.getProblems().size(), "duplicate 'hypertension' should be deduped");
     assertEquals("Hypertension", merged.getProblems().get(0).getCondition());
     assertEquals(1, merged.getAllergies().size());
-    assertEquals(1, merged.getMedications().size());
+    assertEquals(3, merged.getMedications().size());
+    assertEquals("completed", merged.getMedications().get(1).getStatus());
+    assertEquals("not-taken", merged.getMedications().get(2).getStatus());
     assertEquals("Amlodipine 5mg", merged.getMedications().get(0).getMedicine());
     assertEquals("active", merged.getMedications().get(0).getStatus());
     assertEquals(1, merged.getImmunizations().size());

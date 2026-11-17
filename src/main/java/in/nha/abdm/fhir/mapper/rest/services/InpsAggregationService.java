@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -43,6 +44,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class InpsAggregationService {
+
+  private static final String DEFAULT_STATEMENT_STATUS = "active";
+  private static final Map<String, String> STATEMENT_STATUS_BY_REQUEST_STATUS =
+      Map.of("cancelled", "not-taken", "draft", "intended");
 
   private final BundleExtractionService bundleExtractionService;
   private final InpsConverter inpsConverter;
@@ -237,11 +242,18 @@ public class InpsAggregationService {
         PrescriptionResource prescription, String effectiveStart) {
       return MedicationStatementResource.builder()
           .medicine(prescription.getMedicine())
-          .status("active")
+          .status(statementStatus(prescription.getStatus()))
           .effectiveStart(effectiveStart)
           .dosageText(prescription.getDosage())
           .reasonCode(prescription.getReason())
           .build();
+    }
+
+    private String statementStatus(String requestStatus) {
+      if (StringUtils.isBlank(requestStatus)) {
+        return DEFAULT_STATEMENT_STATUS;
+      }
+      return STATEMENT_STATUS_BY_REQUEST_STATUS.getOrDefault(requestStatus, requestStatus);
     }
 
     private boolean isRadiology(String serviceCategory) {
