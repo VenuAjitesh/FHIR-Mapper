@@ -66,6 +66,7 @@ public class MakeWellnessObservationResource {
     buildPerformers(observation, practitionerList);
     buildValue(observation, observationResource);
     buildComponents(observation, observationResource);
+    buildDataAbsentReason(observation, profile);
     Utils.setNarrative(observation, "Observation: " + observationResource.getObservation());
 
     return observation;
@@ -154,6 +155,21 @@ public class MakeWellnessObservationResource {
     } else if (observationResource.getResult() != null) {
       observation.setValue(new CodeableConcept().setText(observationResource.getResult()));
     }
+  }
+
+  private void buildDataAbsentReason(Observation observation, String profile) {
+    if (!ResourceProfileIdentifier.PROFILE_VITAL_SIGNS.equals(profile)
+        || observation.hasValue()
+        || observation.hasComponent()) {
+      return;
+    }
+    observation.setDataAbsentReason(
+        new CodeableConcept()
+            .addCoding(
+                new Coding()
+                    .setSystem(BundleUrlIdentifier.DATA_ABSENT_REASON_URL)
+                    .setCode("unknown")
+                    .setDisplay("Unknown")));
   }
 
   private void buildComponents(
