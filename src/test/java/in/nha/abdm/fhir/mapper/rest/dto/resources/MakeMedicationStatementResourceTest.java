@@ -35,11 +35,35 @@ class MakeMedicationStatementResourceTest {
 
     assertEquals("active", medicationStatement.getStatus().toCode());
     assertEquals("Prenatal vitamins", medicationStatement.getMedicationCodeableConcept().getText());
+    assertFalse(medicationStatement.getMedicationCodeableConcept().hasCoding());
     assertEquals(
         ResourceProfileIdentifier.PROFILE_IN_PS_MEDICATION_STATEMENT,
         medicationStatement.getMeta().getProfile().get(0).getValue());
     assertEquals("1 tablet daily", medicationStatement.getDosageFirstRep().getText());
     assertEquals("Pregnancy", medicationStatement.getReasonCodeFirstRep().getText());
     assertFalse(medicationStatement.getSubject().hasType());
+  }
+
+  @Test
+  void suppliedMedicineCodeIsWrittenAsASnomedCoding() throws Exception {
+    Patient patient = new Patient();
+    patient.setId("patient-1");
+    patient.addName(new HumanName().setText("Test Patient"));
+
+    MedicationStatement medicationStatement =
+        target.getMedicationStatement(
+            MedicationStatementResource.builder()
+                .medicine("Glucosamine 1 g oral tablet")
+                .medicineCode("418197002")
+                .status("active")
+                .build(),
+            patient);
+
+    assertEquals(
+        "http://snomed.info/sct",
+        medicationStatement.getMedicationCodeableConcept().getCodingFirstRep().getSystem());
+    assertEquals(
+        "418197002",
+        medicationStatement.getMedicationCodeableConcept().getCodingFirstRep().getCode());
   }
 }

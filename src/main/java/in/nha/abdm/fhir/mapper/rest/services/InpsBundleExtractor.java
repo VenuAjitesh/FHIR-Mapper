@@ -209,6 +209,7 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
       medications.add(
           MedicationStatementResource.builder()
               .medicine(conceptText(medicationStatement.getMedicationCodeableConcept()))
+              .medicineCode(snomedCode(medicationStatement.getMedicationCodeableConcept()))
               .status(
                   medicationStatement.hasStatus() ? medicationStatement.getStatus().toCode() : null)
               .effectiveStart(
