@@ -1,6 +1,7 @@
 /* (C) 2026 */
 package in.nha.abdm.fhir.mapper.rest.services;
 
+import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import in.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.DateRange;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.DocumentResource;
@@ -14,9 +15,12 @@ import in.nha.abdm.fhir.mapper.rest.requests.helpers.ObservationResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.Range;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.ReferenceRange;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.ValueQuantityResource;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import org.hl7.fhir.r4.model.Attachment;
+import org.hl7.fhir.r4.model.BaseDateTimeType;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.DocumentReference;
@@ -35,6 +39,9 @@ import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.Type;
 
 class FhirExtractionSupport {
+
+  private static final DateTimeFormatter REQUEST_DATE_TIME_FORMAT =
+      DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC);
 
   PatientResource patient(Patient patient) {
     if (patient == null) {
@@ -258,13 +265,23 @@ class FhirExtractionSupport {
         .build();
   }
 
+  protected String dateTimeText(BaseDateTimeType dateTime) {
+    if (dateTime == null || dateTime.getValue() == null) {
+      return null;
+    }
+    if (dateTime.getPrecision().ordinal() <= TemporalPrecisionEnum.DAY.ordinal()) {
+      return dateTime.getValueAsString();
+    }
+    return REQUEST_DATE_TIME_FORMAT.format(dateTime.getValue().toInstant());
+  }
+
   protected DateRange period(Period period) {
     if (period == null || period.isEmpty()) {
       return null;
     }
     return DateRange.builder()
-        .from(period.hasStartElement() ? period.getStartElement().getValueAsString() : null)
-        .to(period.hasEndElement() ? period.getEndElement().getValueAsString() : null)
+        .from(period.hasStartElement() ? dateTimeText(period.getStartElement()) : null)
+        .to(period.hasEndElement() ? dateTimeText(period.getEndElement()) : null)
         .build();
   }
 }

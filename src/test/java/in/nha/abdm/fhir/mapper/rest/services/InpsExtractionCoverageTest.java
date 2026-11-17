@@ -105,8 +105,8 @@ class InpsExtractionCoverageTest {
 
     CarePlanResource plan = extracted.getCarePlans().get(0);
     assertNotNull(plan.getPeriod());
-    assertEquals("2026-09-01T00:00:00Z", plan.getPeriod().getFrom());
-    assertEquals("2026-12-31T23:59:59Z", plan.getPeriod().getTo());
+    assertEquals("2026-09-01T00:00:00.000Z", plan.getPeriod().getFrom());
+    assertEquals("2026-12-31T23:59:59.000Z", plan.getPeriod().getTo());
   }
 
   @Test
@@ -125,9 +125,25 @@ class InpsExtractionCoverageTest {
 
     ConditionResource problem = extracted.getProblems().get(0);
     assertNotNull(problem.getDateRange());
-    assertNotNull(problem.getDateRange().getFrom());
-    assertNotNull(problem.getDateRange().getTo());
-    assertNotNull(problem.getAbatementDate());
+    assertEquals("2019-05-01T10:00:00.000Z", problem.getDateRange().getFrom());
+    assertEquals("2019-05-20T10:00:00.000Z", problem.getDateRange().getTo());
+    assertEquals("2019-06-01T10:00:00.000Z", problem.getAbatementDate());
+  }
+
+  @Test
+  void extractedDateTimesMatchTheRequestFormatAndDatesStayDates() {
+    Condition condition = new Condition();
+    condition.setId("condition-3");
+    condition.setCode(new CodeableConcept().setText("Asthma"));
+    condition.setRecordedDateElement(new DateTimeType("2026-01-10T15:30:00+05:30"));
+    condition.setAbatement(new DateTimeType("2026-02-01"));
+
+    InpsRequest extracted =
+        extract(BundleCompositionIdentifier.INPS_PROBLEMS_SECTION, condition, "condition-3");
+
+    ConditionResource problem = extracted.getProblems().get(0);
+    assertEquals("2026-01-10T10:00:00.000Z", problem.getRecordedDate());
+    assertEquals("2026-02-01", problem.getAbatementDate());
   }
 
   private InpsRequest extract(String sectionTitle, Resource resource, String id) {

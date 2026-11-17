@@ -53,7 +53,7 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
         .careContextReference(bundle.hasIdentifier() ? bundle.getIdentifier().getValue() : null)
         .status(composition.hasStatus() ? composition.getStatus().toCode() : null)
         .compositionDate(
-            composition.hasDateElement() ? composition.getDateElement().getValueAsString() : null)
+            composition.hasDateElement() ? dateTimeText(composition.getDateElement()) : null)
         .title(composition.hasTitle() ? composition.getTitle() : null)
         .patient(patient(index.resolve(composition.getSubject(), Patient.class)))
         .practitioners(practitioners(index, composition.getAuthor()))
@@ -137,7 +137,7 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
               .condition(conceptText(condition.getCode()))
               .recordedDate(
                   condition.hasRecordedDateElement()
-                      ? condition.getRecordedDateElement().getValueAsString()
+                      ? dateTimeText(condition.getRecordedDateElement())
                       : null)
               .clinicalStatus(firstCodingCode(condition.getClinicalStatus()))
               .verificationStatus(firstCodingCode(condition.getVerificationStatus()))
@@ -147,7 +147,7 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
               .dateRange(condition.hasOnsetPeriod() ? period(condition.getOnsetPeriod()) : null)
               .abatementDate(
                   condition.hasAbatementDateTimeType()
-                      ? condition.getAbatementDateTimeType().getValueAsString()
+                      ? dateTimeText(condition.getAbatementDateTimeType())
                       : null)
               .stage(
                   condition.hasStage()
@@ -213,14 +213,11 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
                   medicationStatement.hasStatus() ? medicationStatement.getStatus().toCode() : null)
               .effectiveStart(
                   medicationStatement.hasEffectivePeriod()
-                      ? medicationStatement
-                          .getEffectivePeriod()
-                          .getStartElement()
-                          .getValueAsString()
+                      ? dateTimeText(medicationStatement.getEffectivePeriod().getStartElement())
                       : null)
               .dateAsserted(
                   medicationStatement.hasDateAssertedElement()
-                      ? medicationStatement.getDateAssertedElement().getValueAsString()
+                      ? dateTimeText(medicationStatement.getDateAssertedElement())
                       : null)
               .reasonCode(
                   medicationStatement.hasReasonCode()
@@ -247,7 +244,7 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
           ImmunizationResource.builder()
               .date(
                   immunization.hasOccurrenceDateTimeType()
-                      ? immunization.getOccurrenceDateTimeType().getValueAsString()
+                      ? dateTimeText(immunization.getOccurrenceDateTimeType())
                       : null)
               .vaccineName(conceptText(immunization.getVaccineCode()))
               .brandName(vaccineBrandName(immunization))
@@ -256,11 +253,11 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
               .manufacturer(referenceDisplay(immunization.getManufacturer()))
               .recorded(
                   immunization.hasRecordedElement()
-                      ? immunization.getRecordedElement().getValueAsString()
+                      ? dateTimeText(immunization.getRecordedElement())
                       : null)
               .expirationDate(
                   immunization.hasExpirationDateElement()
-                      ? immunization.getExpirationDateElement().getValueAsString()
+                      ? dateTimeText(immunization.getExpirationDateElement())
                       : null)
               .site(conceptText(immunization.getSite()))
               .route(conceptText(immunization.getRoute()))
@@ -300,7 +297,7 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
           ProcedureResource.builder()
               .date(
                   procedure.hasPerformedDateTimeType()
-                      ? procedure.getPerformedDateTimeType().getValueAsString()
+                      ? dateTimeText(procedure.getPerformedDateTimeType())
                       : null)
               .status(procedure.hasStatus() ? procedure.getStatus().name() : null)
               .procedureName(conceptText(procedure.getCode()))
@@ -331,7 +328,7 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
                   deviceUseStatement.hasStatus() ? deviceUseStatement.getStatus().toCode() : null)
               .recordedDate(
                   deviceUseStatement.hasRecordedOnElement()
-                      ? deviceUseStatement.getRecordedOnElement().getValueAsString()
+                      ? dateTimeText(deviceUseStatement.getRecordedOnElement())
                       : null)
               .note(
                   deviceUseStatement.hasNote()
@@ -368,7 +365,7 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
               .serviceCategory(
                   report.hasCategory() ? conceptText(report.getCategoryFirstRep()) : null)
               .authoredOn(
-                  report.hasIssuedElement() ? report.getIssuedElement().getValueAsString() : null)
+                  report.hasIssuedElement() ? dateTimeText(report.getIssuedElement()) : null)
               .conclusion(report.getConclusion())
               .result(observations)
               .specimen(
@@ -435,7 +432,7 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
               .vaccineName(conceptText(component.getVaccineCodeFirstRep()))
               .date(
                   recommendation.hasDateElement()
-                      ? recommendation.getDateElement().getValueAsString()
+                      ? dateTimeText(recommendation.getDateElement())
                       : null)
               .forecastStatus(
                   component.hasForecastStatus()
@@ -461,9 +458,7 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
               .type(consent.hasCategory() ? conceptText(consent.getCategoryFirstRep()) : null)
               .status(consent.hasStatus() ? consent.getStatus().toCode() : null)
               .dateTime(
-                  consent.hasDateTimeElement()
-                      ? consent.getDateTimeElement().getValueAsString()
-                      : null)
+                  consent.hasDateTimeElement() ? dateTimeText(consent.getDateTimeElement()) : null)
               .build());
     }
     return consents;
@@ -499,7 +494,7 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
                   clinicalImpression.hasStatus() ? clinicalImpression.getStatus().toCode() : null)
               .date(
                   clinicalImpression.hasEffectiveDateTimeType()
-                      ? clinicalImpression.getEffectiveDateTimeType().getValueAsString()
+                      ? dateTimeText(clinicalImpression.getEffectiveDateTimeType())
                       : null)
               .build());
     }
