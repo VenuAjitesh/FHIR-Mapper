@@ -2,6 +2,7 @@
 package in.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -83,6 +84,30 @@ class MakeWellnessObservationResourceTest {
     assertEquals(1, observation.getComponent().size());
     assertEquals("Systolic Blood Pressure", observation.getComponentFirstRep().getCode().getText());
     assertEquals(120, observation.getComponentFirstRep().getValueQuantity().getValue().intValue());
+  }
+
+  @Test
+  void vitalSignWithoutAValueCarriesADataAbsentReason() {
+    unknownSnomedLookup();
+
+    Observation observation =
+        vitalSign(WellnessObservationResource.builder().observation("Blood Pressure").build());
+
+    assertEquals("unknown", observation.getDataAbsentReason().getCodingFirstRep().getCode());
+  }
+
+  @Test
+  void vitalSignWithAValueCarriesNoDataAbsentReason() {
+    unknownSnomedLookup();
+
+    Observation observation =
+        vitalSign(
+            WellnessObservationResource.builder()
+                .observation("Heart rate")
+                .valueQuantity(ValueQuantityResource.builder().unit("/min").value(72).build())
+                .build());
+
+    assertFalse(observation.hasDataAbsentReason());
   }
 
   private void unknownSnomedLookup() {
