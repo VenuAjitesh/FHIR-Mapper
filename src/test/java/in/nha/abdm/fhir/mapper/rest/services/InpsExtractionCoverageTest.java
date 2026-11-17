@@ -109,6 +109,27 @@ class InpsExtractionCoverageTest {
     assertEquals("2026-12-31T23:59:59Z", plan.getPeriod().getTo());
   }
 
+  @Test
+  void conditionOnsetPeriodAndAbatementAreExtracted() {
+    Condition condition = new Condition();
+    condition.setId("condition-2");
+    condition.setCode(new CodeableConcept().setText("Typhoid fever"));
+    condition.setOnset(
+        new Period()
+            .setStartElement(new DateTimeType("2019-05-01T10:00:00Z"))
+            .setEndElement(new DateTimeType("2019-05-20T10:00:00Z")));
+    condition.setAbatement(new DateTimeType("2019-06-01T10:00:00Z"));
+
+    InpsRequest extracted =
+        extract(BundleCompositionIdentifier.INPS_PROBLEMS_SECTION, condition, "condition-2");
+
+    ConditionResource problem = extracted.getProblems().get(0);
+    assertNotNull(problem.getDateRange());
+    assertNotNull(problem.getDateRange().getFrom());
+    assertNotNull(problem.getDateRange().getTo());
+    assertNotNull(problem.getAbatementDate());
+  }
+
   private InpsRequest extract(String sectionTitle, Resource resource, String id) {
     Composition composition = new Composition();
     composition.addSection().setTitle(sectionTitle).addEntry(new Reference("urn:uuid:" + id));

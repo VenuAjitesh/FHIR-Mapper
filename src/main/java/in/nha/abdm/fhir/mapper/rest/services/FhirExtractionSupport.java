@@ -9,7 +9,10 @@ import in.nha.abdm.fhir.mapper.rest.common.helpers.PatientResource;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.PractitionerResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.DiagnosticPresentedForm;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.ObservationComponentResource;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.ObservationReferenceRange;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.ObservationResource;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.Range;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.ReferenceRange;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.ValueQuantityResource;
 import java.util.ArrayList;
 import java.util.List;
@@ -110,6 +113,10 @@ class FhirExtractionSupport {
                 : null)
         .bodySite(conceptText(observation.getBodySite()))
         .valueQuantity(valueQuantity(observation.getValue()))
+        .referenceRange(
+            observation.hasReferenceRange()
+                ? referenceRange(observation.getReferenceRangeFirstRep())
+                : null)
         .components(components(observation))
         .build();
   }
@@ -122,9 +129,44 @@ class FhirExtractionSupport {
               .observation(conceptText(component.getCode()))
               .result(valueText(component.getValue()))
               .valueQuantity(valueQuantity(component.getValue()))
+              .referenceRange(
+                  component.hasReferenceRange()
+                      ? referenceRange(component.getReferenceRangeFirstRep())
+                      : null)
               .build());
     }
     return components;
+  }
+
+  ObservationReferenceRange referenceRange(Observation.ObservationReferenceRangeComponent range) {
+    return ObservationReferenceRange.builder()
+        .low(rangeLimit(range.getLow()))
+        .high(rangeLimit(range.getHigh()))
+        .age(range.hasAge() ? ageRange(range.getAge()) : null)
+        .build();
+  }
+
+  private ReferenceRange rangeLimit(Quantity quantity) {
+    if (quantity == null || !quantity.hasValue()) {
+      return null;
+    }
+    return ReferenceRange.builder()
+        .value(plainNumber(quantity))
+        .unit(quantity.getUnit())
+        .system(quantity.getSystem())
+        .code(quantity.getCode())
+        .build();
+  }
+
+  private Range ageRange(org.hl7.fhir.r4.model.Range age) {
+    return Range.builder()
+        .low(age.hasLow() ? plainNumber(age.getLow()) : null)
+        .high(age.hasHigh() ? plainNumber(age.getHigh()) : null)
+        .build();
+  }
+
+  private String plainNumber(Quantity quantity) {
+    return quantity.hasValue() ? quantity.getValue().stripTrailingZeros().toPlainString() : null;
   }
 
   DocumentResource document(DocumentReference documentReference) {

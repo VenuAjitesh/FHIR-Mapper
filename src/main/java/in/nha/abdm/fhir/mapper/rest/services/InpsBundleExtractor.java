@@ -144,6 +144,11 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
               .category(
                   condition.hasCategory() ? firstCodingCode(condition.getCategoryFirstRep()) : null)
               .severity(conceptText(condition.getSeverity()))
+              .dateRange(condition.hasOnsetPeriod() ? period(condition.getOnsetPeriod()) : null)
+              .abatementDate(
+                  condition.hasAbatementDateTimeType()
+                      ? condition.getAbatementDateTimeType().getValueAsString()
+                      : null)
               .stage(
                   condition.hasStage()
                       ? conceptText(condition.getStageFirstRep().getSummary())
