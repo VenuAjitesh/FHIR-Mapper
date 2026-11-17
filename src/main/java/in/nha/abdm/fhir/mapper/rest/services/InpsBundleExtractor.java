@@ -409,6 +409,7 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
               .description(carePlan.hasDescription() ? carePlan.getDescription() : null)
               .period(period(carePlan.getPeriod()))
               .notes(carePlan.hasNote() ? carePlan.getNoteFirstRep().getText() : null)
+              .goal(carePlan.hasGoal() ? referenceDisplay(carePlan.getGoalFirstRep()) : null)
               .build());
     }
     return carePlans;
