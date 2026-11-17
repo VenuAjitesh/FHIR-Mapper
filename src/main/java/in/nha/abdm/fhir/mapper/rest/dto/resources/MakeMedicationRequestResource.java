@@ -35,7 +35,7 @@ public class MakeMedicationRequestResource {
     mapSubject(medicationRequest, patient);
     setAuthoredOn(medicationRequest, authoredOn);
     setNote(medicationRequest, prescriptionResource);
-    medicationRequest.setStatus(MedicationRequest.MedicationRequestStatus.COMPLETED);
+    medicationRequest.setStatus(requestStatus(prescriptionResource.getStatus()));
     medicationRequest.setIntent(MedicationRequest.MedicationRequestIntent.ORDER);
     medicationRequest.setId(UUID.randomUUID().toString());
     Utils.setNarrative(
@@ -47,6 +47,12 @@ public class MakeMedicationRequestResource {
     return new Meta()
         .addProfile(ResourceProfileIdentifier.PROFILE_MEDICATION_REQUEST)
         .setLastUpdatedElement(Utils.getCurrentTimeStamp());
+  }
+
+  private MedicationRequest.MedicationRequestStatus requestStatus(String status) {
+    return status == null || status.isBlank()
+        ? MedicationRequest.MedicationRequestStatus.COMPLETED
+        : MedicationRequest.MedicationRequestStatus.fromCode(status);
   }
 
   private void setAuthoredOn(MedicationRequest medicationRequest, String authoredOn)
