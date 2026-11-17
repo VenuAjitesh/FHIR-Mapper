@@ -202,6 +202,7 @@ public class DischargeSummaryBundleExtractor extends FhirExtractionSupport {
         .type(carePlan.getTitle())
         .description(carePlan.getDescription())
         .notes(carePlan.hasNote() ? carePlan.getNoteFirstRep().getText() : null)
+        .goal(carePlan.hasGoal() ? referenceDisplay(carePlan.getGoalFirstRep()) : null)
         .build();
   }
 

@@ -66,6 +66,24 @@ class DroppedRequestFieldsTest {
   }
 
   @Test
+  void carePlanGoalReachesTheBundle() throws Exception {
+    when(snomedService.getSnomedEncounterCode(anyString()))
+        .thenReturn(SnomedEncounter.builder().code("734163000").display("Care plan").build());
+
+    CarePlan carePlan =
+        new MakeCarePlanResource(snomedService)
+            .getCarePlan(
+                CarePlanResource.builder()
+                    .intent("plan")
+                    .type("Hypertension management")
+                    .goal("BP below 130/80")
+                    .build(),
+                patient());
+
+    assertEquals("BP below 130/80", carePlan.getGoalFirstRep().getDisplay());
+  }
+
+  @Test
   void observationInterpretationReachesTheBundle() throws Exception {
     when(snomedService.getSnomedObservationCode(anyString()))
         .thenReturn(SnomedObservation.builder().code("718-7").display("Haemoglobin").build());

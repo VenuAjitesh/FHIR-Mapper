@@ -44,6 +44,7 @@ public class MakeCarePlanResource {
     carePlan.setCategory(Collections.singletonList(createCategory(carePlanResource)));
     setPeriod(carePlan, carePlanResource);
     setActivityAndNotes(carePlan, carePlanResource);
+    setGoal(carePlan, carePlanResource.getGoal());
     Utils.setNarrative(carePlan, "Care plan: " + carePlanResource.getType());
     return carePlan;
   }
@@ -70,6 +71,12 @@ public class MakeCarePlanResource {
     }
     if (period.hasStart() || period.hasEnd()) {
       carePlan.setPeriod(period);
+    }
+  }
+
+  private void setGoal(CarePlan carePlan, String goal) {
+    if (goal != null && !goal.isBlank()) {
+      carePlan.addGoal(new Reference().setDisplay(goal));
     }
   }
 
