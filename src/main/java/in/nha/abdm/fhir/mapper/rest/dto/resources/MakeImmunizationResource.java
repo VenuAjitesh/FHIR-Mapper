@@ -66,8 +66,7 @@ public class MakeImmunizationResource {
     mapVaccineDetails(immunization, resource);
 
     if (resource.getManufacturer() != null) {
-      immunization.setManufacturer(
-          Utils.buildReference(organization.getId()).setDisplay(organization.getName()));
+      immunization.setManufacturer(new Reference().setDisplay(resource.getManufacturer()));
     }
     if (resource.getLotNumber() != null) {
       immunization.setLotNumber(resource.getLotNumber());
@@ -98,6 +97,7 @@ public class MakeImmunizationResource {
                 new Immunization.ImmunizationPerformerComponent()
                     .setActor(Utils.buildReference(p.getId()))));
 
+    Utils.setNarrative(immunization, "Immunization: " + resource.getVaccineName());
     return immunization;
   }
 

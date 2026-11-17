@@ -407,9 +407,12 @@ public class InpsConverter {
   private List<CarePlan> createCarePlans(InpsRequest request, Patient patient) {
     return Optional.ofNullable(request.getCarePlans()).orElse(Collections.emptyList()).stream()
         .map(
-            carePlanResource ->
-                makeCarePlanResource.getCarePlan(
-                    carePlanResource, patient, ResourceProfileIdentifier.PROFILE_CARE_PLAN_NRCES))
+            StreamUtils.wrapException(
+                carePlanResource ->
+                    makeCarePlanResource.getCarePlan(
+                        carePlanResource,
+                        patient,
+                        ResourceProfileIdentifier.PROFILE_CARE_PLAN_NRCES)))
         .toList();
   }
 
