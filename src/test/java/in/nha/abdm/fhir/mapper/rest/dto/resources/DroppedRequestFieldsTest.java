@@ -10,11 +10,14 @@ import in.nha.abdm.fhir.mapper.rest.common.helpers.DateRange;
 import in.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import in.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedEncounter;
 import in.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedObservation;
+import in.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedVaccine;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.CarePlanResource;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.ImmunizationResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.ObservationResource;
 import java.util.List;
 import org.hl7.fhir.r4.model.CarePlan;
 import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Patient;
 import org.junit.jupiter.api.Test;
@@ -81,6 +84,26 @@ class DroppedRequestFieldsTest {
                 patient());
 
     assertEquals("BP below 130/80", carePlan.getGoalFirstRep().getDisplay());
+  }
+
+  @Test
+  void immunizationManufacturerKeepsTheSuppliedNameWithoutAnOrganisation() throws Exception {
+    when(snomedService.getSnomedVaccineCode(anyString()))
+        .thenReturn(SnomedVaccine.builder().code("1119349007").display("Covishield").build());
+
+    Immunization immunization =
+        new MakeImmunizationResource(snomedService)
+            .getImmunization(
+                patient(),
+                List.of(),
+                null,
+                ImmunizationResource.builder()
+                    .date("2025-03-01T10:00:00.000Z")
+                    .vaccineName("Covishield")
+                    .manufacturer("Serum Institute")
+                    .build());
+
+    assertEquals("Serum Institute", immunization.getManufacturer().getDisplay());
   }
 
   @Test
