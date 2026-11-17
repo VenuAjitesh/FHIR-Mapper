@@ -3,8 +3,10 @@ package in.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import in.nha.abdm.fhir.mapper.Utils;
 import in.nha.abdm.fhir.mapper.rest.common.constants.*;
+import in.nha.abdm.fhir.mapper.rest.common.helpers.ObservationUtils;
 import in.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import in.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedObservation;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.ObservationComponentResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.WellnessObservationResource;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +65,7 @@ public class MakeWellnessObservationResource {
     buildSubject(observation, patient);
     buildPerformers(observation, practitionerList);
     buildValue(observation, observationResource);
+    buildComponents(observation, observationResource);
     Utils.setNarrative(observation, "Observation: " + observationResource.getObservation());
 
     return observation;
@@ -150,6 +153,25 @@ public class MakeWellnessObservationResource {
               .setUnit(observationResource.getValueQuantity().getUnit()));
     } else if (observationResource.getResult() != null) {
       observation.setValue(new CodeableConcept().setText(observationResource.getResult()));
+    }
+  }
+
+  private void buildComponents(
+      Observation observation, WellnessObservationResource observationResource) {
+    if (observationResource.getComponents() == null) {
+      return;
+    }
+    for (ObservationComponentResource componentResource : observationResource.getComponents()) {
+      Observation.ObservationComponentComponent component =
+          new Observation.ObservationComponentComponent();
+      component.setCode(
+          ObservationUtils.createCodeableConcept(
+              componentResource.getObservation(),
+              snomedService.getSnomedObservationCode(componentResource.getObservation())));
+      component.setValue(
+          ObservationUtils.createValue(
+              componentResource.getValueQuantity(), componentResource.getResult()));
+      observation.addComponent(component);
     }
   }
 }

@@ -11,6 +11,8 @@ import in.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import in.nha.abdm.fhir.mapper.rest.common.constants.SnomedCodeIdentifier;
 import in.nha.abdm.fhir.mapper.rest.database.h2.services.SnomedService;
 import in.nha.abdm.fhir.mapper.rest.database.h2.tables.SnomedObservation;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.ObservationComponentResource;
+import in.nha.abdm.fhir.mapper.rest.requests.helpers.ValueQuantityResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.WellnessObservationResource;
 import java.util.List;
 import org.hl7.fhir.r4.model.Coding;
@@ -61,6 +63,28 @@ class MakeWellnessObservationResourceTest {
     assertEquals(SnomedCodeIdentifier.SNOMED_UNKNOWN, codings.get(0).getCode());
   }
 
+  @Test
+  void componentsReachTheObservation() {
+    unknownSnomedLookup();
+
+    Observation observation =
+        vitalSign(
+            WellnessObservationResource.builder()
+                .observation("Blood Pressure")
+                .components(
+                    List.of(
+                        ObservationComponentResource.builder()
+                            .observation("Systolic Blood Pressure")
+                            .valueQuantity(
+                                ValueQuantityResource.builder().unit("mmHg").value(120).build())
+                            .build()))
+                .build());
+
+    assertEquals(1, observation.getComponent().size());
+    assertEquals("Systolic Blood Pressure", observation.getComponentFirstRep().getCode().getText());
+    assertEquals(120, observation.getComponentFirstRep().getValueQuantity().getValue().intValue());
+  }
+
   private void unknownSnomedLookup() {
     when(snomedService.getSnomedObservationCode(anyString()))
         .thenAnswer(
@@ -83,5 +107,19 @@ class MakeWellnessObservationResourceTest {
         BundleFieldIdentifier.WOMAN_HEALTH,
         "2026-09-10T10:00:00.000Z",
         profile);
+  }
+
+  private Observation vitalSign(WellnessObservationResource resource) {
+    Patient patient = new Patient();
+    patient.setId("patient-1");
+    patient.addName(new HumanName().setText("Test Patient"));
+
+    return makeWellnessObservationResource.getObservation(
+        patient,
+        List.of(),
+        resource,
+        BundleFieldIdentifier.VITAL_SIGNS,
+        "2026-08-13T10:30:00.000Z",
+        ResourceProfileIdentifier.PROFILE_VITAL_SIGNS);
   }
 }
