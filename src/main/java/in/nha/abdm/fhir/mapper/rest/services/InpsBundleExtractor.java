@@ -391,6 +391,7 @@ public class InpsBundleExtractor extends FhirExtractionSupport {
               .observation(conceptText(observation.getCode()))
               .result(valueText(observation.getValue()))
               .valueQuantity(valueQuantity(observation.getValue()))
+              .components(observation.hasComponent() ? components(observation) : null)
               .build());
     }
     return observations;
