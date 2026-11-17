@@ -94,12 +94,20 @@ public class MakeObservationResource {
       return;
     }
     CodeableConcept concept = new CodeableConcept().setText(interpretation);
-    String code = INTERPRETATION_CODES.get(interpretation.trim().toLowerCase(Locale.ROOT));
+    String code = interpretationCode(interpretation.trim());
     if (code != null) {
       concept.addCoding(
           new Coding().setSystem(BundleUrlIdentifier.OBSERVATION_INTERPRETATION_URL).setCode(code));
     }
     observation.addInterpretation(concept);
+  }
+
+  private String interpretationCode(String interpretation) {
+    String upperCased = interpretation.toUpperCase(Locale.ROOT);
+    if (INTERPRETATION_CODES.containsValue(upperCased)) {
+      return upperCased;
+    }
+    return INTERPRETATION_CODES.get(interpretation.toLowerCase(Locale.ROOT));
   }
 
   private void buildCategory(Observation observation, String profile) {
