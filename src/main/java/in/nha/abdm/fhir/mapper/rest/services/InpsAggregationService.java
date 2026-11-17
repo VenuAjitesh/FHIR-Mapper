@@ -243,6 +243,7 @@ public class InpsAggregationService {
         PrescriptionResource prescription, String effectiveStart) {
       return MedicationStatementResource.builder()
           .medicine(prescription.getMedicine())
+          .medicineCode(prescription.getMedicineCode())
           .status(statementStatus(prescription.getStatus()))
           .effectiveStart(effectiveStart)
           .dosageText(dosageText(prescription))

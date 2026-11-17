@@ -58,6 +58,7 @@ public class PrescriptionBundleExtractor extends FhirExtractionSupport {
                 medicationRequest.hasMedicationCodeableConcept()
                     ? conceptText(medicationRequest.getMedicationCodeableConcept())
                     : extractMedicationReferenceDisplay(medicationRequest))
+            .medicineCode(snomedCode(medicationRequest.getMedicationCodeableConcept()))
             .status(medicationRequest.hasStatus() ? medicationRequest.getStatus().toCode() : null)
             .note(
                 medicationRequest.hasNote() ? medicationRequest.getNoteFirstRep().getText() : null);

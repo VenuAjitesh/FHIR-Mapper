@@ -21,6 +21,11 @@ public class PrescriptionResource {
   @NotBlank(message = ValidationConstants.MEDICINE_NAME_MANDATORY_MSG)
   private String medicine;
 
+  @Pattern(
+      regexp = ValidationConstants.SNOMED_CODE_PATTERN,
+      message = ValidationConstants.MEDICINE_CODE_MESSAGE)
+  private String medicineCode;
+
   @Schema(description = SwaggerConstants.DOSAGE_DESC, example = SwaggerConstants.DOSAGE_EXAMPLE)
   @NotBlank(message = ValidationConstants.DOSAGE_INSTRUCTIONS_MANDATORY)
   private String dosage;

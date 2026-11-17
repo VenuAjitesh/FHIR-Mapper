@@ -71,15 +71,20 @@ public class MakeMedicationRequestResource {
 
   private void mapMedicationDetails(
       MedicationRequest medicationRequest, PrescriptionResource resource) {
-    SnomedMedicine snomedMedicine = snomedService.getSnomedMedicineCode(resource.getMedicine());
     medicationRequest.setMedication(
-        new CodeableConcept()
-            .setText(resource.getMedicine())
-            .addCoding(
-                new Coding(
-                    BundleUrlIdentifier.SNOMED_URL,
-                    snomedMedicine.getCode(),
-                    snomedMedicine.getDisplay())));
+        new CodeableConcept().setText(resource.getMedicine()).addCoding(medicineCoding(resource)));
+  }
+
+  private Coding medicineCoding(PrescriptionResource resource) {
+    if (resource.getMedicineCode() != null && !resource.getMedicineCode().isBlank()) {
+      return new Coding(
+          BundleUrlIdentifier.SNOMED_URL,
+          resource.getMedicineCode().trim(),
+          resource.getMedicine());
+    }
+    SnomedMedicine snomedMedicine = snomedService.getSnomedMedicineCode(resource.getMedicine());
+    return new Coding(
+        BundleUrlIdentifier.SNOMED_URL, snomedMedicine.getCode(), snomedMedicine.getDisplay());
   }
 
   private void mapDosageInstruction(

@@ -107,6 +107,9 @@ public class ValidationConstants {
   public static final String GENDER_MESSAGE = "gender must be male, female, other, unknown";
   public static final String INTENT_PATTERN = "^(proposal|plan|order|option)$";
   public static final String PROCEDURE_STATUS_PATTERN = "COMPLETED|INPROGRESS";
+  public static final String SNOMED_CODE_PATTERN = "^\\d{6,18}$";
+  public static final String MEDICINE_CODE_MESSAGE =
+      "medicineCode must be a SNOMED CT code of 6 to 18 digits";
   public static final String MEDICATION_REQUEST_STATUS_PATTERN =
       "active|on-hold|cancelled|completed|entered-in-error|stopped|draft|unknown";
   public static final String MEDICATION_REQUEST_STATUS_MESSAGE =

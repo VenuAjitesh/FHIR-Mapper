@@ -66,6 +66,7 @@ class InpsAggregationServiceTest {
                 List.of(
                     PrescriptionResource.builder()
                         .medicine("Paracetamol")
+                        .medicineCode("322236009")
                         .status("completed")
                         .dosage("1-0-1")
                         .doseQuantity(1)
@@ -116,6 +117,8 @@ class InpsAggregationServiceTest {
             + " Take them after food; note: Continue for a full month",
         merged.getMedications().get(1).getDosageText());
     assertNull(merged.getMedications().get(0).getDosageText());
+    assertEquals("322236009", merged.getMedications().get(1).getMedicineCode());
+    assertNull(merged.getMedications().get(0).getMedicineCode());
     assertEquals("Amlodipine 5mg", merged.getMedications().get(0).getMedicine());
     assertEquals("active", merged.getMedications().get(0).getStatus());
     assertEquals(1, merged.getImmunizations().size());

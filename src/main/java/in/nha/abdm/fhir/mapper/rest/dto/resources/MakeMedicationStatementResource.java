@@ -2,6 +2,7 @@
 package in.nha.abdm.fhir.mapper.rest.dto.resources;
 
 import in.nha.abdm.fhir.mapper.Utils;
+import in.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
 import in.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
 import in.nha.abdm.fhir.mapper.rest.exceptions.ExceptionHandler;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.MedicationStatementResource;
@@ -23,7 +24,7 @@ public class MakeMedicationStatementResource {
     medicationStatement.setId(UUID.randomUUID().toString());
     medicationStatement.setMeta(createMeta());
     setStatus(medicationStatement, resource.getStatus());
-    medicationStatement.setMedication(new CodeableConcept().setText(resource.getMedicine()));
+    medicationStatement.setMedication(medicine(resource));
     medicationStatement.setSubject(createSubject(patient));
     setEffective(medicationStatement, resource.getEffectiveStart());
     setDateAsserted(medicationStatement, resource.getDateAsserted());
@@ -37,6 +38,18 @@ public class MakeMedicationStatementResource {
     return new Meta()
         .setLastUpdatedElement(Utils.getCurrentTimeStamp())
         .addProfile(ResourceProfileIdentifier.PROFILE_IN_PS_MEDICATION_STATEMENT);
+  }
+
+  private CodeableConcept medicine(MedicationStatementResource resource) {
+    CodeableConcept medicine = new CodeableConcept().setText(resource.getMedicine());
+    if (StringUtils.isNotBlank(resource.getMedicineCode())) {
+      medicine.addCoding(
+          new Coding(
+              BundleUrlIdentifier.SNOMED_URL,
+              resource.getMedicineCode().trim(),
+              resource.getMedicine()));
+    }
+    return medicine;
   }
 
   private Reference createSubject(Patient patient) {
