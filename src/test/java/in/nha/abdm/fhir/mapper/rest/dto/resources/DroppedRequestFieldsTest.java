@@ -132,6 +132,26 @@ class DroppedRequestFieldsTest {
   }
 
   @Test
+  void interpretationSuppliedAsACodeIsCoded() throws Exception {
+    when(snomedService.getSnomedObservationCode(anyString()))
+        .thenReturn(SnomedObservation.builder().code("718-7").display("Haemoglobin").build());
+
+    Observation observation =
+        new MakeObservationResource(snomedService)
+            .getObservation(
+                patient(),
+                List.of(),
+                ObservationResource.builder()
+                    .observation("Haemoglobin")
+                    .interpretation("h")
+                    .build(),
+                "2026-09-10T10:00:00.000Z");
+
+    assertEquals("h", observation.getInterpretationFirstRep().getText());
+    assertEquals("H", observation.getInterpretationFirstRep().getCodingFirstRep().getCode());
+  }
+
+  @Test
   void unrecognisedInterpretationStaysTextOnly() throws Exception {
     when(snomedService.getSnomedObservationCode(anyString()))
         .thenReturn(SnomedObservation.builder().code("718-7").display("Haemoglobin").build());
