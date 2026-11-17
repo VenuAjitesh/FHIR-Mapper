@@ -29,6 +29,7 @@ import in.nha.abdm.fhir.mapper.rest.requests.helpers.PrescriptionResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.ProcedureResource;
 import in.nha.abdm.fhir.mapper.rest.requests.helpers.WellnessObservationResource;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -244,9 +245,40 @@ public class InpsAggregationService {
           .medicine(prescription.getMedicine())
           .status(statementStatus(prescription.getStatus()))
           .effectiveStart(effectiveStart)
-          .dosageText(prescription.getDosage())
+          .dosageText(dosageText(prescription))
           .reasonCode(prescription.getReason())
           .build();
+    }
+
+    private String dosageText(PrescriptionResource prescription) {
+      List<String> parts = new ArrayList<>();
+      addPart(parts, "", prescription.getDosage());
+      addPart(parts, "dose ", doseText(prescription));
+      addPart(parts, "form ", prescription.getForm());
+      addPart(parts, "route ", prescription.getRoute());
+      addPart(parts, "method ", prescription.getMethod());
+      addPart(parts, "timing ", prescription.getTiming());
+      addPart(parts, "duration ", prescription.getDuration());
+      addPart(parts, "", prescription.getAdditionalInstructions());
+      addPart(parts, "note: ", prescription.getNote());
+      return parts.isEmpty() ? null : String.join("; ", parts);
+    }
+
+    private void addPart(List<String> parts, String label, String value) {
+      if (StringUtils.isNotBlank(value)) {
+        parts.add(label + value.trim());
+      }
+    }
+
+    private String doseText(PrescriptionResource prescription) {
+      if (prescription.getDoseQuantity() <= 0) {
+        return null;
+      }
+      String quantity =
+          BigDecimal.valueOf(prescription.getDoseQuantity()).stripTrailingZeros().toPlainString();
+      return StringUtils.isBlank(prescription.getDoseUnit())
+          ? quantity
+          : quantity + " " + prescription.getDoseUnit().trim();
     }
 
     private String statementStatus(String requestStatus) {

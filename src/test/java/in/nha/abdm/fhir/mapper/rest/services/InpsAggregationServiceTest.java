@@ -2,6 +2,7 @@
 package in.nha.abdm.fhir.mapper.rest.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -66,6 +67,15 @@ class InpsAggregationServiceTest {
                     PrescriptionResource.builder()
                         .medicine("Paracetamol")
                         .status("completed")
+                        .dosage("1-0-1")
+                        .doseQuantity(1)
+                        .doseUnit("tablet")
+                        .route("Oral")
+                        .method("swallow")
+                        .timing("1-1-D")
+                        .duration("30")
+                        .additionalInstructions("Take them after food")
+                        .note("Continue for a full month")
                         .build(),
                     PrescriptionResource.builder()
                         .medicine("Ibuprofen")
@@ -101,6 +111,11 @@ class InpsAggregationServiceTest {
     assertEquals(3, merged.getMedications().size());
     assertEquals("completed", merged.getMedications().get(1).getStatus());
     assertEquals("not-taken", merged.getMedications().get(2).getStatus());
+    assertEquals(
+        "1-0-1; dose 1 tablet; route Oral; method swallow; timing 1-1-D; duration 30;"
+            + " Take them after food; note: Continue for a full month",
+        merged.getMedications().get(1).getDosageText());
+    assertNull(merged.getMedications().get(0).getDosageText());
     assertEquals("Amlodipine 5mg", merged.getMedications().get(0).getMedicine());
     assertEquals("active", merged.getMedications().get(0).getStatus());
     assertEquals(1, merged.getImmunizations().size());
