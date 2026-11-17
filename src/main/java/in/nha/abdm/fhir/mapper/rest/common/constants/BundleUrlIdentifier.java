@@ -10,6 +10,8 @@ public class BundleUrlIdentifier {
   public static final String SNOMED_URL = "http://snomed.info/sct";
   public static final String LOINC_URL = "http://loinc.org";
   public static final String ICD11_URL = "http://id.who.int/icd/release/11/mms";
+  public static final String LIST_EMPTY_REASON_URL =
+      "http://terminology.hl7.org/CodeSystem/list-empty-reason";
   public static final String OBSERVATION_INTERPRETATION_URL =
       "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation";
   public static final String NAMASTE_URL = "https://namaste.ayush.gov.in";
