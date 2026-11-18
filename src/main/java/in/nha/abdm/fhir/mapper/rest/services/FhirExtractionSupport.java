@@ -2,7 +2,9 @@
 package in.nha.abdm.fhir.mapper.rest.services;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import in.nha.abdm.fhir.mapper.rest.common.constants.BundleUrlIdentifier;
 import in.nha.abdm.fhir.mapper.rest.common.constants.ResourceProfileIdentifier;
+import in.nha.abdm.fhir.mapper.rest.common.constants.SnomedCodeIdentifier;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.DateRange;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.DocumentResource;
 import in.nha.abdm.fhir.mapper.rest.common.helpers.OrganisationResource;
@@ -22,6 +24,7 @@ import java.util.List;
 import org.hl7.fhir.r4.model.Attachment;
 import org.hl7.fhir.r4.model.BaseDateTimeType;
 import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DiagnosticReport;
 import org.hl7.fhir.r4.model.DocumentReference;
 import org.hl7.fhir.r4.model.Encounter;
@@ -203,6 +206,20 @@ class FhirExtractionSupport {
 
   String firstCodingCode(CodeableConcept concept) {
     return concept != null && concept.hasCoding() ? concept.getCodingFirstRep().getCode() : null;
+  }
+
+  String snomedCode(CodeableConcept concept) {
+    if (concept == null) {
+      return null;
+    }
+    for (Coding coding : concept.getCoding()) {
+      if (BundleUrlIdentifier.SNOMED_URL.equals(coding.getSystem())
+          && coding.hasCode()
+          && !SnomedCodeIdentifier.SNOMED_UNKNOWN.equals(coding.getCode())) {
+        return coding.getCode();
+      }
+    }
+    return null;
   }
 
   String referenceDisplay(Reference reference) {
